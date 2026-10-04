@@ -184,6 +184,25 @@ body::after{
 .type-opt .tt{font-size:13.5px;font-weight:600}
 .type-opt .td{font-size:11.5px;color:var(--muted);margin-top:2px}
 
+/* Frequency selector */
+.freq-toggle{display:flex;flex-direction:column;gap:8px}
+.freq-opt{text-align:left;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--ink);font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;transition:.15s}
+.freq-opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.wd-picker{display:flex;gap:7px;flex-wrap:wrap}
+.wd-opt{width:42px;height:42px;border:1.5px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
+.wd-opt.sel{border-color:var(--accent);background:var(--accent);color:#fff}
+.manual-list{display:flex;flex-wrap:wrap;gap:7px;min-height:4px}
+.manual-chip{display:inline-flex;align-items:center;gap:7px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-ring);border-radius:99px;padding:5px 7px 5px 12px;font-size:12.5px;font-weight:500}
+.manual-chip button{border:none;background:rgba(0,0,0,.08);color:inherit;width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center}
+
+/* Stage edit */
+.day-edit{border:none;background:transparent;cursor:pointer;font-size:15px;opacity:.5;padding:4px;flex-shrink:0;transition:.15s}
+.day-edit:active{transform:scale(.9)}
+.stage-edit{display:none;flex-direction:column;gap:8px;margin:10px 0 2px 39px}
+.stage-edit.open{display:flex}
+.stage-edit input{padding:10px 12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;font-size:14px;font-family:inherit}
+.stage-edit input:focus{outline:2px solid var(--accent-ring);outline-offset:-1px}
+
 .emoji-picker{display:flex;gap:8px;flex-wrap:wrap}
 .emoji-opt{width:44px;height:44px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
 .emoji-opt.sel{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.05)}

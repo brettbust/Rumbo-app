@@ -39,6 +39,9 @@ let data = { goals: [], settings:{ theme:'light', notif:false } };
 let currentGoalId = null;
 let draftType = 'days';
 let draftEmoji = '🎯';
+let draftFreq = 'daily';           // 'daily' | 'weekly' | 'manual'
+let draftWeekdays = [];            // 0=Dom ... 6=Sáb
+let draftManualDates = [];         // ISO strings
 
 /* ---------- storage ---------- */
 function load(){
@@ -62,6 +65,23 @@ function fmtDateShort(iso){
   return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
 }
 function addDays(iso,n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function weekdayOf(iso){ return new Date(iso+'T00:00:00').getDay(); }
+// Generate an array of ISO dates given frequency settings
+function genDates(start,count,freq,weekdays){
+  const out=[];
+  if(freq==='weekly' && weekdays && weekdays.length){
+    let cursor=start, guard=0;
+    while(out.length<count && guard<4000){
+      if(weekdays.includes(weekdayOf(cursor))) out.push(cursor);
+      cursor=addDays(cursor,1); guard++;
+    }
+  } else { // daily
+    for(let i=0;i<count;i++) out.push(addDays(start,i));
+  }
+  return out;
+}
+const WD_LABELS=['D','L','M','X','J','V','S'];
+const WD_FULL=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function goalProgress(g){
@@ -180,6 +200,16 @@ function renderDetail(){
         <div class="day-top">
           <button class="check ${d.done?'on':''}" onclick="toggleDay(${i})" aria-label="Marcar">${d.done?'✓':''}</button>
           <div class="day-info"><div class="dtitle">${esc(d.label||('Día '+(i+1)))}</div><div class="ddate">${d.date?fmtDate(d.date):''}</div></div>
+          <button class="day-edit" onclick="editStage(${i})" aria-label="Editar etapa">✏️</button>
+        </div>
+        <div class="stage-edit" id="se-${i}">
+          <input type="text" id="sl-${i}" maxlength="80" placeholder="Nombre de la etapa" value="${esc(d.label||('Día '+(i+1)))}">
+          <input type="date" id="sd-${i}" value="${d.date||''}">
+          <div class="note-actions">
+            <button class="btn sm primary" onclick="saveStage(${i})">Guardar</button>
+            <button class="btn sm ghost" onclick="cancelStage(${i})">Cancelar</button>
+            <button class="btn sm danger ghost" onclick="deleteStage(${i})">Borrar etapa</button>
+          </div>
         </div>
         <button class="note-btn" onclick="toggleNote(${i})">${d.note?'📝 Ver nota':'💬 Añadir nota'}</button>
         <div class="note-view ${d.note?'open':''}" id="nv-${i}">
@@ -195,6 +225,7 @@ function renderDetail(){
         </div>
       </div>`;
     });
+    html+=`<button class="btn ghost block" style="margin-top:4px" onclick="addStage()">+ Añadir etapa</button>`;
   }
   html+=`<div class="btn-row" style="margin-top:20px"><button class="btn ghost" onclick="openEdit('${g.id}')">✏️ Editar meta</button><button class="btn danger ghost" onclick="deleteGoal('${g.id}')">🗑️ Eliminar</button></div>`;
   el.innerHTML=html;
@@ -209,6 +240,36 @@ function toggleDay(i){
   const p=goalProgress(g);
   renderDetail();
   if(g.days[i].done){ flashMotiv(p); }
+}
+function editStage(i){
+  document.querySelectorAll('.stage-edit').forEach(e=>e.classList.remove('open'));
+  document.getElementById('se-'+i).classList.add('open');
+}
+function cancelStage(i){ document.getElementById('se-'+i).classList.remove('open'); }
+function saveStage(i){
+  const g=data.goals.find(x=>x.id===currentGoalId);
+  const label=document.getElementById('sl-'+i).value.trim();
+  const date=document.getElementById('sd-'+i).value;
+  g.days[i].label = label || ('Día '+(i+1));
+  g.days[i].date = date || g.days[i].date;
+  // keep order by date
+  g.days.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  save(); renderDetail(); toast('Etapa actualizada');
+}
+function deleteStage(i){
+  const g=data.goals.find(x=>x.id===currentGoalId);
+  if(g.days.length<=1){ toast('Una meta necesita al menos una etapa.'); return; }
+  confirmSheet('Borrar etapa','Se eliminará esta etapa con su nota. ¿Continuar?','Eliminar',()=>{
+    g.days.splice(i,1); save(); renderDetail();
+  });
+}
+function addStage(){
+  const g=data.goals.find(x=>x.id===currentGoalId);
+  const last=g.days[g.days.length-1];
+  const nextDate = last&&last.date ? addDays(last.date,1) : todayISO();
+  g.days.push({label:'Día '+(g.days.length+1),date:nextDate,done:false});
+  save(); renderDetail();
+  toast('Etapa añadida. Pulsa el lápiz para nombrarla.');
 }
 function flashMotiv(p){
   const box=document.getElementById('motivBox');
@@ -280,6 +341,9 @@ function openEdit(id){
   let g = editing ? data.goals.find(x=>x.id===id) : null;
   draftType = g ? g.type : 'days';
   draftEmoji = g ? (g.emoji||'🎯') : '🎯';
+  draftFreq = g && g.freq ? g.freq : 'daily';
+  draftWeekdays = g && g.weekdays ? g.weekdays.slice() : [];
+  draftManualDates = g && g.type==='days' && g.freq==='manual' ? g.days.map(d=>d.date) : [];
   const sheet=document.getElementById('editSheet');
   sheet.innerHTML=`
     <div class="sheet-grip"></div>
@@ -302,9 +366,6 @@ function openEdit(id){
 
     <div id="typeFields"></div>
 
-    <div class="field"><label>Fecha de inicio</label>
-      <input id="fStart" type="date" value="${g?g.startDate||todayISO():todayISO()}"></div>
-
     <button class="btn primary block" onclick="commitGoal(${editing?`'${id}'`:'null'})">${editing?'Guardar cambios':'Crear meta'}</button>
     <div style="height:8px"></div>
     <button class="btn ghost block" onclick="closeEdit()">Cancelar</button>
@@ -323,45 +384,130 @@ function renderTypeFields(g){
   const el=document.getElementById('typeFields');
   if(draftType==='days'){
     const n = g&&g.type==='days' ? g.days.length : 30;
-    el.innerHTML=`<div class="field"><label>¿Cuántos días o etapas?</label>
-      <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n}">
-      <div class="hint">Se generará una casilla por cada día, empezando en la fecha de inicio. Podrás marcarlas a tu ritmo.</div></div>`;
+    const start = g&&g.startDate ? g.startDate : todayISO();
+    el.innerHTML=`
+      <div class="field"><label>¿Con qué frecuencia?</label>
+        <div class="freq-toggle">
+          <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">📆 Días seguidos</button>
+          <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">🗓️ Días de la semana</button>
+          <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">✍️ Fechas manuales</button>
+        </div>
+      </div>
+      <div id="freqFields"></div>`;
+    renderFreqFields(g,start,n);
   } else {
     const tgt = g&&g.type==='number' ? g.target : '';
     const unit = g&&g.type==='number' ? esc(g.unit||'') : '';
     el.innerHTML=`<div class="field"><label>Meta a alcanzar (número)</label>
       <input id="fTarget" type="number" min="1" inputmode="decimal" placeholder="Ej: 100" value="${tgt}"></div>
       <div class="field"><label>Unidad (opcional)</label>
-      <input id="fUnit" type="text" maxlength="20" placeholder="páginas, km, €, sesiones…" value="${unit}"></div>`;
+      <input id="fUnit" type="text" maxlength="20" placeholder="páginas, km, €, sesiones…" value="${unit}"></div>
+      <div class="field"><label>Fecha de inicio</label>
+      <input id="fStart" type="date" value="${g&&g.startDate?g.startDate:todayISO()}"></div>`;
   }
+}
+function pickFreq(f){
+  draftFreq=f;
+  document.querySelectorAll('.freq-opt').forEach(b=>b.classList.remove('sel'));
+  document.querySelectorAll('.freq-opt')[f==='daily'?0:f==='weekly'?1:2].classList.add('sel');
+  renderFreqFields(null, document.getElementById('fStart')?.value||todayISO(), parseInt(document.getElementById('fCount')?.value)||30);
+}
+function renderFreqFields(g,start,n){
+  const el=document.getElementById('freqFields');
+  if(draftFreq==='manual'){
+    if(draftManualDates.length===0 && g && g.type==='days' && g.freq==='manual'){ draftManualDates=g.days.map(d=>d.date); }
+    el.innerHTML=`
+      <div class="field"><label>Tus fechas (${draftManualDates.length})</label>
+        <div class="manual-list" id="manualList">${renderManualList()}</div>
+        <div class="num-add" style="margin-top:8px">
+          <input type="date" id="manualPick" value="${todayISO()}">
+          <button type="button" class="btn primary" onclick="addManualDate()">Añadir</button>
+        </div>
+        <div class="hint">Añade cada fecha en la que quieras una etapa. Podrás ponerles nombre después.</div>
+      </div>`;
+  } else if(draftFreq==='weekly'){
+    el.innerHTML=`
+      <div class="field"><label>¿Qué días de la semana?</label>
+        <div class="wd-picker">${[1,2,3,4,5,6,0].map(i=>`<button type="button" class="wd-opt${draftWeekdays.includes(i)?' sel':''}" onclick="toggleWd(${i})" aria-label="${WD_FULL[i]}">${WD_LABELS[i]}</button>`).join('')}</div>
+        <div class="hint">Las fechas se generarán en estos días, empezando desde la fecha de inicio.</div>
+      </div>
+      <div class="field"><label>¿Cuántas etapas en total?</label>
+        <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n||30}"></div>
+      <div class="field"><label>Fecha de inicio</label>
+        <input id="fStart" type="date" value="${start}"></div>`;
+  } else { // daily
+    el.innerHTML=`
+      <div class="field"><label>¿Cuántos días o etapas?</label>
+        <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n||30}">
+        <div class="hint">Una etapa por día consecutivo desde la fecha de inicio.</div></div>
+      <div class="field"><label>Fecha de inicio</label>
+        <input id="fStart" type="date" value="${start}"></div>`;
+  }
+}
+function renderManualList(){
+  if(draftManualDates.length===0) return `<div class="hint" style="margin:0">Aún no has añadido fechas.</div>`;
+  const sorted=draftManualDates.slice().sort();
+  return sorted.map((d,i)=>`<div class="manual-chip">${fmtDate(d)}<button type="button" onclick="removeManualDate('${d}')" aria-label="Quitar">✕</button></div>`).join('');
+}
+function addManualDate(){
+  const v=document.getElementById('manualPick').value;
+  if(!v) return;
+  if(!draftManualDates.includes(v)) draftManualDates.push(v);
+  document.getElementById('manualList').innerHTML=renderManualList();
+  document.querySelector('#freqFields .field label').textContent='Tus fechas ('+draftManualDates.length+')';
+}
+function removeManualDate(d){
+  draftManualDates=draftManualDates.filter(x=>x!==d);
+  document.getElementById('manualList').innerHTML=renderManualList();
+  document.querySelector('#freqFields .field label').textContent='Tus fechas ('+draftManualDates.length+')';
+}
+function toggleWd(i){
+  if(draftWeekdays.includes(i)) draftWeekdays=draftWeekdays.filter(x=>x!==i);
+  else draftWeekdays.push(i);
+  document.querySelectorAll('.wd-opt')[[1,2,3,4,5,6,0].indexOf(i)].classList.toggle('sel');
 }
 function commitGoal(id){
   const title=document.getElementById('fTitle').value.trim();
   if(!title){ toast('Ponle un nombre a tu meta.'); return; }
-  const start=document.getElementById('fStart').value||todayISO();
   if(draftType==='days'){
-    let count=parseInt(document.getElementById('fCount').value);
-    if(isNaN(count)||count<1){ toast('Indica cuántos días.'); return; }
-    count=Math.min(count,366);
+    // Build the list of dates according to frequency
+    let dates=[];
+    let start=todayISO();
+    if(draftFreq==='manual'){
+      if(draftManualDates.length===0){ toast('Añade al menos una fecha.'); return; }
+      dates=draftManualDates.slice().sort();
+      start=dates[0];
+    } else {
+      start=document.getElementById('fStart').value||todayISO();
+      let count=parseInt(document.getElementById('fCount').value);
+      if(isNaN(count)||count<1){ toast('Indica cuántas etapas.'); return; }
+      count=Math.min(count,366);
+      if(draftFreq==='weekly'){
+        if(draftWeekdays.length===0){ toast('Elige al menos un día de la semana.'); return; }
+        dates=genDates(start,count,'weekly',draftWeekdays);
+      } else {
+        dates=genDates(start,count,'daily');
+      }
+    }
+    const endDate=dates[dates.length-1];
     if(id){
       const g=data.goals.find(x=>x.id===id);
-      g.title=title; g.emoji=draftEmoji; g.startDate=start;
-      if(g.type!=='days'){ g.type='days'; g.days=[]; }
-      // resize days preserving existing
-      const old=g.days;
-      g.days=[];
-      for(let i=0;i<count;i++){
-        g.days.push(old[i] || {label:'Día '+(i+1), date:addDays(start,i), done:false});
-        g.days[i].date=addDays(start,i);
-        g.days[i].label = g.days[i].label||('Día '+(i+1));
-      }
-      g.endDate=addDays(start,count-1);
+      g.title=title; g.emoji=draftEmoji; g.startDate=start; g.freq=draftFreq; g.weekdays=draftWeekdays.slice();
+      const old = g.type==='days' ? g.days : [];
+      g.type='days';
+      g.days=dates.map((d,i)=>{
+        const prev=old[i];
+        return {label: prev&&prev.label ? prev.label : ('Día '+(i+1)),
+                date:d, done: prev?prev.done:false,
+                note: prev?prev.note:undefined, noteDate: prev?prev.noteDate:undefined};
+      });
+      g.endDate=endDate;
     } else {
-      const days=[];
-      for(let i=0;i<count;i++) days.push({label:'Día '+(i+1),date:addDays(start,i),done:false});
-      data.goals.push({id:uid(),title,emoji:draftEmoji,type:'days',startDate:start,endDate:addDays(start,count-1),days});
+      const days=dates.map((d,i)=>({label:'Día '+(i+1),date:d,done:false}));
+      data.goals.push({id:uid(),title,emoji:draftEmoji,type:'days',freq:draftFreq,weekdays:draftWeekdays.slice(),startDate:start,endDate,days});
     }
   } else {
+    const start=document.getElementById('fStart').value||todayISO();
     const target=parseFloat(document.getElementById('fTarget').value);
     if(isNaN(target)||target<=0){ toast('Indica el número a alcanzar.'); return; }
     const unit=document.getElementById('fUnit').value.trim();
