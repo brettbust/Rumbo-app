@@ -55,19 +55,22 @@ function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }cat
 
 /* ---------- helpers ---------- */
 function uid(){ return 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
-function todayISO(){ return new Date().toISOString().slice(0,10); }
+function pad2(n){ return (n<10?'0':'')+n; }
+// Build a LOCAL date object from an ISO yyyy-mm-dd string (no UTC conversion)
+function parseISO(iso){ const [y,m,d]=iso.split('-').map(Number); return new Date(y,m-1,d); }
+// Convert a local Date to yyyy-mm-dd (no UTC conversion)
+function toISO(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function todayISO(){ return toISO(new Date()); }
 function fmtDate(iso){
   if(!iso) return '';
-  const d=new Date(iso+'T00:00:00');
-  return d.toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
+  return parseISO(iso).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
 }
 function fmtDateShort(iso){
   if(!iso) return '';
-  const d=new Date(iso+'T00:00:00');
-  return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+  return parseISO(iso).toLocaleDateString('es-ES',{day:'numeric',month:'short'});
 }
-function addDays(iso,n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
-function weekdayOf(iso){ return new Date(iso+'T00:00:00').getDay(); }
+function addDays(iso,n){ const d=parseISO(iso); d.setDate(d.getDate()+n); return toISO(d); }
+function weekdayOf(iso){ return parseISO(iso).getDay(); }
 // Generate an array of ISO dates given frequency settings
 function genDates(start,count,freq,weekdays){
   const out=[];
