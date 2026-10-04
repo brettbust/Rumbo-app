@@ -42,6 +42,8 @@ let draftEmoji = '🎯';
 let draftFreq = 'daily';           // 'daily' | 'weekly' | 'manual'
 let draftWeekdays = [];            // 0=Dom ... 6=Sáb
 let draftManualDates = [];         // ISO strings
+let draftStart = '';               // fecha de inicio en edición
+let draftCount = 30;               // cantidad de etapas en edición
 
 /* ---------- storage ---------- */
 function load(){
@@ -344,6 +346,8 @@ function openEdit(id){
   draftFreq = g && g.freq ? g.freq : 'daily';
   draftWeekdays = g && g.weekdays ? g.weekdays.slice() : [];
   draftManualDates = g && g.type==='days' && g.freq==='manual' ? g.days.map(d=>d.date) : [];
+  draftStart = g && g.startDate ? g.startDate : todayISO();
+  draftCount = g && g.type==='days' ? g.days.length : 30;
   const sheet=document.getElementById('editSheet');
   sheet.innerHTML=`
     <div class="sheet-grip"></div>
@@ -407,38 +411,45 @@ function renderTypeFields(g){
   }
 }
 function pickFreq(f){
+  // preserve whatever the user already typed before redrawing
+  const curStart=document.getElementById('fStart')?.value;
+  const curCount=parseInt(document.getElementById('fCount')?.value);
+  if(curStart) draftStart=curStart;
+  if(!isNaN(curCount)) draftCount=curCount;
   draftFreq=f;
   document.querySelectorAll('.freq-opt').forEach(b=>b.classList.remove('sel'));
   document.querySelectorAll('.freq-opt')[f==='daily'?0:f==='weekly'?1:2].classList.add('sel');
-  renderFreqFields(null, document.getElementById('fStart')?.value||todayISO(), parseInt(document.getElementById('fCount')?.value)||30);
+  renderFreqFields(null, draftStart||todayISO(), draftCount||30);
 }
 function renderFreqFields(g,start,n){
   const el=document.getElementById('freqFields');
+  start = start || draftStart || todayISO();
+  n = n || draftCount || 30;
   if(draftFreq==='manual'){
-    if(draftManualDates.length===0 && g && g.type==='days' && g.freq==='manual'){ draftManualDates=g.days.map(d=>d.date); }
     el.innerHTML=`
-      <div class="field"><label>Tus fechas (${draftManualDates.length})</label>
-        <div class="manual-list" id="manualList">${renderManualList()}</div>
-        <div class="num-add" style="margin-top:8px">
+      <div class="field"><label id="manualLbl">Tus fechas (${draftManualDates.length})</label>
+        <div class="num-add" style="margin-bottom:10px">
           <input type="date" id="manualPick" value="${todayISO()}">
-          <button type="button" class="btn primary" onclick="addManualDate()">Añadir</button>
+          <button type="button" class="btn primary" onclick="addManualDate()">Añadir fecha</button>
         </div>
-        <div class="hint">Añade cada fecha en la que quieras una etapa. Podrás ponerles nombre después.</div>
+        <div class="manual-list" id="manualList">${renderManualList()}</div>
+        <div class="hint">Añade una por una las fechas en las que quieras una etapa. El orden se ajusta solo. Luego podrás nombrarlas.</div>
       </div>`;
   } else if(draftFreq==='weekly'){
     el.innerHTML=`
       <div class="field"><label>¿Qué días de la semana?</label>
         <div class="wd-picker">${[1,2,3,4,5,6,0].map(i=>`<button type="button" class="wd-opt${draftWeekdays.includes(i)?' sel':''}" onclick="toggleWd(${i})" aria-label="${WD_FULL[i]}">${WD_LABELS[i]}</button>`).join('')}</div>
-        <div class="hint">Las fechas se generarán en estos días, empezando desde la fecha de inicio.</div>
+        <div class="hint">Elige uno o más días. Las etapas caerán en esos días.</div>
       </div>
       <div class="field"><label>¿Cuántas etapas en total?</label>
-        <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n||30}"></div>
+        <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n}">
+        <div class="hint">Cuántas clases, sesiones o repeticiones quieres en total.</div></div>
       <div class="field"><label>Fecha de inicio</label>
         <input id="fStart" type="date" value="${start}"></div>`;
   } else { // daily
     el.innerHTML=`
-      <div class="field"><label>¿Cuántos días o etapas?</label>
-        <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n||30}">
+      <div class="field"><label>¿Cuántos días seguidos?</label>
+        <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n}">
         <div class="hint">Una etapa por día consecutivo desde la fecha de inicio.</div></div>
       <div class="field"><label>Fecha de inicio</label>
         <input id="fStart" type="date" value="${start}"></div>`;
@@ -447,24 +458,31 @@ function renderFreqFields(g,start,n){
 function renderManualList(){
   if(draftManualDates.length===0) return `<div class="hint" style="margin:0">Aún no has añadido fechas.</div>`;
   const sorted=draftManualDates.slice().sort();
-  return sorted.map((d,i)=>`<div class="manual-chip">${fmtDate(d)}<button type="button" onclick="removeManualDate('${d}')" aria-label="Quitar">✕</button></div>`).join('');
+  return sorted.map(d=>`<div class="manual-chip">${fmtDate(d)}<button type="button" onclick="removeManualDate('${d}')" aria-label="Quitar">✕</button></div>`).join('');
+}
+function refreshManualLbl(){
+  const lbl=document.getElementById('manualLbl');
+  if(lbl) lbl.textContent='Tus fechas ('+draftManualDates.length+')';
 }
 function addManualDate(){
-  const v=document.getElementById('manualPick').value;
-  if(!v) return;
-  if(!draftManualDates.includes(v)) draftManualDates.push(v);
+  const el=document.getElementById('manualPick');
+  const v=el&&el.value;
+  if(!v){ toast('Elige una fecha primero.'); return; }
+  if(draftManualDates.includes(v)){ toast('Esa fecha ya está en la lista.'); return; }
+  draftManualDates.push(v);
   document.getElementById('manualList').innerHTML=renderManualList();
-  document.querySelector('#freqFields .field label').textContent='Tus fechas ('+draftManualDates.length+')';
+  refreshManualLbl();
 }
 function removeManualDate(d){
   draftManualDates=draftManualDates.filter(x=>x!==d);
   document.getElementById('manualList').innerHTML=renderManualList();
-  document.querySelector('#freqFields .field label').textContent='Tus fechas ('+draftManualDates.length+')';
+  refreshManualLbl();
 }
 function toggleWd(i){
   if(draftWeekdays.includes(i)) draftWeekdays=draftWeekdays.filter(x=>x!==i);
   else draftWeekdays.push(i);
-  document.querySelectorAll('.wd-opt')[[1,2,3,4,5,6,0].indexOf(i)].classList.toggle('sel');
+  const pos=[1,2,3,4,5,6,0].indexOf(i);
+  document.querySelectorAll('.wd-opt')[pos].classList.toggle('sel');
 }
 function commitGoal(id){
   const title=document.getElementById('fTitle').value.trim();
@@ -478,8 +496,10 @@ function commitGoal(id){
       dates=draftManualDates.slice().sort();
       start=dates[0];
     } else {
-      start=document.getElementById('fStart').value||todayISO();
-      let count=parseInt(document.getElementById('fCount').value);
+      const startEl=document.getElementById('fStart');
+      const countEl=document.getElementById('fCount');
+      start=(startEl&&startEl.value)||draftStart||todayISO();
+      let count=countEl?parseInt(countEl.value):draftCount;
       if(isNaN(count)||count<1){ toast('Indica cuántas etapas.'); return; }
       count=Math.min(count,366);
       if(draftFreq==='weekly'){
@@ -489,6 +509,7 @@ function commitGoal(id){
         dates=genDates(start,count,'daily');
       }
     }
+    if(dates.length===0){ toast('No se pudieron generar las fechas. Revisa los datos.'); return; }
     const endDate=dates[dates.length-1];
     if(id){
       const g=data.goals.find(x=>x.id===id);
