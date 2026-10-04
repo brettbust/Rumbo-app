@@ -109,8 +109,8 @@ function renderHome(){
     el.innerHTML=`<div class="empty">
       <div class="big">🎯</div>
       <h3>Empieza tu primera meta</h3>
-      <p>Elige algo que quieras lograr, ponle un plazo y marca tu avance cada día.</p>
-      <button class="btn primary" onclick="openEdit()">Crear una meta</button>
+      <p>Elige algo que quieras lograr, ponle un plazo y marca tu avance cada día. Pulsa el botón <b>Nueva meta</b> de abajo para empezar.</p>
+      <div class="empty-arrow">↓</div>
     </div>`;
     return;
   }
