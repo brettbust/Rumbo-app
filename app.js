@@ -139,15 +139,15 @@ function renderHome(){
     </div>`;
     return;
   }
-  // overall
-  let totPct=0;
-  data.goals.forEach(g=>totPct+=goalProgress(g).pct);
-  const avg=Math.round(totPct/data.goals.length);
-  const active=data.goals.filter(g=>goalProgress(g).pct<100).length;
+  // overall: cuántas metas completadas del total (sin promediar porcentajes de metas distintas)
+  const done=data.goals.filter(g=>goalProgress(g).pct>=100).length;
+  const total=data.goals.length;
+  const active=total-done;
+  const ringPct = total>0 ? Math.round(done/total*100) : 0;
   let html=`<div class="hero"><div class="hero-top">
-    <div class="ring-wrap">${ring(avg,88,9)}<div class="ring-label"><b>${avg}%</b><span>en total</span></div></div>
-    <div class="hero-txt"><h2>${data.goals.length} ${data.goals.length===1?'meta':'metas'} en marcha</h2>
-    <p>${active>0?active+(active===1?' activa, ':' activas, '):''}${data.goals.length-active} completada${data.goals.length-active===1?'':'s'}</p></div>
+    <div class="ring-wrap">${ring(ringPct,88,9)}<div class="ring-label"><b>${done}/${total}</b><span>metas</span></div></div>
+    <div class="hero-txt"><h2>${done} de ${total} completada${done===1?'':'s'}</h2>
+    <p>${active>0?('Tienes '+active+(active===1?' meta activa':' metas activas')):'¡Todo completado! 🎉'}</p></div>
   </div></div>`;
   html+=`<div class="section-label">Mis metas</div>`;
   data.goals.forEach(g=>{
