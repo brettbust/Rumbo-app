@@ -1,5 +1,7 @@
 /* ============ RUMBO ============ */
 const STORE_KEY = 'rumbo_v1';
+const WORKER_URL = 'https://soft-silence-4fe6.rumboapp-oficial.workers.dev/';
+let draftImportStages = [];   // etapas extraídas de un archivo importado
 const MOTIV = [
  "Cada paso cuenta, y acabas de dar uno.",
  "La constancia vence al talento. Sigue así.",
@@ -34,6 +36,28 @@ const MOTIV = [
 ];
 const FINISH_MSG = "¡Lo lograste! Completaste tu meta. Date el crédito que mereces. 🎉";
 const EMOJIS = ["🎯","📚","🏃","💪","🧠","💰","🎸","🎨","🧘","🌱","💻","✍️","🍎","💧","⭐","🔥"];
+// Modern line icons (Lucide-style). Usage: icon('name')
+const ICONS = {
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+  edit:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  note:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  calClock:'<path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5.5"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="18" cy="18" r="4"/><path d="M18 16.5V18l1 1"/>',
+  hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+  pen:'<path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'
+};
+function icon(name,size){
+  const s=size||18;
+  return `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+}
 
 let data = { goals: [], settings:{ theme:'light', notif:false } };
 let currentGoalId = null;
@@ -205,7 +229,7 @@ function renderDetail(){
         <div class="day-top">
           <button class="check ${d.done?'on':''}" onclick="toggleDay(${i})" aria-label="Marcar">${d.done?'✓':''}</button>
           <div class="day-info"><div class="dtitle">${esc(d.label||('Día '+(i+1)))}</div><div class="ddate">${d.date?fmtDate(d.date):''}</div></div>
-          <button class="day-edit" onclick="editStage(${i})" aria-label="Editar etapa">✏️</button>
+          <button class="day-edit" onclick="editStage(${i})" aria-label="Editar etapa">${icon('pen',16)}</button>
         </div>
         <div class="stage-edit" id="se-${i}">
           <input type="text" id="sl-${i}" maxlength="80" placeholder="Nombre de la etapa" value="${esc(d.label||('Día '+(i+1)))}">
@@ -216,10 +240,10 @@ function renderDetail(){
             <button class="btn sm danger ghost" onclick="deleteStage(${i})">Borrar etapa</button>
           </div>
         </div>
-        <button class="note-btn" onclick="toggleNote(${i})">${d.note?'📝 Ver nota':'💬 Añadir nota'}</button>
+        <button class="note-btn" onclick="toggleNote(${i})">${icon(d.note?'note':'message',14)} ${d.note?'Ver nota':'Añadir nota'}</button>
         <div class="note-view ${d.note?'open':''}" id="nv-${i}">
           <div class="ntext">${d.note?esc(d.note):''}</div>
-          <div class="nmeta"><span>🗓️ ${d.noteDate?'Guardada: '+d.noteDate:''}</span>
+          <div class="nmeta"><span>${icon('calendar',13)} ${d.noteDate?'Guardada: '+d.noteDate:''}</span>
             <button class="btn sm ghost" onclick="editNote(${i})">Editar</button>
             <button class="btn sm danger ghost" onclick="delNote(${i})">Eliminar</button>
           </div>
@@ -230,9 +254,9 @@ function renderDetail(){
         </div>
       </div>`;
     });
-    html+=`<button class="btn ghost block" style="margin-top:4px" onclick="addStage()">+ Añadir etapa</button>`;
+    html+=`<button class="btn ghost block" style="margin-top:4px" onclick="addStage()">${icon('plus',16)} Añadir etapa</button>`;
   }
-  html+=`<div class="btn-row" style="margin-top:20px"><button class="btn ghost" onclick="openEdit('${g.id}')">✏️ Editar meta</button><button class="btn danger ghost" onclick="deleteGoal('${g.id}')">🗑️ Eliminar</button></div>`;
+  html+=`<div class="btn-row" style="margin-top:20px"><button class="btn ghost" onclick="openEdit('${g.id}')">${icon('edit',15)} Editar meta</button><button class="btn danger ghost" onclick="deleteGoal('${g.id}')">${icon('trash',15)} Eliminar</button></div>`;
   el.innerHTML=html;
 }
 
@@ -349,6 +373,7 @@ function openEdit(id){
   draftFreq = g && g.freq ? g.freq : 'daily';
   draftWeekdays = g && g.weekdays ? g.weekdays.slice() : [];
   draftManualDates = g && g.type==='days' && g.freq==='manual' ? g.days.map(d=>d.date) : [];
+  draftImportStages = [];
   draftStart = g && g.startDate ? g.startDate : todayISO();
   draftCount = g && g.type==='days' ? g.days.length : 30;
   const sheet=document.getElementById('editSheet');
@@ -366,9 +391,9 @@ function openEdit(id){
     <div class="field"><label>Tipo de meta</label>
       <div class="type-toggle">
         <div class="type-opt${draftType==='days'?' sel':''}" id="typeDays" onclick="pickType('days')">
-          <div class="te">📅</div><div class="tt">Por días</div><div class="td">Marca cada día o etapa</div></div>
+          <div class="te">${icon('calendar',24)}</div><div class="tt">Por días</div><div class="td">Marca cada día o etapa</div></div>
         <div class="type-opt${draftType==='number'?' sel':''}" id="typeNum" onclick="pickType('number')">
-          <div class="te">🔢</div><div class="tt">Numérica</div><div class="td">Suma hacia un total</div></div>
+          <div class="te">${icon('hash',24)}</div><div class="tt">Numérica</div><div class="td">Suma hacia un total</div></div>
       </div></div>
 
     <div id="typeFields"></div>
@@ -395,9 +420,10 @@ function renderTypeFields(g){
     el.innerHTML=`
       <div class="field"><label>¿Con qué frecuencia?</label>
         <div class="freq-toggle">
-          <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">📆 Días seguidos</button>
-          <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">🗓️ Días de la semana</button>
-          <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">✍️ Fechas manuales</button>
+          <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">${icon('calendar',17)} Días seguidos</button>
+          <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">${icon('calClock',17)} Días de la semana</button>
+          <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">${icon('pen',17)} Fechas manuales</button>
+          <button type="button" class="freq-opt${draftFreq==='import'?' sel':''}" onclick="pickFreq('import')">${icon('upload',17)} Importar cronograma</button>
         </div>
       </div>
       <div id="freqFields"></div>`;
@@ -420,14 +446,35 @@ function pickFreq(f){
   if(curStart) draftStart=curStart;
   if(!isNaN(curCount)) draftCount=curCount;
   draftFreq=f;
+  const idx={daily:0,weekly:1,manual:2,import:3}[f];
   document.querySelectorAll('.freq-opt').forEach(b=>b.classList.remove('sel'));
-  document.querySelectorAll('.freq-opt')[f==='daily'?0:f==='weekly'?1:2].classList.add('sel');
+  document.querySelectorAll('.freq-opt')[idx].classList.add('sel');
   renderFreqFields(null, draftStart||todayISO(), draftCount||30);
 }
 function renderFreqFields(g,start,n){
   const el=document.getElementById('freqFields');
   start = start || draftStart || todayISO();
   n = n || draftCount || 30;
+  if(draftFreq==='import'){
+    el.innerHTML=`
+      <div class="field">
+        <label>Sube tu cronograma</label>
+        <div class="import-zone" id="importZone" onclick="document.getElementById('importFileInput').click()">
+          <div class="iz-icon">${icon('upload',26)}</div>
+          <div class="iz-main">Toca para elegir un archivo</div>
+          <div class="iz-sub">CSV · Excel · PDF · Imagen · Word</div>
+        </div>
+        <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls,.pdf,.png,.jpg,.jpeg,.webp,.docx" style="display:none" onchange="handleImportFile(this)">
+        <div class="import-badges">
+          <span class="ib ib-free">${icon('calendar',12)} CSV y Excel: gratis</span>
+          <span class="ib ib-ai">${icon('upload',12)} PDF, imagen y Word: con IA</span>
+        </div>
+        <div class="hint">La app leerá tu cronograma y creará una etapa por cada fecha. Podrás revisarlas antes de crear la meta.</div>
+      </div>
+      <div id="importStatus"></div>
+      <div id="importPreview"></div>`;
+    return;
+  }
   if(draftFreq==='manual'){
     el.innerHTML=`
       <div class="field"><label id="manualLbl">Tus fechas (${draftManualDates.length})</label>
@@ -487,10 +534,247 @@ function toggleWd(i){
   const pos=[1,2,3,4,5,6,0].indexOf(i);
   document.querySelectorAll('.wd-opt')[pos].classList.toggle('sel');
 }
+
+/* =============== IMPORTAR CRONOGRAMA =============== */
+function importStatus(html){ const el=document.getElementById('importStatus'); if(el) el.innerHTML=html; }
+function importSpinner(msg){ importStatus(`<div class="import-loading"><div class="spinner"></div><span>${msg}</span></div>`); }
+
+async function handleImportFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  draftImportStages = [];
+  document.getElementById('importPreview').innerHTML='';
+  const name = file.name.toLowerCase();
+  try{
+    if(name.endsWith('.csv')){
+      importSpinner('Leyendo tu archivo CSV…');
+      const text = await file.text();
+      const stages = parseCSV(text);
+      finishImport(stages);
+    } else if(name.endsWith('.xlsx') || name.endsWith('.xls')){
+      importSpinner('Leyendo tu Excel…');
+      const stages = await parseExcel(file);
+      finishImport(stages);
+    } else if(name.endsWith('.pdf') || name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.webp')){
+      importSpinner('Analizando con IA… esto puede tardar unos segundos.');
+      const stages = await parseWithAI_file(file);
+      finishImport(stages);
+    } else if(name.endsWith('.docx')){
+      importSpinner('Leyendo el documento Word…');
+      const text = await parseDocxText(file);
+      importSpinner('Analizando con IA… esto puede tardar unos segundos.');
+      const stages = await parseWithAI_text(text);
+      finishImport(stages);
+    } else {
+      importStatus(`<div class="import-err">Formato no admitido. Usa CSV, Excel, PDF, imagen o Word.</div>`);
+    }
+  }catch(err){
+    importStatus(`<div class="import-err">No se pudo leer el archivo: ${esc(String(err.message||err))}</div>`);
+  }
+  input.value='';
+}
+
+/* ---- CSV (sin IA) ---- */
+function parseCSV(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length===0) throw new Error('El archivo está vacío');
+  const rows = lines.map(l=>splitCSVLine(l));
+  // detectar si la primera fila es encabezado:
+  // es encabezado solo si NINGUNA de sus celdas es una fecha válida
+  // y alguna celda parece un título de columna
+  const first = rows[0].map(c=>c.toLowerCase());
+  const firstHasDate = rows[0].some(c=>normalizeDate(c));
+  const hasHeader = !firstHasDate && first.some(c=>/fecha|date|día|dia|tema|clase|nombre|actividad|title|label|asunto/.test(c));
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+  // detectar columna de fecha y de nombre
+  let dateCol=0, labelCol=1;
+  if(hasHeader){
+    first.forEach((c,i)=>{ if(/fecha|date|día|dia/.test(c)) dateCol=i; if(/tema|clase|nombre|actividad|title|label|asunto/.test(c)) labelCol=i; });
+  }
+  const stages=[];
+  for(const r of dataRows){
+    const rawDate = (r[dateCol]||'').trim();
+    const iso = normalizeDate(rawDate);
+    if(!iso) continue;
+    const label = (r[labelCol]||r.find((c,i)=>i!==dateCol&&c.trim())||'').trim() || 'Etapa';
+    stages.push({date:iso, label});
+  }
+  return stages;
+}
+function splitCSVLine(line){
+  const out=[]; let cur=''; let q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(q){ if(c==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else { if(c==='"') q=true; else if(c===',' || c===';' || c==='\t') {out.push(cur);cur='';} else cur+=c; }
+  }
+  out.push(cur);
+  return out.map(s=>s.trim());
+}
+
+/* ---- Excel (sin IA, con SheetJS) ---- */
+async function parseExcel(file){
+  await ensureSheetJS();
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, {type:'array', cellDates:true});
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet, {header:1, raw:false, dateNF:'yyyy-mm-dd'});
+  const clean = rows.filter(r=>r && r.some(c=>c!=null && String(c).trim()));
+  if(clean.length===0) throw new Error('La hoja está vacía');
+  const first = clean[0].map(c=>String(c||'').toLowerCase());
+  const firstHasDate = clean[0].some(c=>normalizeDate(String(c||'')));
+  const hasHeader = !firstHasDate && first.some(c=>/fecha|date|día|dia|tema|clase|nombre|actividad|title|label|asunto/.test(c));
+  let dateCol=0, labelCol=1;
+  if(hasHeader){
+    first.forEach((c,i)=>{ if(/fecha|date|día|dia/.test(c)) dateCol=i; if(/tema|clase|nombre|actividad|title|label|asunto/.test(c)) labelCol=i; });
+  }
+  const dataRows = hasHeader ? clean.slice(1) : clean;
+  const stages=[];
+  for(const r of dataRows){
+    const iso = normalizeDate(String(r[dateCol]||''));
+    if(!iso) continue;
+    const label = String(r[labelCol]|| r.find((c,i)=>i!==dateCol&&String(c||'').trim()) ||'').trim() || 'Etapa';
+    stages.push({date:iso, label});
+  }
+  return stages;
+}
+let _sheetjsLoaded=false;
+function ensureSheetJS(){
+  if(_sheetjsLoaded && window.XLSX) return Promise.resolve();
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=()=>{_sheetjsLoaded=true;res();};
+    s.onerror=()=>rej(new Error('No se pudo cargar el lector de Excel'));
+    document.head.appendChild(s);
+  });
+}
+
+/* ---- Word: extraer texto (con Mammoth) ---- */
+async function parseDocxText(file){
+  await ensureMammoth();
+  const buf = await file.arrayBuffer();
+  const result = await window.mammoth.extractRawText({arrayBuffer:buf});
+  return result.value || '';
+}
+let _mammothLoaded=false;
+function ensureMammoth(){
+  if(_mammothLoaded && window.mammoth) return Promise.resolve();
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+    s.onload=()=>{_mammothLoaded=true;res();};
+    s.onerror=()=>rej(new Error('No se pudo cargar el lector de Word'));
+    document.head.appendChild(s);
+  });
+}
+
+/* ---- IA: archivo (PDF/imagen) ---- */
+async function parseWithAI_file(file){
+  const base64 = await fileToBase64(file);
+  const mimeType = file.type || guessMime(file.name);
+  const resp = await fetch(WORKER_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ fileBase64: base64, mimeType })
+  });
+  return await handleAIResponse(resp);
+}
+/* ---- IA: texto (Word) ---- */
+async function parseWithAI_text(text){
+  const resp = await fetch(WORKER_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ text })
+  });
+  return await handleAIResponse(resp);
+}
+async function handleAIResponse(resp){
+  if(!resp.ok){
+    let msg='El servicio de IA no respondió bien.';
+    try{ const j=await resp.json(); if(j.error) msg=j.error; }catch(e){}
+    throw new Error(msg);
+  }
+  const data = await resp.json();
+  if(!Array.isArray(data.stages)) throw new Error('La IA no devolvió etapas válidas.');
+  return data.stages.map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||'Etapa').trim()})).filter(s=>s.date);
+}
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{ const s=r.result; res(s.substring(s.indexOf(',')+1)); };
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+}
+function guessMime(name){
+  name=name.toLowerCase();
+  if(name.endsWith('.pdf')) return 'application/pdf';
+  if(name.endsWith('.png')) return 'image/png';
+  if(name.endsWith('.webp')) return 'image/webp';
+  return 'image/jpeg';
+}
+
+/* ---- Normalizar fechas de cualquier formato a YYYY-MM-DD ---- */
+function normalizeDate(raw){
+  if(!raw) return null;
+  raw = String(raw).trim();
+  // Ya en ISO
+  let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return `${m[1]}-${pad2(+m[2])}-${pad2(+m[3])}`;
+  // DD/MM/YYYY o DD-MM-YYYY o DD.MM.YYYY
+  m = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if(m){
+    let d=+m[1], mo=+m[2], y=+m[3];
+    if(y<100) y+=2000;
+    // si el primero es claramente > 12, es día; asumimos DD/MM (formato común fuera de EEUU)
+    if(d>31 || mo>12){ // orden invertido improbable, intento MM/DD
+      [d,mo]=[mo,d];
+    }
+    if(mo>12) return null;
+    return `${y}-${pad2(mo)}-${pad2(d)}`;
+  }
+  return null;
+}
+
+/* ---- Mostrar vista previa de etapas importadas ---- */
+function finishImport(stages){
+  if(!stages || stages.length===0){
+    importStatus(`<div class="import-err">No encontré fechas en el archivo. Revisa que tenga una columna de fecha, o prueba con otro formato.</div>`);
+    return;
+  }
+  stages.sort((a,b)=>a.date.localeCompare(b.date));
+  draftImportStages = stages;
+  importStatus(`<div class="import-ok">${icon('calendar',14)} Encontré ${stages.length} ${stages.length===1?'etapa':'etapas'}. Revísalas y crea la meta.</div>`);
+  const prev = stages.slice(0,8).map(s=>`<div class="prev-row"><span class="prev-date">${fmtDateShort(s.date)}</span><span class="prev-label">${esc(s.label)}</span></div>`).join('');
+  const more = stages.length>8 ? `<div class="prev-more">y ${stages.length-8} más…</div>` : '';
+  document.getElementById('importPreview').innerHTML=`<div class="import-prev">${prev}${more}</div>`;
+}
+
 function commitGoal(id){
   const title=document.getElementById('fTitle').value.trim();
   if(!title){ toast('Ponle un nombre a tu meta.'); return; }
   if(draftType==='days'){
+    // Caso especial: cronograma importado (trae fecha + nombre por etapa)
+    if(draftFreq==='import'){
+      if(!draftImportStages || draftImportStages.length===0){ toast('Sube un cronograma primero.'); return; }
+      const imp = draftImportStages.slice().sort((a,b)=>a.date.localeCompare(b.date));
+      const start = imp[0].date;
+      const endDate = imp[imp.length-1].date;
+      const days = imp.map(s=>({label:s.label||'Etapa', date:s.date, done:false}));
+      if(id){
+        const g=data.goals.find(x=>x.id===id);
+        g.title=title; g.emoji=draftEmoji; g.startDate=start; g.freq='import'; g.weekdays=[];
+        g.type='days'; g.days=days; g.endDate=endDate;
+      } else {
+        data.goals.push({id:uid(),title,emoji:draftEmoji,type:'days',freq:'import',weekdays:[],startDate:start,endDate,days});
+      }
+      save(); closeEdit();
+      if(id){ renderDetail(); } else { show('home'); }
+      renderHome();
+      toast('¡Meta creada desde tu cronograma!');
+      return;
+    }
     // Build the list of dates according to frequency
     let dates=[];
     let start=todayISO();

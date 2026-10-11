@@ -191,6 +191,31 @@ body::after{
 .wd-picker{display:flex;gap:7px;flex-wrap:wrap}
 .wd-opt{width:42px;height:42px;border:1.5px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
 .wd-opt.sel{border-color:var(--accent);background:var(--accent);color:#fff}
+
+/* Importar cronograma */
+.import-zone{border:2px dashed var(--line);border-radius:14px;padding:26px 16px;text-align:center;cursor:pointer;transition:.15s;background:var(--surface-2)}
+.import-zone:active{transform:scale(.99)}
+.import-zone:hover{border-color:var(--accent-ring);background:var(--accent-soft)}
+.import-zone .iz-icon{color:var(--accent);display:flex;justify-content:center;margin-bottom:8px}
+.import-zone .iz-main{font-size:15px;font-weight:600}
+.import-zone .iz-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.import-badges{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+.ib{font-size:11px;font-weight:600;padding:4px 9px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
+.ib svg{display:block}
+.ib-free{background:var(--accent-soft);color:var(--accent)}
+.ib-ai{background:#FBEFD8;color:#9A6B10}
+:root[data-theme="dark"] .ib-ai{background:#3A2E12;color:#E8B84B}
+.import-loading{display:flex;align-items:center;gap:11px;padding:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;margin-top:12px;font-size:14px;color:var(--muted)}
+.spinner{width:20px;height:20px;border:2.5px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.import-ok{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--accent-soft);border:1px solid var(--accent-ring);color:var(--accent);border-radius:12px;margin-top:12px;font-size:14px;font-weight:600}
+.import-err{padding:12px 14px;background:var(--danger-soft);border:1px solid var(--danger);color:var(--danger);border-radius:12px;margin-top:12px;font-size:13.5px}
+.import-prev{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.prev-row{display:flex;gap:12px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:13px}
+.prev-row:last-child{border-bottom:none}
+.prev-date{color:var(--accent);font-weight:600;flex-shrink:0;min-width:54px}
+.prev-label{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev-more{padding:9px 13px;font-size:12.5px;color:var(--muted);text-align:center;background:var(--surface-2)}
 .manual-list{display:flex;flex-wrap:wrap;gap:7px;min-height:4px}
 .manual-chip{display:inline-flex;align-items:center;gap:7px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-ring);border-radius:99px;padding:5px 7px 5px 12px;font-size:12.5px;font-weight:500}
 .manual-chip button{border:none;background:rgba(0,0,0,.08);color:inherit;width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center}
@@ -216,7 +241,13 @@ body::after{
 .set-row{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--line);gap:12px}
 .set-row:last-child{border-bottom:none}
 .set-row .lft{display:flex;align-items:center;gap:13px;min-width:0}
-.set-row .ico{font-size:19px;flex-shrink:0}
+.set-row .ico{flex-shrink:0;color:var(--muted);display:flex;align-items:center}
+.set-row .ico svg{display:block}
+.ic{vertical-align:-3px}
+.note-btn .ic,.btn .ic,.freq-opt .ic{vertical-align:-2px}
+.freq-opt{display:flex;align-items:center;gap:9px}
+.type-opt .te{display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.day-edit .ic{vertical-align:middle}
 .set-row .txt{min-width:0}
 .set-row .txt b{font-size:14.5px;font-weight:600;display:block}
 .set-row .txt span{font-size:12.5px;color:var(--muted)}
@@ -225,7 +256,9 @@ body::after{
 .switch::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
 .switch.on::after{left:21px}
 
-.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:14px;font-family:inherit;cursor:pointer;padding:6px 2px;margin-bottom:6px}
+.back-btn{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);color:var(--ink);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;padding:9px 15px 9px 12px;margin-bottom:14px;border-radius:99px;box-shadow:var(--shadow);transition:.15s}
+.back-btn:active{transform:scale(.96)}
+.back-btn svg{width:17px;height:17px;flex-shrink:0}
 
 .toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:200;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -242,7 +275,7 @@ body::after{
       <svg class="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="var(--accent)"/><path d="M20 40 L32 20 L44 40 Z" fill="none" stroke="var(--accent-ring)" stroke-width="4" stroke-linejoin="round"/><circle cx="32" cy="44" r="4" fill="var(--gold)"/></svg>
       <span id="brandText">Rumbo</span>
     </div>
-    <button class="icon-btn" id="settingsBtn" aria-label="Ajustes">⚙️</button>
+    <button class="icon-btn" id="settingsBtn" aria-label="Ajustes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
 
   <!-- HOME -->
@@ -252,35 +285,35 @@ body::after{
 
   <!-- DETAIL -->
   <div class="view" id="view-detail">
-    <button class="back-btn" id="detailBack">‹ Todas mis metas</button>
+    <button class="back-btn" id="detailBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Todas mis metas</button>
     <div id="detailContent"></div>
   </div>
 
   <!-- SETTINGS -->
   <div class="view" id="view-settings">
-    <button class="back-btn" id="settingsBack">‹ Volver</button>
+    <button class="back-btn" id="settingsBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button>
     <h2 style="font-size:22px;font-weight:700;margin:4px 4px 18px">Ajustes</h2>
     <div class="set-group">
       <div class="set-row">
-        <div class="lft"><span class="ico">🌙</span><div class="txt"><b>Tema oscuro</b><span>Cambia la apariencia</span></div></div>
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="0"/><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span><div class="txt"><b>Tema oscuro</b><span>Cambia la apariencia</span></div></div>
         <button class="switch" id="themeSwitch" aria-label="Tema oscuro"></button>
       </div>
       <div class="set-row">
-        <div class="lft"><span class="ico">🔔</span><div class="txt"><b>Recordatorio diario</b><span>Un aviso para no perder el ritmo</span></div></div>
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><div class="txt"><b>Recordatorio diario</b><span>Un aviso para no perder el ritmo</span></div></div>
         <button class="switch" id="notifSwitch" aria-label="Recordatorio"></button>
       </div>
     </div>
     <div class="set-group">
       <div class="set-row" id="exportRow" style="cursor:pointer">
-        <div class="lft"><span class="ico">⬇️</span><div class="txt"><b>Exportar mis datos</b><span>Guarda una copia de seguridad</span></div></div>
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><div class="txt"><b>Exportar mis datos</b><span>Guarda una copia de seguridad</span></div></div>
         <span style="color:var(--muted)">›</span>
       </div>
       <div class="set-row" id="importRow" style="cursor:pointer">
-        <div class="lft"><span class="ico">⬆️</span><div class="txt"><b>Importar datos</b><span>Restaura desde una copia</span></div></div>
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span><div class="txt"><b>Importar datos</b><span>Restaura desde una copia</span></div></div>
         <span style="color:var(--muted)">›</span>
       </div>
       <div class="set-row" id="wipeRow" style="cursor:pointer">
-        <div class="lft"><span class="ico">🗑️</span><div class="txt"><b style="color:var(--danger)">Borrar todo</b><span>Elimina todas las metas</span></div></div>
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span><div class="txt"><b style="color:var(--danger)">Borrar todo</b><span>Elimina todas las metas</span></div></div>
         <span style="color:var(--muted)">›</span>
       </div>
     </div>
