@@ -751,9 +751,22 @@ function finishImport(stages){
   document.getElementById('importPreview').innerHTML=`<div class="import-prev">${prev}${more}</div>`;
 }
 
-function commitGoal(id){
+function commitGoal(id, forceDuplicate){
   const title=document.getElementById('fTitle').value.trim();
   if(!title){ toast('Ponle un nombre a tu meta.'); return; }
+  // Aviso de nombre duplicado (solo al crear una meta nueva, no al editar)
+  if(!id && !forceDuplicate){
+    const exists = data.goals.some(g=>g.title.trim().toLowerCase()===title.toLowerCase());
+    if(exists){
+      confirmSheet(
+        'Nombre repetido',
+        `Ya tienes una meta llamada "${esc(title)}". ¿Quieres crear otra con el mismo nombre de todas formas?`,
+        'Crear igual',
+        ()=>{ commitGoal(null, true); }
+      );
+      return;
+    }
+  }
   if(draftType==='days'){
     // Caso especial: cronograma importado (trae fecha + nombre por etapa)
     if(draftFreq==='import'){
