@@ -690,13 +690,17 @@ async function parseWithAI_text(text){
   return await handleAIResponse(resp);
 }
 async function handleAIResponse(resp){
-  if(!resp.ok){
-    let msg='El servicio de IA no respondió bien.';
-    try{ const j=await resp.json(); if(j.error) msg=j.error; }catch(e){}
+  const data = await resp.json().catch(()=>({error:'Respuesta no legible del servidor'}));
+  if(!resp.ok || !Array.isArray(data.stages)){
+    let msg = data.error || 'La IA no devolvió etapas válidas.';
+    const extra = [];
+    if(data.status) extra.push('HTTP '+data.status);
+    if(data.finishReason) extra.push('motivo: '+data.finishReason);
+    if(data.detail) extra.push('detalle: '+String(data.detail).substring(0,300));
+    if(data.raw) extra.push('respuesta: '+String(data.raw).substring(0,300));
+    if(extra.length) msg += ' ['+extra.join(' · ')+']';
     throw new Error(msg);
   }
-  const data = await resp.json();
-  if(!Array.isArray(data.stages)) throw new Error('La IA no devolvió etapas válidas.');
   return data.stages.map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||'Etapa').trim()})).filter(s=>s.date);
 }
 function fileToBase64(file){
