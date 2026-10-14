@@ -2,39 +2,9 @@
 const STORE_KEY = 'rumbo_v1';
 const WORKER_URL = 'https://soft-silence-4fe6.rumboapp-oficial.workers.dev/';
 let draftImportStages = [];   // etapas extraídas de un archivo importado
-const MOTIV = [
- "Cada paso cuenta, y acabas de dar uno.",
- "La constancia vence al talento. Sigue así.",
- "Bien hecho. Tu yo del futuro te lo agradece.",
- "Lo empezado ya no vuelve a cero. Adelante.",
- "Pequeños avances diarios construyen grandes logros.",
- "Hoy estás más cerca que ayer. Eso es progreso.",
- "No subestimes lo lejos que has llegado.",
- "El impulso se construye un día a la vez. ¡Vas bien!",
- "Avanzar es ganar. Y hoy ganaste otra vez.",
- "Lo difícil de hoy será lo natural de mañana.",
- "Tu esfuerzo se nota en esa barra. ¡Sigue!",
- "Terminar lo que empiezas es un superpoder. Lo tienes.",
- "Un paso más, una excusa menos. Orgulloso de ti.",
- "La disciplina de hoy es la libertad de mañana.",
- "Estás convirtiendo la intención en hábito. Genial.",
- "Nada detiene a quien avanza con propósito.",
- "Mira cuánto has recorrido. La meta se acerca.",
- "Cada marca es una promesa que te cumples.",
- "El progreso no siempre se ve, pero hoy sí. ¡Bravo!",
- "Sigue el ritmo: lo estás haciendo de verdad.",
- "Que nada apague tus ganas. Vas por buen camino.",
- "Hoy elegiste avanzar. Esa decisión suma.",
- "La meta está más cerca del final que del inicio.",
- "Constancia sobre motivación. Y aquí sigues.",
- "El último tramo sabe distinto. Sigue subiendo.",
- "Estás a un paso más de lograrlo. No aflojes.",
- "Grande no es el paso, grande es no detenerse.",
- "Lo estás haciendo. Punto. Sigue adelante.",
- "Tu compromiso contigo mismo se ve hoy.",
- "Casi en la cima. Este avance pesa. ¡Vamos!"
-];
-const FINISH_MSG = "¡Lo lograste! Completaste tu meta. Date el crédito que mereces. 🎉";
+// MOTIV y FINISH_MSG ahora vienen del idioma activo (i18n)
+function getMotiv(){ return t('motiv'); }
+function getFinishMsg(){ return t('finishMsg'); }
 const EMOJIS = ["🎯","📚","🏃","💪","🧠","💰","🎸","🎨","🧘","🌱","💻","✍️","🍎","💧","⭐","🔥"];
 // Modern line icons (Lucide-style). Usage: icon('name')
 const ICONS = {
@@ -75,7 +45,7 @@ function load(){
   if(!data.settings) data.settings={theme:'light',notif:false};
   if(!data.goals) data.goals=[];
 }
-function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast('No se pudo guardar. ¿Espacio lleno?'); } }
+function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast(t('toastNoSpace')); } }
 
 /* ---------- helpers ---------- */
 function uid(){ return 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
@@ -109,8 +79,9 @@ function genDates(start,count,freq,weekdays){
   }
   return out;
 }
-const WD_LABELS=['D','L','M','X','J','V','S'];
-const WD_FULL=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+// Días de la semana desde el idioma activo
+function WD_LABEL(i){ return t('weekdays')[i]; }
+function WD_FULL_NAME(i){ return t('weekdaysFull')[i]; }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function goalProgress(g){
@@ -157,8 +128,8 @@ function renderHome(){
   if(data.goals.length===0){
     el.innerHTML=`<div class="empty">
       <div class="big">🎯</div>
-      <h3>Empieza tu primera meta</h3>
-      <p>Elige algo que quieras lograr, ponle un plazo y marca tu avance cada día. Pulsa el botón <b>Nueva meta</b> de abajo para empezar.</p>
+      <h3>${t('emptyTitle')}</h3>
+      <p>${t('emptyDesc')}</p>
       <div class="empty-arrow">↓</div>
     </div>`;
     return;
@@ -169,15 +140,15 @@ function renderHome(){
   const active=total-done;
   const ringPct = total>0 ? Math.round(done/total*100) : 0;
   let html=`<div class="hero"><div class="hero-top">
-    <div class="ring-wrap">${ring(ringPct,88,9)}<div class="ring-label"><b>${done}/${total}</b><span>metas</span></div></div>
+    <div class="ring-wrap">${ring(ringPct,88,9)}<div class="ring-label"><b>${done}/${total}</b><span>${t('manyGoals')}</span></div></div>
     <div class="hero-txt"><h2>${done} de ${total} completada${done===1?'':'s'}</h2>
-    <p>${active>0?('Tienes '+active+(active===1?' meta activa':' metas activas')):'¡Todo completado! 🎉'}</p></div>
+    <p>${active>0?(t('youHave')+' '+active+' '+(active===1?t('activeOne'):t('activeMany'))):t('allDone')}</p></div>
   </div></div>`;
   html+=`<div class="section-label">Mis metas</div>`;
   data.goals.forEach(g=>{
     const p=goalProgress(g);
     const sub = g.type==='number' ? `${p.done} / ${p.total} ${esc(g.unit||'')}` : `${p.done} / ${p.total} días`;
-    const deadline = g.endDate ? 'Meta: '+fmtDateShort(g.endDate) : '';
+    const deadline = g.endDate ? t('goalDeadline')+' '+fmtDateShort(g.endDate) : '';
     html+=`<div class="goal" onclick="openDetail('${g.id}')">
       <div class="accent-strip"></div>
       <div class="goal-head">
@@ -186,7 +157,7 @@ function renderHome(){
         <div class="goal-pct">${p.pct}%</div>
       </div>
       <div class="mini-track"><div class="mini-fill" style="width:${p.pct}%"></div></div>
-      <div class="goal-foot"><span>${p.pct===100?'✅ Completada':'En progreso'}</span><span>${deadline}</span></div>
+      <div class="goal-foot"><span>${p.pct===100?('✅ '+t('done')):t('inProgress')}</span><span>${deadline}</span></div>
     </div>`;
   });
   el.innerHTML=html;
@@ -207,40 +178,40 @@ function renderDetail(){
     <div class="demoji">${g.emoji||'🎯'}</div>
     <h2>${esc(g.title)}</h2>
     <div class="dmeta">${g.startDate?fmtDate(g.startDate):''}${g.endDate?' → '+fmtDate(g.endDate):''}</div>
-    <div class="big-ring">${ring(p.pct,150,12)}<div class="lbl"><b>${p.pct}%</b><span>completado</span></div></div>
+    <div class="big-ring">${ring(p.pct,150,12)}<div class="lbl"><b>${p.pct}%</b><span>${t('percentDone')}</span></div></div>
     <div class="detail-count">${g.type==='number'?`${p.done} de ${p.total} ${esc(g.unit||'')}`:`${p.done} de ${p.total} días`}</div>
-    <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?FINISH_MSG:(p.done>0?MOTIV[Math.min(p.done-1,MOTIV.length-1)]:'Marca tu primer avance para arrancar.')}</span></div>
+    <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?getFinishMsg():(p.done>0?getMotiv()[Math.min(p.done-1,getMotiv().length-1)]:t('firstStepMsg'))}</span></div>
   </div>`;
 
   if(g.type==='number'){
     html+=`<div class="num-panel">
       <div class="num-row"><span class="cur">${p.done}</span><span class="of">/ ${p.total} ${esc(g.unit||'')}</span></div>
       <div class="num-add">
-        <input type="number" id="numInput" placeholder="¿Cuánto sumaste?" inputmode="decimal">
-        <button class="btn primary" onclick="addNumber()">Sumar</button>
+        <input type="number" id="numInput" placeholder="${t('howMuch')}" inputmode="decimal">
+        <button class="btn primary" onclick="addNumber()">${t('add')}</button>
       </div>
-      <div class="btn-row"><button class="btn sm ghost" onclick="quickAdd(1)">+1</button><button class="btn sm ghost" onclick="quickAdd(5)">+5</button><button class="btn sm ghost" onclick="quickAdd(10)">+10</button><button class="btn sm ghost" onclick="setNumber()">Ajustar total…</button></div>
+      <div class="btn-row"><button class="btn sm ghost" onclick="quickAdd(1)">+1</button><button class="btn sm ghost" onclick="quickAdd(5)">+5</button><button class="btn sm ghost" onclick="quickAdd(10)">+10</button><button class="btn sm ghost" onclick="setNumber()">${t('adjustTotal')}</button></div>
     </div>`;
   } else {
-    html+=`<div class="days-head"><h3>Etapas (${p.done}/${p.total})</h3></div>`;
+    html+=`<div class="days-head"><h3>${t('stages')} (${p.done}/${p.total})</h3></div>`;
     g.days.forEach((d,i)=>{
       const nk='n'+i;
       html+=`<div class="day${d.done?' done':''}">
         <div class="day-top">
           <button class="check ${d.done?'on':''}" onclick="toggleDay(${i})" aria-label="Marcar">${d.done?'✓':''}</button>
-          <div class="day-info"><div class="dtitle">${esc(d.label||('Día '+(i+1)))}</div><div class="ddate">${d.date?fmtDate(d.date):''}</div></div>
-          <button class="day-edit" onclick="editStage(${i})" aria-label="Editar etapa">${icon('pen',16)}</button>
+          <div class="day-info"><div class="dtitle">${esc(d.label||(t('dayLabel')+' '+(i+1)))}</div><div class="ddate">${d.date?fmtDate(d.date):''}</div></div>
+          <button class="day-edit" onclick="editStage(${i})" aria-label="${t('editGoal')}">${icon('pen',16)}</button>
         </div>
         <div class="stage-edit" id="se-${i}">
-          <input type="text" id="sl-${i}" maxlength="80" placeholder="Nombre de la etapa" value="${esc(d.label||('Día '+(i+1)))}">
+          <input type="text" id="sl-${i}" maxlength="80" placeholder="${t('stageName')}" value="${esc(d.label||(t('dayLabel')+' '+(i+1)))}">
           <input type="date" id="sd-${i}" value="${d.date||''}">
           <div class="note-actions">
-            <button class="btn sm primary" onclick="saveStage(${i})">Guardar</button>
-            <button class="btn sm ghost" onclick="cancelStage(${i})">Cancelar</button>
-            <button class="btn sm danger ghost" onclick="deleteStage(${i})">Borrar etapa</button>
+            <button class="btn sm primary" onclick="saveStage(${i})">${t('save')}</button>
+            <button class="btn sm ghost" onclick="cancelStage(${i})">${t('cancel')}</button>
+            <button class="btn sm danger ghost" onclick="deleteStage(${i})">${t('deleteStage')}</button>
           </div>
         </div>
-        <button class="note-btn" onclick="toggleNote(${i})">${icon(d.note?'note':'message',14)} ${d.note?'Ver nota':'Añadir nota'}</button>
+        <button class="note-btn" onclick="toggleNote(${i})">${icon(d.note?'note':'message',14)} ${d.note?t('viewNote'):t('addNote')}</button>
         <div class="note-view ${d.note?'open':''}" id="nv-${i}">
           <div class="ntext">${d.note?esc(d.note):''}</div>
           <div class="nmeta"><span>${icon('calendar',13)} ${d.noteDate?'Guardada: '+d.noteDate:''}</span>
@@ -249,14 +220,14 @@ function renderDetail(){
           </div>
         </div>
         <div class="note-edit" id="ne-${i}">
-          <textarea id="nt-${i}" placeholder="Escribe una nota para esta etapa…">${d.note?esc(d.note):''}</textarea>
-          <div class="note-actions"><button class="btn sm primary" onclick="saveNote(${i})">Guardar nota</button><button class="btn sm ghost" onclick="cancelNote(${i})">Cancelar</button></div>
+          <textarea id="nt-${i}" placeholder="${t('notePh')}">${d.note?esc(d.note):''}</textarea>
+          <div class="note-actions"><button class="btn sm primary" onclick="saveNote(${i})">${t('saveNote')}</button><button class="btn sm ghost" onclick="cancelNote(${i})">${t('cancel')}</button></div>
         </div>
       </div>`;
     });
-    html+=`<button class="btn ghost block" style="margin-top:4px" onclick="addStage()">${icon('plus',16)} Añadir etapa</button>`;
+    html+=`<button class="btn ghost block" style="margin-top:4px" onclick="addStage()">${icon('plus',16)} ${t('addStage')}</button>`;
   }
-  html+=`<div class="btn-row" style="margin-top:20px"><button class="btn ghost" onclick="openEdit('${g.id}')">${icon('edit',15)} Editar meta</button><button class="btn danger ghost" onclick="deleteGoal('${g.id}')">${icon('trash',15)} Eliminar</button></div>`;
+  html+=`<div class="btn-row" style="margin-top:20px"><button class="btn ghost" onclick="openEdit('${g.id}')">${icon('edit',15)} ${t('editGoal')}</button><button class="btn danger ghost" onclick="deleteGoal('${g.id}')">${icon('trash',15)} ${t('delete')}</button></div>`;
   el.innerHTML=html;
 }
 
@@ -279,16 +250,16 @@ function saveStage(i){
   const g=data.goals.find(x=>x.id===currentGoalId);
   const label=document.getElementById('sl-'+i).value.trim();
   const date=document.getElementById('sd-'+i).value;
-  g.days[i].label = label || ('Día '+(i+1));
+  g.days[i].label = label || (t('dayLabel')+' '+(i+1));
   g.days[i].date = date || g.days[i].date;
   // keep order by date
   g.days.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  save(); renderDetail(); toast('Etapa actualizada');
+  save(); renderDetail(); toast(t('toastStageUpdated'));
 }
 function deleteStage(i){
   const g=data.goals.find(x=>x.id===currentGoalId);
-  if(g.days.length<=1){ toast('Una meta necesita al menos una etapa.'); return; }
-  confirmSheet('Borrar etapa','Se eliminará esta etapa con su nota. ¿Continuar?','Eliminar',()=>{
+  if(g.days.length<=1){ toast(t('toastNeedOneStage')); return; }
+  confirmSheet(t('deleteStage'),t('confirmDelStage'),t('delete'),()=>{
     g.days.splice(i,1); save(); renderDetail();
   });
 }
@@ -296,17 +267,17 @@ function addStage(){
   const g=data.goals.find(x=>x.id===currentGoalId);
   const last=g.days[g.days.length-1];
   const nextDate = last&&last.date ? addDays(last.date,1) : todayISO();
-  g.days.push({label:'Día '+(g.days.length+1),date:nextDate,done:false});
+  g.days.push({label:t('dayLabel')+' '+(g.days.length+1),date:nextDate,done:false});
   save(); renderDetail();
-  toast('Etapa añadida. Pulsa el lápiz para nombrarla.');
+  toast(t('toastStageAdded'));
 }
 function flashMotiv(p){
   const box=document.getElementById('motivBox');
   if(!box) return;
   box.style.opacity=0;
   setTimeout(()=>{
-    const t=document.getElementById('motivText');
-    if(t) t.textContent = p.pct===100?FINISH_MSG:MOTIV[Math.min(p.done-1,MOTIV.length-1)];
+    const mt=document.getElementById('motivText');
+    if(mt) mt.textContent = p.pct===100?getFinishMsg():getMotiv()[Math.min(p.done-1,getMotiv().length-1)];
     const ico=box.querySelector('.ico'); if(ico) ico.textContent=p.pct===100?'🎉':'🌟';
     box.style.opacity=1;
   },180);
@@ -327,13 +298,13 @@ function cancelNote(i){
 function saveNote(i){
   const g=data.goals.find(x=>x.id===currentGoalId);
   const v=document.getElementById('nt-'+i).value.trim();
-  if(!v){ toast('Escribe algo antes de guardar.'); return; }
+  if(!v){ toast(t('toastEmptyNote')); return; }
   g.days[i].note=v; g.days[i].noteDate=fmtDate(todayISO());
-  save(); renderDetail(); toast('Nota guardada');
+  save(); renderDetail(); toast(t('toastNoteSaved'));
 }
 function delNote(i){
   const g=data.goals.find(x=>x.id===currentGoalId);
-  confirmSheet('Eliminar nota','¿Seguro que quieres borrar esta nota?','Eliminar',()=>{
+  confirmSheet(t('delete'),t('confirmDelNote'),t('delete'),()=>{
     delete g.days[i].note; delete g.days[i].noteDate; save(); renderDetail();
   });
 }
@@ -342,7 +313,7 @@ function delNote(i){
 function addNumber(){
   const inp=document.getElementById('numInput');
   const v=parseFloat(inp.value);
-  if(isNaN(v)){ toast('Escribe un número.'); return; }
+  if(isNaN(v)){ toast(t('toastNeedNumber')); return; }
   applyNumber(v);
   inp.value='';
 }
@@ -357,9 +328,9 @@ function applyNumber(v){
 }
 function setNumber(){
   const g=data.goals.find(x=>x.id===currentGoalId);
-  confirmSheet('Ajustar total','Escribe el total acumulado que quieres fijar.','Guardar',()=>{
+  confirmSheet(t('adjustTotal'),'',t('save'),()=>{
     const v=parseFloat(document.getElementById('cfInput').value);
-    if(isNaN(v)){ toast('Número no válido'); return; }
+    if(isNaN(v)){ toast(t('toastNeedNumber')); return; }
     g.current=Math.max(0,v); save(); renderDetail();
   },`<input class="field" id="cfInput" type="number" inputmode="decimal" value="${g.current}" style="width:100%;padding:12px 13px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;font-size:15px;margin-top:4px">`);
 }
@@ -379,28 +350,28 @@ function openEdit(id){
   const sheet=document.getElementById('editSheet');
   sheet.innerHTML=`
     <div class="sheet-grip"></div>
-    <h2>${editing?'Editar meta':'Nueva meta'}</h2>
-    <div class="sub">${editing?'Cambia los detalles de tu meta.':'Define qué quieres lograr y en cuánto tiempo.'}</div>
+    <h2>${editing?t('editGoal'):t('newGoal')}</h2>
+    <div class="sub"></div>
 
-    <div class="field"><label>¿Qué quieres lograr?</label>
-      <input id="fTitle" type="text" maxlength="60" placeholder="Ej: Leer un libro, correr 5K…" value="${g?esc(g.title):''}"></div>
+    <div class="field"><label>${t('whatAchieve')}</label>
+      <input id="fTitle" type="text" maxlength="60" placeholder="${t('goalNamePh')}" value="${g?esc(g.title):''}"></div>
 
-    <div class="field"><label>Icono</label>
+    <div class="field"><label>${t('icon')}</label>
       <div class="emoji-picker" id="emojiPicker">${EMOJIS.map(e=>`<button class="emoji-opt${e===draftEmoji?' sel':''}" onclick="pickEmoji('${e}',this)">${e}</button>`).join('')}</div></div>
 
-    <div class="field"><label>Tipo de meta</label>
+    <div class="field"><label>${t('goalType')}</label>
       <div class="type-toggle">
         <div class="type-opt${draftType==='days'?' sel':''}" id="typeDays" onclick="pickType('days')">
-          <div class="te">${icon('calendar',24)}</div><div class="tt">Por días</div><div class="td">Marca cada día o etapa</div></div>
+          <div class="te">${icon('calendar',24)}</div><div class="tt">${t('typeDays')}</div><div class="td">${t('typeDaysDesc')}</div></div>
         <div class="type-opt${draftType==='number'?' sel':''}" id="typeNum" onclick="pickType('number')">
-          <div class="te">${icon('hash',24)}</div><div class="tt">Numérica</div><div class="td">Suma hacia un total</div></div>
+          <div class="te">${icon('hash',24)}</div><div class="tt">${t('typeNum')}</div><div class="td">${t('typeNumDesc')}</div></div>
       </div></div>
 
     <div id="typeFields"></div>
 
-    <button class="btn primary block" onclick="commitGoal(${editing?`'${id}'`:'null'})">${editing?'Guardar cambios':'Crear meta'}</button>
+    <button class="btn primary block" onclick="commitGoal(${editing?`'${id}'`:'null'})">${editing?t('saveChanges'):t('createGoal')}</button>
     <div style="height:8px"></div>
-    <button class="btn ghost block" onclick="closeEdit()">Cancelar</button>
+    <button class="btn ghost block" onclick="closeEdit()">${t('cancel')}</button>
   `;
   renderTypeFields(g);
   document.getElementById('editScrim').classList.add('open');
@@ -418,12 +389,12 @@ function renderTypeFields(g){
     const n = g&&g.type==='days' ? g.days.length : 30;
     const start = g&&g.startDate ? g.startDate : todayISO();
     el.innerHTML=`
-      <div class="field"><label>¿Con qué frecuencia?</label>
+      <div class="field"><label>${t('frequency')}</label>
         <div class="freq-toggle">
-          <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">${icon('calendar',17)} Días seguidos</button>
-          <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">${icon('calClock',17)} Días de la semana</button>
-          <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">${icon('pen',17)} Fechas manuales</button>
-          <button type="button" class="freq-opt${draftFreq==='import'?' sel':''}" onclick="pickFreq('import')">${icon('upload',17)} Importar cronograma</button>
+          <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">${icon('calendar',17)} ${t('freqDaily')}</button>
+          <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">${icon('calClock',17)} ${t('freqWeekly')}</button>
+          <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">${icon('pen',17)} ${t('freqManual')}</button>
+          <button type="button" class="freq-opt${draftFreq==='import'?' sel':''}" onclick="pickFreq('import')">${icon('upload',17)} ${t('freqImport')}</button>
         </div>
       </div>
       <div id="freqFields"></div>`;
@@ -431,11 +402,11 @@ function renderTypeFields(g){
   } else {
     const tgt = g&&g.type==='number' ? g.target : '';
     const unit = g&&g.type==='number' ? esc(g.unit||'') : '';
-    el.innerHTML=`<div class="field"><label>Meta a alcanzar (número)</label>
+    el.innerHTML=`<div class="field"><label>${t('targetNum')}</label>
       <input id="fTarget" type="number" min="1" inputmode="decimal" placeholder="Ej: 100" value="${tgt}"></div>
-      <div class="field"><label>Unidad (opcional)</label>
-      <input id="fUnit" type="text" maxlength="20" placeholder="páginas, km, €, sesiones…" value="${unit}"></div>
-      <div class="field"><label>Fecha de inicio</label>
+      <div class="field"><label>${t('unitOpt')}</label>
+      <input id="fUnit" type="text" maxlength="20" placeholder="${t('unitPh')}" value="${unit}"></div>
+      <div class="field"><label>${t('startDate')}</label>
       <input id="fStart" type="date" value="${g&&g.startDate?g.startDate:todayISO()}"></div>`;
   }
 }
@@ -458,18 +429,18 @@ function renderFreqFields(g,start,n){
   if(draftFreq==='import'){
     el.innerHTML=`
       <div class="field">
-        <label>Sube tu cronograma</label>
+        <label>${t('uploadSchedule')}</label>
         <div class="import-zone" id="importZone" onclick="document.getElementById('importFileInput').click()">
           <div class="iz-icon">${icon('upload',26)}</div>
-          <div class="iz-main">Toca para elegir un archivo</div>
-          <div class="iz-sub">CSV · Excel · PDF · Imagen · Word</div>
+          <div class="iz-main">${t('tapToChoose')}</div>
+          <div class="iz-sub">${t('importFormats')}</div>
         </div>
         <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls,.pdf,.png,.jpg,.jpeg,.webp,.docx" style="display:none" onchange="handleImportFile(this)">
         <div class="import-badges">
-          <span class="ib ib-free">${icon('calendar',12)} CSV y Excel: gratis</span>
-          <span class="ib ib-ai">${icon('upload',12)} PDF, imagen y Word: con IA</span>
+          <span class="ib ib-free">${icon('calendar',12)} ${t('freeBadge')}</span>
+          <span class="ib ib-ai">${icon('upload',12)} ${t('aiBadge')}</span>
         </div>
-        <div class="hint">La app leerá tu cronograma y creará una etapa por cada fecha. Podrás revisarlas antes de crear la meta.</div>
+        <div class="hint">${t('importHint')}</div>
       </div>
       <div id="importStatus"></div>
       <div id="importPreview"></div>`;
@@ -477,48 +448,48 @@ function renderFreqFields(g,start,n){
   }
   if(draftFreq==='manual'){
     el.innerHTML=`
-      <div class="field"><label id="manualLbl">Tus fechas (${draftManualDates.length})</label>
+      <div class="field"><label id="manualLbl">${t('yourDates')} (${draftManualDates.length})</label>
         <div class="num-add" style="margin-bottom:10px">
           <input type="date" id="manualPick" value="${todayISO()}">
-          <button type="button" class="btn primary" onclick="addManualDate()">Añadir fecha</button>
+          <button type="button" class="btn primary" onclick="addManualDate()">${t('addDate')}</button>
         </div>
         <div class="manual-list" id="manualList">${renderManualList()}</div>
-        <div class="hint">Añade una por una las fechas en las que quieras una etapa. El orden se ajusta solo. Luego podrás nombrarlas.</div>
+        <div class="hint">${t('manualHint')}</div>
       </div>`;
   } else if(draftFreq==='weekly'){
     el.innerHTML=`
-      <div class="field"><label>¿Qué días de la semana?</label>
-        <div class="wd-picker">${[1,2,3,4,5,6,0].map(i=>`<button type="button" class="wd-opt${draftWeekdays.includes(i)?' sel':''}" onclick="toggleWd(${i})" aria-label="${WD_FULL[i]}">${WD_LABELS[i]}</button>`).join('')}</div>
-        <div class="hint">Elige uno o más días. Las etapas caerán en esos días.</div>
+      <div class="field"><label>${t('whichWeekdays')}</label>
+        <div class="wd-picker">${[1,2,3,4,5,6,0].map(i=>`<button type="button" class="wd-opt${draftWeekdays.includes(i)?' sel':''}" onclick="toggleWd(${i})" aria-label="${WD_FULL_NAME(i)}">${WD_LABEL(i)}</button>`).join('')}</div>
+        <div class="hint">${t('weekdaysHint')}</div>
       </div>
-      <div class="field"><label>¿Cuántas etapas en total?</label>
+      <div class="field"><label>${t('howManyStages')}</label>
         <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n}">
-        <div class="hint">Cuántas clases, sesiones o repeticiones quieres en total.</div></div>
-      <div class="field"><label>Fecha de inicio</label>
+        <div class="hint">${t('stagesHint')}</div></div>
+      <div class="field"><label>${t('startDate')}</label>
         <input id="fStart" type="date" value="${start}"></div>`;
   } else { // daily
     el.innerHTML=`
-      <div class="field"><label>¿Cuántos días seguidos?</label>
+      <div class="field"><label>${t('howManyDays')}</label>
         <input id="fCount" type="number" min="1" max="366" inputmode="numeric" value="${n}">
-        <div class="hint">Una etapa por día consecutivo desde la fecha de inicio.</div></div>
-      <div class="field"><label>Fecha de inicio</label>
+        <div class="hint">${t('daysHint')}</div></div>
+      <div class="field"><label>${t('startDate')}</label>
         <input id="fStart" type="date" value="${start}"></div>`;
   }
 }
 function renderManualList(){
-  if(draftManualDates.length===0) return `<div class="hint" style="margin:0">Aún no has añadido fechas.</div>`;
+  if(draftManualDates.length===0) return `<div class="hint" style="margin:0">${t('noDatesYet')}</div>`;
   const sorted=draftManualDates.slice().sort();
   return sorted.map(d=>`<div class="manual-chip">${fmtDate(d)}<button type="button" onclick="removeManualDate('${d}')" aria-label="Quitar">✕</button></div>`).join('');
 }
 function refreshManualLbl(){
   const lbl=document.getElementById('manualLbl');
-  if(lbl) lbl.textContent='Tus fechas ('+draftManualDates.length+')';
+  if(lbl) lbl.textContent=t('yourDates')+' ('+draftManualDates.length+')';
 }
 function addManualDate(){
   const el=document.getElementById('manualPick');
   const v=el&&el.value;
-  if(!v){ toast('Elige una fecha primero.'); return; }
-  if(draftManualDates.includes(v)){ toast('Esa fecha ya está en la lista.'); return; }
+  if(!v){ toast(t('toastPickDate')); return; }
+  if(draftManualDates.includes(v)){ toast(t('toastDateExists')); return; }
   draftManualDates.push(v);
   document.getElementById('manualList').innerHTML=renderManualList();
   refreshManualLbl();
@@ -547,29 +518,29 @@ async function handleImportFile(input){
   const name = file.name.toLowerCase();
   try{
     if(name.endsWith('.csv')){
-      importSpinner('Leyendo tu archivo CSV…');
+      importSpinner(t('importReadingCsv'));
       const text = await file.text();
       const stages = parseCSV(text);
       finishImport(stages);
     } else if(name.endsWith('.xlsx') || name.endsWith('.xls')){
-      importSpinner('Leyendo tu Excel…');
+      importSpinner(t('importReadingExcel'));
       const stages = await parseExcel(file);
       finishImport(stages);
     } else if(name.endsWith('.pdf') || name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.webp')){
-      importSpinner('Analizando con IA… esto puede tardar unos segundos.');
+      importSpinner(t('importAnalyzing'));
       const stages = await parseWithAI_file(file);
       finishImport(stages);
     } else if(name.endsWith('.docx')){
-      importSpinner('Leyendo el documento Word…');
+      importSpinner(t('importReadingWord'));
       const text = await parseDocxText(file);
-      importSpinner('Analizando con IA… esto puede tardar unos segundos.');
+      importSpinner(t('importAnalyzing'));
       const stages = await parseWithAI_text(text);
       finishImport(stages);
     } else {
-      importStatus(`<div class="import-err">Formato no admitido. Usa CSV, Excel, PDF, imagen o Word.</div>`);
+      importStatus(`<div class="import-err">${t('importBadFormat')}</div>`);
     }
   }catch(err){
-    importStatus(`<div class="import-err">No se pudo leer el archivo: ${esc(String(err.message||err))}</div>`);
+    importStatus(`<div class="import-err">${t('importReadError')} ${esc(String(err.message||err))}</div>`);
   }
   input.value='';
 }
@@ -577,7 +548,7 @@ async function handleImportFile(input){
 /* ---- CSV (sin IA) ---- */
 function parseCSV(text){
   const lines = text.split(/\r?\n/).filter(l=>l.trim());
-  if(lines.length===0) throw new Error('El archivo está vacío');
+  if(lines.length===0) throw new Error(t('toastInvalidFile'));
   const rows = lines.map(l=>splitCSVLine(l));
   // detectar si la primera fila es encabezado:
   // es encabezado solo si NINGUNA de sus celdas es una fecha válida
@@ -620,7 +591,7 @@ async function parseExcel(file){
   const sheet = wb.Sheets[wb.SheetNames[0]];
   const rows = XLSX.utils.sheet_to_json(sheet, {header:1, raw:false, dateNF:'yyyy-mm-dd'});
   const clean = rows.filter(r=>r && r.some(c=>c!=null && String(c).trim()));
-  if(clean.length===0) throw new Error('La hoja está vacía');
+  if(clean.length===0) throw new Error(t('toastInvalidFile'));
   const first = clean[0].map(c=>String(c||'').toLowerCase());
   const firstHasDate = clean[0].some(c=>normalizeDate(String(c||'')));
   const hasHeader = !firstHasDate && first.some(c=>/fecha|date|día|dia|tema|clase|nombre|actividad|title|label|asunto/.test(c));
@@ -692,7 +663,7 @@ async function parseWithAI_text(text){
 async function handleAIResponse(resp){
   const data = await resp.json().catch(()=>({error:'Respuesta no legible del servidor'}));
   if(!resp.ok || !Array.isArray(data.stages)){
-    let msg = data.error || 'La IA no devolvió etapas válidas.';
+    let msg = data.error || t('importReadError');
     const extra = [];
     if(data.status) extra.push('HTTP '+data.status);
     if(data.finishReason) extra.push('motivo: '+data.finishReason);
@@ -701,7 +672,7 @@ async function handleAIResponse(resp){
     if(extra.length) msg += ' ['+extra.join(' · ')+']';
     throw new Error(msg);
   }
-  return data.stages.map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||'Etapa').trim()})).filter(s=>s.date);
+  return data.stages.map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||t('stageLabel')).trim()})).filter(s=>s.date);
 }
 function fileToBase64(file){
   return new Promise((res,rej)=>{
@@ -744,28 +715,28 @@ function normalizeDate(raw){
 /* ---- Mostrar vista previa de etapas importadas ---- */
 function finishImport(stages){
   if(!stages || stages.length===0){
-    importStatus(`<div class="import-err">No encontré fechas en el archivo. Revisa que tenga una columna de fecha, o prueba con otro formato.</div>`);
+    importStatus(`<div class="import-err">${t('importNoDates')}</div>`);
     return;
   }
   stages.sort((a,b)=>a.date.localeCompare(b.date));
   draftImportStages = stages;
-  importStatus(`<div class="import-ok">${icon('calendar',14)} Encontré ${stages.length} ${stages.length===1?'etapa':'etapas'}. Revísalas y crea la meta.</div>`);
+  importStatus(`<div class="import-ok">${icon('calendar',14)} ${t('importFound')} ${stages.length} ${stages.length===1?t('importFoundStage'):t('importFoundStages')}</div>`);
   const prev = stages.slice(0,8).map(s=>`<div class="prev-row"><span class="prev-date">${fmtDateShort(s.date)}</span><span class="prev-label">${esc(s.label)}</span></div>`).join('');
-  const more = stages.length>8 ? `<div class="prev-more">y ${stages.length-8} más…</div>` : '';
+  const more = stages.length>8 ? `<div class="prev-more">${stages.length-8} ${t('importMore')}</div>` : '';
   document.getElementById('importPreview').innerHTML=`<div class="import-prev">${prev}${more}</div>`;
 }
 
 function commitGoal(id, forceDuplicate){
   const title=document.getElementById('fTitle').value.trim();
-  if(!title){ toast('Ponle un nombre a tu meta.'); return; }
+  if(!title){ toast(t('toastNeedName')); return; }
   // Aviso de nombre duplicado (solo al crear una meta nueva, no al editar)
   if(!id && !forceDuplicate){
     const exists = data.goals.some(g=>g.title.trim().toLowerCase()===title.toLowerCase());
     if(exists){
       confirmSheet(
-        'Nombre repetido',
+        t('dupName'),
         `Ya tienes una meta llamada "${esc(title)}". ¿Quieres crear otra con el mismo nombre de todas formas?`,
-        'Crear igual',
+        t('createAnyway'),
         ()=>{ commitGoal(null, true); }
       );
       return;
@@ -774,11 +745,11 @@ function commitGoal(id, forceDuplicate){
   if(draftType==='days'){
     // Caso especial: cronograma importado (trae fecha + nombre por etapa)
     if(draftFreq==='import'){
-      if(!draftImportStages || draftImportStages.length===0){ toast('Sube un cronograma primero.'); return; }
+      if(!draftImportStages || draftImportStages.length===0){ toast(t('toastNeedSchedule')); return; }
       const imp = draftImportStages.slice().sort((a,b)=>a.date.localeCompare(b.date));
       const start = imp[0].date;
       const endDate = imp[imp.length-1].date;
-      const days = imp.map(s=>({label:s.label||'Etapa', date:s.date, done:false}));
+      const days = imp.map(s=>({label:s.label||t('stageLabel'), date:s.date, done:false}));
       if(id){
         const g=data.goals.find(x=>x.id===id);
         g.title=title; g.emoji=draftEmoji; g.startDate=start; g.freq='import'; g.weekdays=[];
@@ -789,14 +760,14 @@ function commitGoal(id, forceDuplicate){
       save(); closeEdit();
       if(id){ renderDetail(); } else { show('home'); }
       renderHome();
-      toast('¡Meta creada desde tu cronograma!');
+      toast(t('toastGoalImported'));
       return;
     }
     // Build the list of dates according to frequency
     let dates=[];
     let start=todayISO();
     if(draftFreq==='manual'){
-      if(draftManualDates.length===0){ toast('Añade al menos una fecha.'); return; }
+      if(draftManualDates.length===0){ toast(t('toastNeedDate')); return; }
       dates=draftManualDates.slice().sort();
       start=dates[0];
     } else {
@@ -804,16 +775,16 @@ function commitGoal(id, forceDuplicate){
       const countEl=document.getElementById('fCount');
       start=(startEl&&startEl.value)||draftStart||todayISO();
       let count=countEl?parseInt(countEl.value):draftCount;
-      if(isNaN(count)||count<1){ toast('Indica cuántas etapas.'); return; }
+      if(isNaN(count)||count<1){ toast(t('toastNeedStages')); return; }
       count=Math.min(count,366);
       if(draftFreq==='weekly'){
-        if(draftWeekdays.length===0){ toast('Elige al menos un día de la semana.'); return; }
+        if(draftWeekdays.length===0){ toast(t('toastNeedWeekday')); return; }
         dates=genDates(start,count,'weekly',draftWeekdays);
       } else {
         dates=genDates(start,count,'daily');
       }
     }
-    if(dates.length===0){ toast('No se pudieron generar las fechas. Revisa los datos.'); return; }
+    if(dates.length===0){ toast(t('toastNoDatesGen')); return; }
     const endDate=dates[dates.length-1];
     if(id){
       const g=data.goals.find(x=>x.id===id);
@@ -822,19 +793,19 @@ function commitGoal(id, forceDuplicate){
       g.type='days';
       g.days=dates.map((d,i)=>{
         const prev=old[i];
-        return {label: prev&&prev.label ? prev.label : ('Día '+(i+1)),
+        return {label: prev&&prev.label ? prev.label : (t('dayLabel')+' '+(i+1)),
                 date:d, done: prev?prev.done:false,
                 note: prev?prev.note:undefined, noteDate: prev?prev.noteDate:undefined};
       });
       g.endDate=endDate;
     } else {
-      const days=dates.map((d,i)=>({label:'Día '+(i+1),date:d,done:false}));
+      const days=dates.map((d,i)=>({label:t('dayLabel')+' '+(i+1),date:d,done:false}));
       data.goals.push({id:uid(),title,emoji:draftEmoji,type:'days',freq:draftFreq,weekdays:draftWeekdays.slice(),startDate:start,endDate,days});
     }
   } else {
     const start=document.getElementById('fStart').value||todayISO();
     const target=parseFloat(document.getElementById('fTarget').value);
-    if(isNaN(target)||target<=0){ toast('Indica el número a alcanzar.'); return; }
+    if(isNaN(target)||target<=0){ toast(t('toastNeedTarget')); return; }
     const unit=document.getElementById('fUnit').value.trim();
     if(id){
       const g=data.goals.find(x=>x.id===id);
@@ -849,12 +820,12 @@ function commitGoal(id, forceDuplicate){
   closeEdit();
   if(id){ renderDetail(); } else { show('home'); }
   renderHome();
-  toast(id?'Meta actualizada':'¡Meta creada!');
+  toast(id?t('toastGoalUpdated'):t('toastGoalCreated'));
 }
 function closeEdit(){ document.getElementById('editScrim').classList.remove('open'); }
 
 function deleteGoal(id){
-  confirmSheet('Eliminar meta','Se borrará esta meta con todo su progreso y notas. No se puede deshacer.','Eliminar',()=>{
+  confirmSheet(t('delete'),t('confirmDelGoal'),t('delete'),()=>{
     data.goals=data.goals.filter(x=>x.id!==id);
     save(); renderHome(); show('home');
   });
@@ -866,7 +837,7 @@ function confirmSheet(title,msg,okLabel,cb,extraHtml){
   confirmCb=cb;
   const s=document.getElementById('confirmSheet');
   s.innerHTML=`<div class="sheet-grip"></div><h2>${title}</h2><div class="sub">${msg}</div>${extraHtml||''}
-    <button class="btn ${okLabel==='Eliminar'?'danger':'primary'} block" id="confirmOk" style="margin-top:12px">${okLabel}</button>
+    <button class="btn ${okLabel===t('delete')?'danger':'primary'} block" id="confirmOk" style="margin-top:12px">${okLabel}</button>
     <div style="height:8px"></div><button class="btn ghost block" onclick="closeConfirm()">Cancelar</button>`;
   document.getElementById('confirmScrim').classList.add('open');
   document.getElementById('confirmOk').onclick=()=>{ const cb2=confirmCb; closeConfirm(); if(cb2) cb2(); };
@@ -903,7 +874,7 @@ function exportData(){
   a.href=url; a.download='rumbo-backup-'+todayISO()+'.json';
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
-  toast('Copia descargada');
+  toast(t('toastExported'));
 }
 function importData(file){
   const r=new FileReader();
@@ -911,11 +882,11 @@ function importData(file){
     try{
       const obj=JSON.parse(r.result);
       if(!obj.goals) throw 0;
-      confirmSheet('Importar datos','Esto reemplazará tus metas actuales por las de la copia. ¿Continuar?','Importar',()=>{
+      confirmSheet(t('importData'),t('confirmImport'),t('importData'),()=>{
         data=obj; if(!data.settings)data.settings={theme:'light',notif:false};
-        save(); applyTheme(); renderHome(); show('home'); toast('Datos importados');
+        save(); applyTheme(); renderHome(); show('home'); toast(t('toastImported'));
       });
-    }catch(e){ toast('Archivo no válido'); }
+    }catch(e){ toast(t('toastInvalidFile')); }
   };
   r.readAsText(file);
 }
@@ -923,17 +894,17 @@ function importData(file){
 /* ---------- notifications ---------- */
 async function toggleNotif(){
   if(!data.settings.notif){
-    if(!('Notification' in window)){ toast('Tu navegador no admite avisos'); return; }
+    if(!('Notification' in window)){ toast(t('toastNoNotif')); return; }
     const perm=await Notification.requestPermission();
-    if(perm!=='granted'){ toast('Permiso denegado'); return; }
+    if(perm!=='granted'){ toast(t('toastNotifDenied')); return; }
     data.settings.notif=true; save();
     document.getElementById('notifSwitch').classList.add('on');
-    toast('Recordatorio activado');
+    toast(t('toastNotifOn'));
     scheduleNotif();
   } else {
     data.settings.notif=false; save();
     document.getElementById('notifSwitch').classList.remove('on');
-    toast('Recordatorio desactivado');
+    toast(t('toastNotifOff'));
   }
 }
 function scheduleNotif(){
@@ -943,15 +914,58 @@ function scheduleNotif(){
   if(t<=now) t.setDate(t.getDate()+1);
   setTimeout(()=>{
     if(data.settings.notif && Notification.permission==='granted'){
-      new Notification('Rumbo',{body:'¿Ya avanzaste hoy en tus metas? Un pequeño paso cuenta.'});
+      new Notification('Rumbo',{body:t('reminderBody')});
     }
     scheduleNotif();
   }, t-now);
 }
 
 /* ---------- init ---------- */
+/* ---------- i18n: aplicar traducciones al HTML fijo ---------- */
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if(typeof val === 'string') el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
+    el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+  });
+  // etiqueta del idioma actual en ajustes
+  const lc = document.getElementById('langCurrent');
+  if(lc) lc.textContent = (I18N[CURRENT_LANG]?._name || 'Español') + ' ›';
+  // tagline / descripción de la app
+  const md = document.querySelector('meta[name=description]');
+  if(md) md.setAttribute('content', t('appTagline'));
+}
+
+function openLangPicker(){
+  const sheet = document.getElementById('langSheet');
+  const langs = Object.keys(I18N);
+  sheet.innerHTML = `<div class="sheet-grip"></div><h2>${t('language')}</h2><div class="sub">${t('languageDesc')}</div>
+    <div class="lang-list">${langs.map(l=>`
+      <button class="lang-opt${l===CURRENT_LANG?' sel':''}" onclick="chooseLang('${l}')">
+        <span>${I18N[l]._name}</span>${l===CURRENT_LANG?icon('calendar',0)+'<span class="lang-check">✓</span>':''}
+      </button>`).join('')}</div>
+    <div style="height:8px"></div><button class="btn ghost block" onclick="closeLang()">${t('cancel')}</button>`;
+  document.getElementById('langScrim').classList.add('open');
+}
+function closeLang(){ document.getElementById('langScrim').classList.remove('open'); }
+function chooseLang(lang){
+  setLang(lang);
+  data.settings.lang = lang;
+  save();
+  applyI18n();
+  renderHome();
+  closeLang();
+  show('settings');
+}
+
 function init(){
   load();
+  // Idioma: el guardado en ajustes, o el del dispositivo
+  setLang((data.settings && data.settings.lang) ? data.settings.lang : detectLang());
+  applyI18n();
   applyTheme();
   document.getElementById('notifSwitch').classList.toggle('on',data.settings.notif);
   renderHome();
@@ -965,12 +979,14 @@ function init(){
   document.getElementById('exportRow').onclick=exportData;
   document.getElementById('importRow').onclick=()=>document.getElementById('importFile').click();
   document.getElementById('importFile').onchange=e=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; };
-  document.getElementById('wipeRow').onclick=()=>confirmSheet('Borrar todo','Se eliminarán todas tus metas, avances y notas de este dispositivo. No se puede deshacer.','Eliminar',()=>{
+  document.getElementById('wipeRow').onclick=()=>confirmSheet(t('wipe'),t('confirmWipe'),t('delete'),()=>{
     data={goals:[],settings:data.settings}; save(); renderHome(); show('home');
   });
+  document.getElementById('langRow').onclick=openLangPicker;
   // close sheets on scrim tap
   document.getElementById('editScrim').addEventListener('click',e=>{ if(e.target.id==='editScrim') closeEdit(); });
   document.getElementById('confirmScrim').addEventListener('click',e=>{ if(e.target.id==='confirmScrim') closeConfirm(); });
+  document.getElementById('langScrim').addEventListener('click',e=>{ if(e.target.id==='langScrim') closeLang(); });
 
   if(data.settings.notif) scheduleNotif();
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
