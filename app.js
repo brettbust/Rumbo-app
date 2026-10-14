@@ -641,13 +641,17 @@ function ensureMammoth(){
 }
 
 /* ---- IA: archivo (PDF/imagen) ---- */
+// Nombre del idioma activo para pedirle al servidor que traduzca a él
+function activeLangName(){
+  return (I18N[CURRENT_LANG] && I18N[CURRENT_LANG]._name) ? I18N[CURRENT_LANG]._name : 'Español';
+}
 async function parseWithAI_file(file){
   const base64 = await fileToBase64(file);
   const mimeType = file.type || guessMime(file.name);
   const resp = await fetch(WORKER_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ fileBase64: base64, mimeType })
+    body: JSON.stringify({ fileBase64: base64, mimeType, lang: activeLangName() })
   });
   return await handleAIResponse(resp);
 }
@@ -656,7 +660,7 @@ async function parseWithAI_text(text){
   const resp = await fetch(WORKER_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ text })
+    body: JSON.stringify({ text, lang: activeLangName() })
   });
   return await handleAIResponse(resp);
 }
