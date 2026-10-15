@@ -4,6 +4,13 @@ const WORKER_URL = 'https://soft-silence-4fe6.rumboapp-oficial.workers.dev/';
 let draftImportStages = [];   // etapas extraídas de un archivo importado
 // MOTIV y FINISH_MSG ahora vienen del idioma activo (i18n)
 function getMotiv(){ return t('motiv'); }
+// Elige el mensaje motivador para "done" avances completados, rotando la lista
+// para que no se quede atascado en el último cuando hay más etapas que mensajes.
+function motivFor(done){
+  const list = getMotiv();
+  if(done<=0) return list[0];
+  return list[(done-1) % list.length];
+}
 function getFinishMsg(){ return t('finishMsg'); }
 const EMOJIS = ["🎯","📚","🏃","💪","🧠","💰","🎸","🎨","🧘","🌱","💻","✍️","🍎","💧","⭐","🔥"];
 // Modern line icons (Lucide-style). Usage: icon('name')
@@ -99,10 +106,19 @@ function goalProgress(g){
 /* ---------- toast ---------- */
 let toastTimer;
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
+  const el=document.getElementById('toast');
+  el.innerHTML=''; el.textContent=msg; el.classList.remove('progress'); el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+}
+// Toast especial con porcentaje grande + mensaje motivador (para cuando marcas progreso)
+function progressToast(pct, msg){
+  const el=document.getElementById('toast');
+  el.classList.add('progress');
+  el.innerHTML=`<span class="pt-pct">${pct}%</span><span class="pt-msg">${esc(msg)}</span>`;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
 }
 
 /* ---------- navigation ---------- */
@@ -180,7 +196,7 @@ function renderDetail(){
     <div class="dmeta">${g.startDate?fmtDate(g.startDate):''}${g.endDate?' → '+fmtDate(g.endDate):''}</div>
     <div class="big-ring">${ring(p.pct,150,12)}<div class="lbl"><b>${p.pct}%</b><span>${t('percentDone')}</span></div></div>
     <div class="detail-count">${g.type==='number'?`${p.done} de ${p.total} ${esc(g.unit||'')}`:`${p.done} de ${p.total} días`}</div>
-    <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?getFinishMsg():(p.done>0?getMotiv()[Math.min(p.done-1,getMotiv().length-1)]:t('firstStepMsg'))}</span></div>
+    <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?getFinishMsg():(p.done>0?motivFor(p.done):t('firstStepMsg'))}</span></div>
   </div>`;
 
   if(g.type==='number'){
@@ -238,8 +254,44 @@ function toggleDay(i){
   if(g.days[i].done && !g.days[i].date) g.days[i].date=todayISO();
   save();
   const p=goalProgress(g);
-  renderDetail();
-  if(g.days[i].done){ flashMotiv(p); }
+  // Actualizar en el sitio sin redibujar toda la pantalla (no se pierde el scroll)
+  const row=document.querySelectorAll('.day')[getDayDomIndex(i)];
+  if(row){
+    const chk=row.querySelector('.check');
+    if(chk){ chk.classList.toggle('on',g.days[i].done); chk.textContent=g.days[i].done?'✓':''; }
+    row.classList.toggle('done',g.days[i].done);
+  }
+  // Actualizar barra/anillo y contador del hero de detalle
+  updateDetailProgress(p);
+  if(g.days[i].done){
+    flashMotiv(p);
+    progressToast(p.pct, p.pct===100?getFinishMsg():motivFor(p.done));
+    // Pedir un mensaje único a la IA en paralelo (si no está completada y la opción está activa)
+    if(p.pct<100 && data.settings.aiMotiv!==false){
+      fetchAiMotiv(g.title, p.done, p.total, p.pct);
+    }
+  }
+}
+// Las etapas en el DOM incluyen las de tipo festivo/orden; aquí el índice coincide 1:1
+function getDayDomIndex(i){ return i; }
+// Actualiza el anillo, porcentaje y contador del detalle sin redibujar la lista
+function updateDetailProgress(p){
+  const pctEl=document.querySelector('.big-ring .lbl b');
+  if(pctEl) pctEl.textContent=p.pct+'%';
+  const g=data.goals.find(x=>x.id===currentGoalId);
+  const countEl=document.querySelector('.detail-count');
+  if(countEl && g) countEl.textContent = g.type==='number'
+    ? `${p.done} ${t('ofUnit')} ${p.total} ${esc(g.unit||'')}`
+    : `${p.done} ${t('ofDays')} ${p.total} ${t('dayLabel').toLowerCase()}s`;
+  // redibujar el anillo (el arco)
+  const ringHost=document.querySelector('.big-ring');
+  if(ringHost){
+    const svg=ring(p.pct,150,12);
+    ringHost.innerHTML = svg + ringHost.querySelector('.lbl').outerHTML;
+  }
+  // actualizar también el contador de "Etapas (x/y)" si existe
+  const dh=document.querySelector('.days-head h3');
+  if(dh) dh.textContent=`${t('stages')} (${p.done}/${p.total})`;
 }
 function editStage(i){
   document.querySelectorAll('.stage-edit').forEach(e=>e.classList.remove('open'));
@@ -271,13 +323,43 @@ function addStage(){
   save(); renderDetail();
   toast(t('toastStageAdded'));
 }
+let motivReqId = 0;  // para ignorar respuestas de IA que llegan tarde
+// Pide un mensaje motivador único a la IA y lo coloca cuando llega (sin bloquear).
+async function fetchAiMotiv(goalTitle, done, total, pct){
+  const myId = ++motivReqId;
+  try{
+    const resp = await fetch(WORKER_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'motivate', lang: activeLangName(), goalTitle, done, total, pct })
+    });
+    const data = await resp.json();
+    // si llegó una petición más nueva mientras tanto, descartar esta
+    if(myId !== motivReqId) return;
+    if(data && data.message && data.message.length){
+      swapMotivText(data.message);
+    }
+  }catch(e){ /* si falla, se queda el mensaje local que ya se mostró */ }
+}
+// Cambia suavemente el texto del mensaje motivador visible
+function swapMotivText(msg){
+  const mt=document.getElementById('motivText');
+  const box=document.getElementById('motivBox');
+  if(mt){ mt.textContent = msg; }
+  // también en el toast de progreso si sigue visible
+  const toastEl=document.getElementById('toast');
+  if(toastEl && toastEl.classList.contains('show') && toastEl.classList.contains('progress')){
+    const pm=toastEl.querySelector('.pt-msg');
+    if(pm) pm.textContent = msg;
+  }
+}
 function flashMotiv(p){
   const box=document.getElementById('motivBox');
   if(!box) return;
   box.style.opacity=0;
   setTimeout(()=>{
     const mt=document.getElementById('motivText');
-    if(mt) mt.textContent = p.pct===100?getFinishMsg():getMotiv()[Math.min(p.done-1,getMotiv().length-1)];
+    if(mt) mt.textContent = p.pct===100?getFinishMsg():motivFor(p.done);
     const ico=box.querySelector('.ico'); if(ico) ico.textContent=p.pct===100?'🎉':'🌟';
     box.style.opacity=1;
   },180);
@@ -325,6 +407,10 @@ function applyNumber(v){
   const p=goalProgress(g);
   renderDetail();
   flashMotiv(p);
+  progressToast(p.pct, p.pct===100?getFinishMsg():motivFor(p.done));
+  if(p.pct<100 && data.settings.aiMotiv!==false){
+    fetchAiMotiv(g.title, p.done, p.total, p.pct);
+  }
 }
 function setNumber(){
   const g=data.goals.find(x=>x.id===currentGoalId);
@@ -972,8 +1058,16 @@ function init(){
   applyI18n();
   applyTheme();
   document.getElementById('notifSwitch').classList.toggle('on',data.settings.notif);
+  document.getElementById('aiMotivSwitch').classList.toggle('on',data.settings.aiMotiv!==false);
   renderHome();
 
+  document.getElementById('aiMotivSwitch').onclick=()=>{
+    const el=document.getElementById('aiMotivSwitch');
+    const on = !el.classList.contains('on');
+    el.classList.toggle('on',on);
+    data.settings.aiMotiv = on;
+    save();
+  };
   document.getElementById('fab').onclick=()=>openEdit();
   document.getElementById('settingsBtn').onclick=()=>show('settings');
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };

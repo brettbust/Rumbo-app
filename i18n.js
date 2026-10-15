@@ -47,6 +47,7 @@ var I18N = {
     firstStepMsg: 'Marca tu primer avance para arrancar.',
     darkMode: 'Tema oscuro', darkModeDesc: 'Cambia la apariencia',
     reminder: 'Recordatorio diario', reminderDesc: 'Un aviso para no perder el ritmo',
+    aiMotiv: 'Mensajes con IA', aiMotivDesc: 'Frases motivadoras únicas al avanzar',
     language: 'Idioma', languageDesc: 'Elige el idioma de la app',
     exportData: 'Exportar mis datos', exportDesc: 'Guarda una copia de seguridad',
     importData: 'Importar datos', importDataDesc: 'Restaura desde una copia',
