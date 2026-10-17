@@ -730,7 +730,11 @@ async function handleImportFile(input){
       importStatus(`<div class="import-err">${t('importBadFormat')}</div>`);
     }
   }catch(err){
-    importStatus(`<div class="import-err">${t('importReadError')} ${esc(String(err.message||err))}</div>`);
+    if(err && err.notSchedule){
+      importStatus(`<div class="import-err">${esc(String(err.message))}</div>`);
+    } else {
+      importStatus(`<div class="import-err">${t('importReadError')} ${esc(String(err.message||err))}</div>`);
+    }
   }
   input.value='';
 }
@@ -902,6 +906,12 @@ async function parseWithAI_text(text){
 }
 async function handleAIResponse(resp){
   const data = await resp.json().catch(()=>({error:'Respuesta no legible del servidor'}));
+  // La IA determinó que el archivo NO es un cronograma
+  if(data && data.notSchedule){
+    const e = new Error(t('importNotSchedule'));
+    e.notSchedule = true;
+    throw e;
+  }
   if(!resp.ok || !Array.isArray(data.stages)){
     let msg = data.error || t('importReadError');
     const extra = [];

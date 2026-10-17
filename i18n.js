@@ -87,6 +87,7 @@ var I18N = {
     importReadingWord: 'Leyendo el documento Word…',
     importFound: 'Encontré', importFoundStages: 'etapas. Revísalas y crea la meta.', importFoundStage: 'etapa. Revísala y crea la meta.',
     importNoDates: 'No encontré fechas en el archivo. Revisa que tenga una columna de fecha, o prueba con otro formato.',
+    importNotSchedule: 'Este archivo no parece un cronograma, así que no puedo crear etapas con él. Sube un documento o imagen con una lista de fechas y temas (por ejemplo, un calendario de clases o un plan de entrenamiento). También puedes crear tu meta a mano o con el generador de IA.',
     importBadFormat: 'Formato no admitido. Usa CSV, Excel, PDF, imagen o Word.',
     importReadError: 'No se pudo leer el archivo:', importMore: 'más…',
     reminderBody: '¿Ya avanzaste hoy en tus metas? Un pequeño paso cuenta.',
