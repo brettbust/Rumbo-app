@@ -2,14 +2,46 @@
 const STORE_KEY = 'rumbo_v1';
 const WORKER_URL = 'https://soft-silence-4fe6.rumboapp-oficial.workers.dev/';
 let draftImportStages = [];   // etapas extraídas de un archivo importado
-// MOTIV y FINISH_MSG ahora vienen del idioma activo (i18n)
-function getMotiv(){ return t('motiv'); }
-// Elige el mensaje motivador para "done" avances completados, rotando la lista
-// para que no se quede atascado en el último cuando hay más etapas que mensajes.
+// Banco de frases = frases base del idioma + frases que la IA fue generando y guardando.
+function getMotivBank(){
+  const base = t('motiv') || [];
+  let extra = [];
+  try{
+    const stored = (data.aiMotivBank && data.aiMotivBank[CURRENT_LANG]) || [];
+    extra = Array.isArray(stored) ? stored : [];
+  }catch(e){}
+  return base.concat(extra);
+}
+function getMotiv(){ return getMotivBank(); }
+let lastMotivShown = '';   // última frase elegida (para redibujar sin gastar otra)
+// Elige una frase NUEVA evitando repetir hasta agotar el banco. Solo al marcar progreso.
 function motivFor(done){
-  const list = getMotiv();
-  if(done<=0) return list[0];
-  return list[(done-1) % list.length];
+  const list = getMotivBank();
+  if(list.length===0) return '';
+  if(done<=0){ lastMotivShown=list[0]; return list[0]; }
+  let picked;
+  try{
+    data._shown = data._shown || {};
+    let shown = data._shown[CURRENT_LANG] || [];
+    if(shown.length >= list.length) shown = [];           // reiniciar al agotar
+    const avail = [];
+    for(let i=0;i<list.length;i++) if(!shown.includes(i)) avail.push(i);
+    const pick = avail.length ? avail[Math.floor(Math.random()*avail.length)] : ((done-1)%list.length);
+    shown.push(pick);
+    data._shown[CURRENT_LANG] = shown;
+    save();
+    picked = list[pick];
+  }catch(e){
+    picked = list[(done-1) % list.length];
+  }
+  lastMotivShown = picked;
+  return picked;
+}
+// Muestra una frase SIN gastar una nueva (para redibujar el detalle).
+function motivShow(done){
+  if(lastMotivShown) return lastMotivShown;
+  const list=getMotivBank();
+  return list.length ? list[(Math.max(1,done)-1)%list.length] : '';
 }
 function getFinishMsg(){ return t('finishMsg'); }
 const EMOJIS = ["🎯","📚","🏃","💪","🧠","💰","🎸","🎨","🧘","🌱","💻","✍️","🍎","💧","⭐","🔥"];
@@ -196,7 +228,7 @@ function renderDetail(){
     <div class="dmeta">${g.startDate?fmtDate(g.startDate):''}${g.endDate?' → '+fmtDate(g.endDate):''}</div>
     <div class="big-ring">${ring(p.pct,150,12)}<div class="lbl"><b>${p.pct}%</b><span>${t('percentDone')}</span></div></div>
     <div class="detail-count">${g.type==='number'?`${p.done} de ${p.total} ${esc(g.unit||'')}`:`${p.done} de ${p.total} días`}</div>
-    <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?getFinishMsg():(p.done>0?motivFor(p.done):t('firstStepMsg'))}</span></div>
+    <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?getFinishMsg():(p.done>0?motivShow(p.done):t('firstStepMsg'))}</span></div>
   </div>`;
 
   if(g.type==='number'){
@@ -264,9 +296,10 @@ function toggleDay(i){
   // Actualizar barra/anillo y contador del hero de detalle
   updateDetailProgress(p);
   if(g.days[i].done){
-    flashMotiv(p);
-    progressToast(p.pct, p.pct===100?getFinishMsg():motivFor(p.done));
-    // Pedir un mensaje único a la IA en paralelo (si no está completada y la opción está activa)
+    const msg = p.pct===100 ? getFinishMsg() : motivFor(p.done);
+    flashMotiv(p, msg);
+    progressToast(p.pct, msg);
+    // La IA genera frases nuevas en segundo plano y las guarda en el banco (no cambia la pantalla)
     if(p.pct<100 && data.settings.aiMotiv!==false){
       fetchAiMotiv(g.title, p.done, p.total, p.pct);
     }
@@ -323,22 +356,38 @@ function addStage(){
   save(); renderDetail();
   toast(t('toastStageAdded'));
 }
-let motivReqId = 0;  // para ignorar respuestas de IA que llegan tarde
-// Pide un mensaje motivador único a la IA y lo coloca cuando llega (sin bloquear).
+// Pide una frase motivadora genérica a la IA y la GUARDA en el banco (no cambia la pantalla).
+// Así el banco crece en silencio y las próximas veces hay más variedad sin repetir.
+let aiMotivBusy = false;
+const AI_BANK_MAX = 300;   // tope de frases guardadas por idioma
 async function fetchAiMotiv(goalTitle, done, total, pct){
-  const myId = ++motivReqId;
+  if(aiMotivBusy) return;       // evitar peticiones solapadas
+  aiMotivBusy = true;
+  const lang = CURRENT_LANG;
   try{
     const resp = await fetch(WORKER_URL, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action:'motivate', lang: activeLangName(), goalTitle, done, total, pct })
     });
-    const data = await resp.json();
-    // si llegó una petición más nueva mientras tanto, descartar esta
-    if(myId !== motivReqId) return;
-    const clean = cleanMotivMsg(data && data.message, goalTitle);
-    if(clean) swapMotivText(clean);
-  }catch(e){ /* si falla, se queda el mensaje local que ya se mostró */ }
+    const res = await resp.json();
+    const clean = cleanMotivMsg(res && res.message, goalTitle);
+    if(clean){
+      data.aiMotivBank = data.aiMotivBank || {};
+      const bank = data.aiMotivBank[lang] || [];
+      // no duplicar (ni contra el banco IA ni contra las frases base)
+      const base = (I18N[lang] && I18N[lang].motiv) ? I18N[lang].motiv : [];
+      const exists = bank.some(f=>f.toLowerCase()===clean.toLowerCase())
+                  || base.some(f=>f.toLowerCase()===clean.toLowerCase());
+      if(!exists){
+        bank.push(clean);
+        if(bank.length>AI_BANK_MAX) bank.shift(); // mantener acotado
+        data.aiMotivBank[lang]=bank;
+        save();
+      }
+    }
+  }catch(e){ /* si falla, no pasa nada: el banco sigue como estaba */ }
+  finally{ aiMotivBusy=false; }
 }
 // Limpia y valida el mensaje de la IA; devuelve null si no sirve (y se queda el local)
 function cleanMotivMsg(raw, goalTitle){
@@ -357,25 +406,14 @@ function cleanMotivMsg(raw, goalTitle){
   if(m.length > 160) m = m.slice(0,160).trim();
   return m;
 }
-// Cambia suavemente el texto del mensaje motivador visible
-function swapMotivText(msg){
-  const mt=document.getElementById('motivText');
-  const box=document.getElementById('motivBox');
-  if(mt){ mt.textContent = msg; }
-  // también en el toast de progreso si sigue visible
-  const toastEl=document.getElementById('toast');
-  if(toastEl && toastEl.classList.contains('show') && toastEl.classList.contains('progress')){
-    const pm=toastEl.querySelector('.pt-msg');
-    if(pm) pm.textContent = msg;
-  }
-}
-function flashMotiv(p){
+function flashMotiv(p, msg){
   const box=document.getElementById('motivBox');
   if(!box) return;
+  const text = p.pct===100 ? getFinishMsg() : (msg || motivFor(p.done));
   box.style.opacity=0;
   setTimeout(()=>{
     const mt=document.getElementById('motivText');
-    if(mt) mt.textContent = p.pct===100?getFinishMsg():motivFor(p.done);
+    if(mt) mt.textContent = text;
     const ico=box.querySelector('.ico'); if(ico) ico.textContent=p.pct===100?'🎉':'🌟';
     box.style.opacity=1;
   },180);
@@ -422,8 +460,9 @@ function applyNumber(v){
   save();
   const p=goalProgress(g);
   renderDetail();
-  flashMotiv(p);
-  progressToast(p.pct, p.pct===100?getFinishMsg():motivFor(p.done));
+  const msg = p.pct===100 ? getFinishMsg() : motivFor(p.done);
+  flashMotiv(p, msg);
+  progressToast(p.pct, msg);
   if(p.pct<100 && data.settings.aiMotiv!==false){
     fetchAiMotiv(g.title, p.done, p.total, p.pct);
   }
