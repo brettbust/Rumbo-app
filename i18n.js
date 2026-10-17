@@ -6,7 +6,7 @@ var RTL_LANGS = ['he', 'ar'];
 
 var I18N = {
   es: {
-    _name: 'Español',
+    _name: 'Español', _en: 'Spanish',
     appTagline: 'Sigue tus metas, un paso a la vez',
     settings: 'Ajustes', back: 'Volver', allGoals: 'Todas mis metas',
     newGoal: 'Nueva meta', editGoal: 'Editar meta', createGoal: 'Crear meta',

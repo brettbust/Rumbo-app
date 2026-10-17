@@ -837,7 +837,10 @@ function ensureMammoth(){
 /* ---- IA: archivo (PDF/imagen) ---- */
 // Nombre del idioma activo para pedirle al servidor que traduzca a él
 function activeLangName(){
-  return (I18N[CURRENT_LANG] && I18N[CURRENT_LANG]._name) ? I18N[CURRENT_LANG]._name : 'Español';
+  const L = I18N[CURRENT_LANG];
+  if(L && L._en) return L._en;               // nombre en inglés: el más fiable para la IA
+  if(L && L._name) return L._name;
+  return 'Spanish';
 }
 
 /* ---------- Generador de metas con IA ---------- */

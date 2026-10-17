@@ -3,7 +3,7 @@
 
 Object.assign(I18N, {
   en: {
-    _name: 'English',
+    _name: 'English', _en: 'English',
     appTagline: 'Track your goals, one step at a time',
     settings: 'Settings', back: 'Back', allGoals: 'All my goals',
     newGoal: 'New goal', editGoal: 'Edit goal', createGoal: 'Create goal',
@@ -111,7 +111,7 @@ Object.assign(I18N, {
   },
 
   pt: {
-    _name: 'Português',
+    _name: 'Português', _en: 'Portuguese',
     appTagline: 'Acompanhe suas metas, um passo de cada vez',
     settings: 'Configurações', back: 'Voltar', allGoals: 'Todas as minhas metas',
     newGoal: 'Nova meta', editGoal: 'Editar meta', createGoal: 'Criar meta',
@@ -219,7 +219,7 @@ Object.assign(I18N, {
   },
 
   he: {
-    _name: 'עברית',
+    _name: 'עברית', _en: 'Hebrew',
     appTagline: 'עקוב אחרי המטרות שלך, צעד אחר צעד',
     settings: 'הגדרות', back: 'חזרה', allGoals: 'כל המטרות שלי',
     newGoal: 'מטרה חדשה', editGoal: 'עריכת מטרה', createGoal: 'צור מטרה',
@@ -327,7 +327,7 @@ Object.assign(I18N, {
   },
 
   ar: {
-    _name: 'العربية',
+    _name: 'العربية', _en: 'Arabic',
     appTagline: 'تابع أهدافك خطوة بخطوة',
     settings: 'الإعدادات', back: 'رجوع', allGoals: 'كل أهدافي',
     newGoal: 'هدف جديد', editGoal: 'تعديل الهدف', createGoal: 'إنشاء هدف',
@@ -435,7 +435,7 @@ Object.assign(I18N, {
   },
 
   ru: {
-    _name: 'Русский',
+    _name: 'Русский', _en: 'Russian',
     appTagline: 'Отслеживайте цели шаг за шагом',
     settings: 'Настройки', back: 'Назад', allGoals: 'Все мои цели',
     newGoal: 'Новая цель', editGoal: 'Изменить цель', createGoal: 'Создать цель',
@@ -543,7 +543,7 @@ Object.assign(I18N, {
   },
 
   zh: {
-    _name: '中文',
+    _name: '中文', _en: 'Chinese',
     appTagline: '一步一步追踪你的目标',
     settings: '设置', back: '返回', allGoals: '我的所有目标',
     newGoal: '新目标', editGoal: '编辑目标', createGoal: '创建目标',
@@ -651,7 +651,7 @@ Object.assign(I18N, {
   },
 
   it: {
-    _name: 'Italiano',
+    _name: 'Italiano', _en: 'Italian',
     appTagline: 'Segui i tuoi obiettivi, un passo alla volta',
     settings: 'Impostazioni', back: 'Indietro', allGoals: 'Tutti i miei obiettivi',
     newGoal: 'Nuovo obiettivo', editGoal: 'Modifica obiettivo', createGoal: 'Crea obiettivo',
@@ -759,7 +759,7 @@ Object.assign(I18N, {
   },
 
   fr: {
-    _name: 'Français',
+    _name: 'Français', _en: 'French',
     appTagline: 'Suivez vos objectifs, pas à pas',
     settings: 'Paramètres', back: 'Retour', allGoals: 'Tous mes objectifs',
     newGoal: 'Nouvel objectif', editGoal: 'Modifier l\'objectif', createGoal: 'Créer l\'objectif',
@@ -867,7 +867,7 @@ Object.assign(I18N, {
   },
 
   ja: {
-    _name: '日本語',
+    _name: '日本語', _en: 'Japanese',
     appTagline: '一歩ずつ目標を追いかけよう',
     settings: '設定', back: '戻る', allGoals: 'すべての目標',
     newGoal: '新しい目標', editGoal: '目標を編集', createGoal: '目標を作成',
