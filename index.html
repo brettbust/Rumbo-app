@@ -107,6 +107,10 @@ body::after{
 .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + var(--safe-bottom));background:var(--accent);color:#fff;border:none;border-radius:99px;padding:15px 26px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(15,110,86,.35);display:flex;align-items:center;gap:8px;z-index:50;transition:.15s}
 .fab:active{transform:translateX(-50%) scale(.96)}
 .fab svg{width:18px;height:18px}
+.scrolltop{position:fixed;right:18px;bottom:calc(88px + var(--safe-bottom));width:46px;height:46px;border-radius:50%;background:var(--surface);color:var(--accent);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:49;transition:.2s;opacity:0}
+.scrolltop.show{display:flex;opacity:1}
+.scrolltop:active{transform:scale(.92)}
+.scrolltop svg{width:22px;height:22px}
 
 /* Detail view */
 .detail-hero{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px;margin-bottom:18px;box-shadow:var(--shadow);text-align:center}
@@ -355,6 +359,10 @@ body::after{
 <div class="scrim" id="confirmScrim">
   <div class="sheet" id="confirmSheet"></div>
 </div>
+
+<button class="scrolltop" id="scrollTopBtn" aria-label="Subir al principio">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
 
 <div class="toast" id="toast"></div>
 

@@ -166,7 +166,7 @@ function progressToast(pct, msg){
   el.innerHTML=`<span class="pt-pct">${pct}%</span><span class="pt-msg">${esc(msg)}</span>`;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),5600);
 }
 
 /* ---------- navigation ---------- */
@@ -1170,6 +1170,14 @@ function init(){
     data={goals:[],settings:data.settings}; save(); renderHome(); show('home');
   });
   document.getElementById('langRow').onclick=openLangPicker;
+  // Botón para subir al principio: aparece al bajar, sube suave al tocarlo
+  const scrollBtn=document.getElementById('scrollTopBtn');
+  scrollBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+  window.addEventListener('scroll',()=>{
+    // mostrar solo si se bajó bastante y estamos en la pantalla de detalle
+    const show = window.scrollY>300 && document.getElementById('view-detail').classList.contains('active');
+    scrollBtn.classList.toggle('show',show);
+  },{passive:true});
   // close sheets on scrim tap
   document.getElementById('editScrim').addEventListener('click',e=>{ if(e.target.id==='editScrim') closeEdit(); });
   document.getElementById('confirmScrim').addEventListener('click',e=>{ if(e.target.id==='confirmScrim') closeConfirm(); });
