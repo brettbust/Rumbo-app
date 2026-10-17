@@ -205,19 +205,19 @@ function renderHome(){
   const ringPct = total>0 ? Math.round(done/total*100) : 0;
   let html=`<div class="hero"><div class="hero-top">
     <div class="ring-wrap">${ring(ringPct,88,9)}<div class="ring-label"><b>${done}/${total}</b><span>${t('manyGoals')}</span></div></div>
-    <div class="hero-txt"><h2>${done} de ${total} completada${done===1?'':'s'}</h2>
+    <div class="hero-txt"><h2>${done} ${t('ofDays')} ${total} ${done===1?t('completed'):t('completedPl')}</h2>
     <p>${active>0?(t('youHave')+' '+active+' '+(active===1?t('activeOne'):t('activeMany'))):t('allDone')}</p></div>
   </div></div>`;
-  html+=`<div class="section-label">Mis metas</div>`;
+  html+=`<div class="section-label">${t('myGoals')}</div>`;
   data.goals.forEach(g=>{
     const p=goalProgress(g);
-    const sub = g.type==='number' ? `${p.done} / ${p.total} ${esc(g.unit||'')}` : `${p.done} / ${p.total} días`;
+    const sub = g.type==='number' ? `${p.done} / ${p.total} ${esc(g.unit||'')}` : `${p.done} / ${p.total} ${t('daysUnit')}`;
     const deadline = g.endDate ? t('goalDeadline')+' '+fmtDateShort(g.endDate) : '';
     html+=`<div class="goal" onclick="openDetail('${g.id}')">
       <div class="accent-strip"></div>
       <div class="goal-head">
         <div class="goal-emoji">${g.emoji||'🎯'}</div>
-        <div class="goal-title"><h3>${esc(g.title)}</h3><div class="meta">${sub}</div></div>
+        <div class="goal-title"><h3 dir="auto">${esc(g.title)}</h3><div class="meta">${sub}</div></div>
         <div class="goal-pct">${p.pct}%</div>
       </div>
       <div class="mini-track"><div class="mini-fill" style="width:${p.pct}%"></div></div>
@@ -248,7 +248,7 @@ function renderDetail(){
     <h2>${esc(g.title)}</h2>
     <div class="dmeta">${g.startDate?fmtDate(g.startDate):''}${g.endDate?' → '+fmtDate(g.endDate):''}</div>
     <div class="big-ring">${ring(p.pct,150,12)}<div class="lbl"><b>${p.pct}%</b><span>${t('percentDone')}</span></div></div>
-    <div class="detail-count">${g.type==='number'?`${p.done} de ${p.total} ${esc(g.unit||'')}`:`${p.done} de ${p.total} días`}</div>
+    <div class="detail-count">${g.type==='number'?`${p.done} ${t('ofDays')} ${p.total} ${esc(g.unit||'')}`:`${p.done} ${t('ofDays')} ${p.total} ${t('daysUnit')}`}</div>
     <div class="motiv" id="motivBox"><span class="ico">🌟</span><span id="motivText">${p.pct===100?getFinishMsg():(p.done>0?motivShow(p.done):t('firstStepMsg'))}</span></div>
   </div>`;
 

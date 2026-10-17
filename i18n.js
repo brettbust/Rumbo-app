@@ -42,7 +42,7 @@ var I18N = {
     stageName: 'Nombre de la etapa', save: 'Guardar',
     viewNote: 'Ver nota', addNote: 'Añadir nota', notePh: 'Escribe una nota para esta etapa…',
     saveNote: 'Guardar nota', savedOn: 'Guardada:',
-    percentDone: 'completado', ofUnit: 'de', ofDays: 'de',
+    percentDone: 'completado', ofUnit: 'de', ofDays: 'de', daysUnit: 'días',
     howMuch: '¿Cuánto sumaste?', add: 'Sumar', adjustTotal: 'Ajustar total…',
     firstStepMsg: 'Marca tu primer avance para arrancar.',
     darkMode: 'Tema oscuro', darkModeDesc: 'Cambia la apariencia',
