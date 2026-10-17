@@ -532,6 +532,17 @@ function openEdit(id){
     <h2>${editing?t('editGoal'):t('newGoal')}</h2>
     <div class="sub"></div>
 
+    ${editing ? '' : `
+    <div class="ai-gen-box">
+      <div class="ai-gen-head">${icon('star',18)} <b>${t('aiPlanTitle')}</b></div>
+      <div class="ai-gen-sub">${t('aiPlanSub')}</div>
+      <textarea id="aiGoalText" rows="2" placeholder="${t('aiPlanPh')}"></textarea>
+      <button class="btn primary block" id="aiGenBtn" onclick="generatePlan()">${icon('star',16)} ${t('aiPlanBtn')}</button>
+      <div id="aiGenStatus"></div>
+    </div>
+    <div class="ai-gen-divider"><span>${t('aiPlanOr')}</span></div>
+    `}
+
     <div class="field"><label>${t('whatAchieve')}</label>
       <input id="fTitle" type="text" maxlength="60" placeholder="${t('goalNamePh')}" value="${g?esc(g.title):''}"></div>
 
@@ -823,6 +834,52 @@ function ensureMammoth(){
 // Nombre del idioma activo para pedirle al servidor que traduzca a él
 function activeLangName(){
   return (I18N[CURRENT_LANG] && I18N[CURRENT_LANG]._name) ? I18N[CURRENT_LANG]._name : 'Español';
+}
+
+/* ---------- Generador de metas con IA ---------- */
+let planBusy = false;
+async function generatePlan(){
+  if(planBusy) return;
+  const ta = document.getElementById('aiGoalText');
+  const goalText = (ta && ta.value || '').trim();
+  const statusEl = document.getElementById('aiGenStatus');
+  if(!goalText){ if(statusEl) statusEl.innerHTML=`<div class="import-err">${t('aiPlanNeedText')}</div>`; return; }
+  planBusy = true;
+  if(statusEl) statusEl.innerHTML=`<div class="import-loading"><div class="spinner"></div><span>${t('aiPlanLoading')}</span></div>`;
+  const btn=document.getElementById('aiGenBtn'); if(btn) btn.disabled=true;
+  const startDate = addDays(todayISO(),1);   // empieza el día después de hoy
+  try{
+    const resp = await fetch(WORKER_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'plan', lang: activeLangName(), goalText, startDate })
+    });
+    const res = await resp.json();
+    if(res.error){ if(statusEl) statusEl.innerHTML=`<div class="import-err">${esc(res.error)}</div>`; return; }
+    const stages = (Array.isArray(res.stages)?res.stages:[])
+      .map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||t('stageLabel')).trim()}))
+      .filter(s=>s.date && s.label);
+    if(stages.length===0){ if(statusEl) statusEl.innerHTML=`<div class="import-err">${t('aiPlanNoStages')}</div>`; return; }
+    // Rellenar el formulario con el plan y pasarlo a modo "fechas manuales" (cada etapa su fecha)
+    if(res.title){ const ft=document.getElementById('fTitle'); if(ft) ft.value=res.title.slice(0,60); }
+    if(res.emoji){ draftEmoji=res.emoji; }
+    draftType='days';
+    draftFreq='import';          // reutiliza el flujo de importación (etapas con fecha+nombre)
+    draftImportStages = stages.slice().sort((a,b)=>a.date.localeCompare(b.date));
+    // refrescar la vista del formulario para que muestre el tipo días + vista previa
+    renderTypeFields(null);
+    pickType('days');
+    // seleccionar la opción import y mostrar la vista previa
+    if(typeof pickFreq==='function') pickFreq('import');
+    finishImport(draftImportStages);   // muestra la vista previa de etapas
+    if(statusEl) statusEl.innerHTML=`<div class="import-ok">${icon('star',14)} ${t('aiPlanReady')}</div>`;
+    // llevar al usuario a la vista previa
+    const prev=document.getElementById('importPreview'); if(prev) prev.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){
+    if(statusEl) statusEl.innerHTML=`<div class="import-err">${t('aiPlanError')}</div>`;
+  }finally{
+    planBusy=false;
+    const b=document.getElementById('aiGenBtn'); if(b) b.disabled=false;
+  }
 }
 async function parseWithAI_file(file){
   const base64 = await fileToBase64(file);
