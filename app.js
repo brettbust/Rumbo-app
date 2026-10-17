@@ -534,7 +534,7 @@ function openEdit(id){
 
     ${editing ? '' : `
     <div class="ai-gen-box">
-      <div class="ai-gen-head">${icon('star',18)}<span>${t('aiPlanTitle')}</span></div>
+      <div class="ai-gen-head"><span>${t('aiPlanTitle')}</span>${icon('star',18)}</div>
       <div class="ai-gen-sub">${t('aiPlanSub')}</div>
       <textarea id="aiGoalText" rows="2" placeholder="${t('aiPlanPh')}"></textarea>
       <button class="btn primary block" id="aiGenBtn" onclick="generatePlan()">${icon('star',16)} ${t('aiPlanBtn')}</button>
