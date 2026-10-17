@@ -336,10 +336,26 @@ async function fetchAiMotiv(goalTitle, done, total, pct){
     const data = await resp.json();
     // si llegó una petición más nueva mientras tanto, descartar esta
     if(myId !== motivReqId) return;
-    if(data && data.message && data.message.length){
-      swapMotivText(data.message);
-    }
+    const clean = cleanMotivMsg(data && data.message, goalTitle);
+    if(clean) swapMotivText(clean);
   }catch(e){ /* si falla, se queda el mensaje local que ya se mostró */ }
+}
+// Limpia y valida el mensaje de la IA; devuelve null si no sirve (y se queda el local)
+function cleanMotivMsg(raw, goalTitle){
+  if(!raw || typeof raw!=='string') return null;
+  let m = raw.trim();
+  // descartar de entrada si parece JSON crudo o restos de cronograma
+  if(/^[\{\[]/.test(m) || m.includes('"date"') || m.includes('"stages"') || m.includes('"label"')) return null;
+  // quitar comillas y llaves/corchetes de JSON que a veces se cuelan
+  m = m.replace(/^[\s"'`{}\[\]:,]+/, '').replace(/[\s"'`{}\[\]:,]+$/, '').trim();
+  // quitar prefijos como "message":, "mensaje":, etc.
+  m = m.replace(/^(message|mensaje|msg|texto|text)\s*[:：]\s*/i, '').replace(/^["'`]+|["'`]+$/g,'').trim();
+  // descartar si quedó vacío, muy corto, o es solo el nombre de la meta
+  if(m.length < 4) return null;
+  if(goalTitle && m.toLowerCase() === goalTitle.trim().toLowerCase()) return null;
+  // limitar largo por seguridad
+  if(m.length > 160) m = m.slice(0,160).trim();
+  return m;
 }
 // Cambia suavemente el texto del mensaje motivador visible
 function swapMotivText(msg){
