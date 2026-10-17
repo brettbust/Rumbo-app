@@ -113,6 +113,11 @@ body::after{
 .scrolltop svg{width:22px;height:22px}
 
 /* Detail view */
+.detail-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px}
+.detail-topbar .back-btn{margin-bottom:0}
+.detail-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn.danger{color:var(--danger)}
+.icon-btn.danger:active{background:var(--danger-soft)}
 .detail-hero{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px;margin-bottom:18px;box-shadow:var(--shadow);text-align:center}
 .detail-hero .demoji{font-size:40px;margin-bottom:8px}
 .detail-hero h2{font-size:20px;font-weight:700;margin-bottom:4px}
@@ -300,7 +305,13 @@ body::after{
 
   <!-- DETAIL -->
   <div class="view" id="view-detail">
-    <button class="back-btn" id="detailBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="allGoals">Todas mis metas</span></button>
+    <div class="detail-topbar">
+      <button class="back-btn" id="detailBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="allGoals">Todas mis metas</span></button>
+      <div class="detail-actions">
+        <button class="icon-btn" id="detailEdit" aria-label="Editar meta" data-i18n-aria="editGoal"></button>
+        <button class="icon-btn danger" id="detailDelete" aria-label="Eliminar meta" data-i18n-aria="delete"></button>
+      </div>
+    </div>
     <div id="detailContent"></div>
   </div>
 

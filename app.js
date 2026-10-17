@@ -230,6 +230,11 @@ function renderHome(){
 /* ---------- DETAIL ---------- */
 function openDetail(id){
   currentGoalId=id;
+  // iconos y acciones de los botones superiores de editar/eliminar
+  const eb=document.getElementById('detailEdit');
+  const db=document.getElementById('detailDelete');
+  if(eb){ eb.innerHTML=icon('edit',18); eb.onclick=()=>openEdit(id); }
+  if(db){ db.innerHTML=icon('trash',18); db.onclick=()=>deleteGoal(id); }
   renderDetail();
   show('detail');
 }
@@ -291,7 +296,6 @@ function renderDetail(){
     });
     html+=`<button class="btn ghost block" style="margin-top:4px" onclick="addStage()">${icon('plus',16)} ${t('addStage')}</button>`;
   }
-  html+=`<div class="btn-row" style="margin-top:20px"><button class="btn ghost" onclick="openEdit('${g.id}')">${icon('edit',15)} ${t('editGoal')}</button><button class="btn danger ghost" onclick="deleteGoal('${g.id}')">${icon('trash',15)} ${t('delete')}</button></div>`;
   el.innerHTML=html;
 }
 
