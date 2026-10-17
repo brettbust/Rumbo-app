@@ -83,6 +83,22 @@ function load(){
   try{ const raw=localStorage.getItem(STORE_KEY); if(raw) data=JSON.parse(raw); }catch(e){}
   if(!data.settings) data.settings={theme:'light',notif:false};
   if(!data.goals) data.goals=[];
+  cleanupBank();   // depurar frases malas que se hayan guardado antes
+}
+// Revisa el banco de frases IA y quita las que ya no pasan el filtro de calidad
+function cleanupBank(){
+  if(!data.aiMotivBank) return;
+  let changed=false;
+  Object.keys(data.aiMotivBank).forEach(lang=>{
+    const arr = data.aiMotivBank[lang];
+    if(!Array.isArray(arr)) return;
+    const clean = arr.filter(f=>{
+      const c = cleanMotivMsg(f, '');
+      return c && c===f && looksRightLanguage(f, lang);
+    });
+    if(clean.length !== arr.length){ data.aiMotivBank[lang]=clean; changed=true; }
+  });
+  if(changed){ try{ save(); }catch(e){} }
 }
 function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast(t('toastNoSpace')); } }
 
@@ -372,16 +388,16 @@ async function fetchAiMotiv(goalTitle, done, total, pct){
     });
     const res = await resp.json();
     const clean = cleanMotivMsg(res && res.message, goalTitle);
-    if(clean){
+    // solo guardar si pasa el filtro Y parece estar en el idioma correcto
+    if(clean && looksRightLanguage(clean, lang)){
       data.aiMotivBank = data.aiMotivBank || {};
       const bank = data.aiMotivBank[lang] || [];
-      // no duplicar (ni contra el banco IA ni contra las frases base)
       const base = (I18N[lang] && I18N[lang].motiv) ? I18N[lang].motiv : [];
       const exists = bank.some(f=>f.toLowerCase()===clean.toLowerCase())
                   || base.some(f=>f.toLowerCase()===clean.toLowerCase());
       if(!exists){
         bank.push(clean);
-        if(bank.length>AI_BANK_MAX) bank.shift(); // mantener acotado
+        if(bank.length>AI_BANK_MAX) bank.shift();
         data.aiMotivBank[lang]=bank;
         save();
       }
@@ -393,18 +409,36 @@ async function fetchAiMotiv(goalTitle, done, total, pct){
 function cleanMotivMsg(raw, goalTitle){
   if(!raw || typeof raw!=='string') return null;
   let m = raw.trim();
-  // descartar de entrada si parece JSON crudo o restos de cronograma
-  if(/^[\{\[]/.test(m) || m.includes('"date"') || m.includes('"stages"') || m.includes('"label"')) return null;
-  // quitar comillas y llaves/corchetes de JSON que a veces se cuelan
-  m = m.replace(/^[\s"'`{}\[\]:,]+/, '').replace(/[\s"'`{}\[\]:,]+$/, '').trim();
-  // quitar prefijos como "message":, "mensaje":, etc.
-  m = m.replace(/^(message|mensaje|msg|texto|text)\s*[:：]\s*/i, '').replace(/^["'`]+|["'`]+$/g,'').trim();
-  // descartar si quedó vacío, muy corto, o es solo el nombre de la meta
-  if(m.length < 4) return null;
+  // 1) descartar JSON crudo o restos de cronograma
+  if(/^[\{\[]/.test(m) || m.includes('"date"') || m.includes('"stages"') || m.includes('"label"') || m.includes('":')) return null;
+  // 2) quedarse solo con la primera línea (a veces devuelve varias)
+  m = m.split(/[\r\n]/)[0].trim();
+  // 3) quitar comillas y signos sueltos de los extremos
+  m = m.replace(/^[\s"'`{}\[\]:,.;\-–—]+/, '').replace(/[\s"'`{}\[\]:,;]+$/, '').trim();
+  // 4) quitar prefijos tipo "mensaje:", "frase:", etc.
+  m = m.replace(/^(message|mensaje|msg|texto|text|frase|phrase)\s*[:：]\s*/i, '').replace(/^["'`]+|["'`]+$/g,'').trim();
+  // 5) validaciones de calidad
+  if(m.length < 10) return null;                         // demasiado corta (un fragmento)
+  if(m.length > 140) return null;                        // demasiado larga: probablemente mal formada
+  const words = m.split(/\s+/).filter(Boolean);
+  if(words.length < 3) return null;                      // al menos 3 palabras
   if(goalTitle && m.toLowerCase() === goalTitle.trim().toLowerCase()) return null;
-  // limitar largo por seguridad
-  if(m.length > 160) m = m.slice(0,160).trim();
+  // 6) debe parecer una frase COMPLETA: terminar en puntuación de cierre
+  //    (evita guardar frases cortadas como "cada paso que")
+  if(!/[.!?…。！？]$/.test(m)) return null;
+  // 7) sin caracteres raros de código
+  if(/[<>{}]|https?:\/\//.test(m)) return null;
   return m;
+}
+// Comprueba que la frase está en el idioma esperado (evita guardar inglés cuando la app está en español, etc.)
+function looksRightLanguage(msg, lang){
+  if(lang==='en' || lang==='zh' || lang==='ja' || lang==='ar' || lang==='he' || lang==='ru') return true; // difícil de validar, se confía en el prompt
+  // para idiomas latinos, rechazar si parece claramente inglés
+  const lower = ' '+msg.toLowerCase()+' ';
+  const englishWords = [' the ',' you ',' your ',' keep ',' step ',' already ',' started ',' going ',' every ',' progress ',' goal ',' done '];
+  let hits=0; englishWords.forEach(w=>{ if(lower.includes(w)) hits++; });
+  // si tiene 2+ palabras típicas de inglés y el idioma no es inglés, rechazar
+  return !(hits>=2 && lang!=='en');
 }
 function flashMotiv(p, msg){
   const box=document.getElementById('motivBox');
