@@ -202,10 +202,11 @@ body::after{
 .wd-opt.sel{border-color:var(--accent);background:var(--accent);color:#fff}
 
 /* Importar cronograma */
-.ai-gen-box{border:1.5px solid var(--accent-ring);background:var(--accent-soft);border-radius:14px;padding:15px;margin-bottom:16px}
-.ai-gen-head{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--accent);margin-bottom:3px}
-.ai-gen-head .ic{color:var(--gold)}
-.ai-gen-sub{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.ai-gen-box{border:1.5px solid var(--accent-ring);background:var(--accent-soft);border-radius:14px;padding:16px;margin-bottom:16px}
+.ai-gen-head{display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:700;color:var(--accent);margin-bottom:5px;line-height:1.2}
+.ai-gen-head .ic,.ai-gen-head svg{color:var(--gold);flex-shrink:0}
+.ai-gen-sub{font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.4;text-align:left}
+[dir="rtl"] .ai-gen-sub{text-align:right}
 .ai-gen-box textarea{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;resize:vertical;margin-bottom:10px}
 .ai-gen-box textarea:focus{outline:2px solid var(--accent-ring);outline-offset:-1px}
 .ai-gen-divider{display:flex;align-items:center;gap:12px;margin:4px 0 16px;color:var(--faint);font-size:12px}
