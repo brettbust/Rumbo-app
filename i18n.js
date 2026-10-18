@@ -56,6 +56,8 @@ var I18N = {
     aiPlanNeedText: 'Escribe qué quieres lograr.',
     aiPlanNoStages: 'No pude crear un plan. Prueba a describir la meta de otra forma.',
     aiPlanError: 'No se pudo crear el plan. Inténtalo de nuevo.',
+    modeAiTitle: 'Crear con IA', modeAiDesc: 'Describe tu meta y la IA arma el plan por ti.',
+    modeManualTitle: 'Crear manualmente', modeManualDesc: 'Tú defines las etapas, fechas y detalles.',
     language: 'Idioma', languageDesc: 'Elige el idioma de la app',
     exportData: 'Exportar mis datos', exportDesc: 'Guarda una copia de seguridad',
     importData: 'Importar datos', importDataDesc: 'Restaura desde una copia',

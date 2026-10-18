@@ -260,6 +260,7 @@ function renderDetail(){
         <button class="btn primary" onclick="addNumber()">${t('add')}</button>
       </div>
       <div class="btn-row"><button class="btn sm ghost" onclick="quickAdd(1)">+1</button><button class="btn sm ghost" onclick="quickAdd(5)">+5</button><button class="btn sm ghost" onclick="quickAdd(10)">+10</button><button class="btn sm ghost" onclick="setNumber()">${t('adjustTotal')}</button></div>
+      <div class="btn-row btn-row-sub"><button class="btn sm ghost minus" onclick="quickAdd(-1)">-1</button><button class="btn sm ghost minus" onclick="quickAdd(-5)">-5</button><button class="btn sm ghost minus" onclick="quickAdd(-10)">-10</button></div>
     </div>`;
   } else {
     html+=`<div class="days-head"><h3>${t('stages')} (${p.done}/${p.total})</h3></div>`;
@@ -494,7 +495,10 @@ function addNumber(){
 function quickAdd(v){ applyNumber(v); }
 function applyNumber(v){
   const g=data.goals.find(x=>x.id===currentGoalId);
-  g.current=Math.max(0,Math.round((g.current+v)*100)/100);
+  let next = Math.round((g.current+v)*100)/100;
+  next = Math.max(0, next);                       // no bajar de 0
+  if(g.target>0) next = Math.min(next, g.target); // no pasar del total definido
+  g.current = next;
   save();
   const p=goalProgress(g);
   renderDetail();
@@ -514,9 +518,30 @@ function setNumber(){
   },`<input class="field" id="cfInput" type="number" inputmode="decimal" value="${g.current}" style="width:100%;padding:12px 13px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;font-size:15px;margin-top:4px">`);
 }
 
+/* ---------- elegir modo de nueva meta: IA o manual ---------- */
+function chooseNewGoalMode(){
+  const sheet=document.getElementById('editSheet');
+  sheet.innerHTML=`
+    <div class="sheet-grip"></div>
+    <h2>${t('newGoal')}</h2>
+    <div class="mode-choice">
+      <button class="mode-card" onclick="openEdit(null,'ai')">
+        <div class="mode-ic">${icon('star',26)}</div>
+        <div class="mode-tx"><b>${t('modeAiTitle')}</b><span>${t('modeAiDesc')}</span></div>
+      </button>
+      <button class="mode-card" onclick="openEdit(null,'manual')">
+        <div class="mode-ic">${icon('edit',24)}</div>
+        <div class="mode-tx"><b>${t('modeManualTitle')}</b><span>${t('modeManualDesc')}</span></div>
+      </button>
+    </div>
+    <button class="btn ghost block" onclick="closeEdit()" style="margin-top:14px">${t('cancel')}</button>`;
+  document.getElementById('editScrim').classList.add('open');
+}
+
 /* ---------- create / edit ---------- */
-function openEdit(id){
+function openEdit(id, mode){
   const editing = !!id;
+  const showAi = !editing && mode==='ai';   // recuadro de IA solo en modo IA
   let g = editing ? data.goals.find(x=>x.id===id) : null;
   draftType = g ? g.type : 'days';
   draftEmoji = g ? (g.emoji||'🎯') : '🎯';
@@ -532,7 +557,7 @@ function openEdit(id){
     <h2>${editing?t('editGoal'):t('newGoal')}</h2>
     <div class="sub"></div>
 
-    ${editing ? '' : `
+    ${!showAi ? '' : `
     <div class="ai-gen-box">
       <div class="ai-gen-head"><span>${t('aiPlanTitle')}</span>${icon('star',18)}</div>
       <div class="ai-gen-sub">${t('aiPlanSub')}</div>
@@ -1231,7 +1256,7 @@ function init(){
     data.settings.aiMotiv = on;
     save();
   };
-  document.getElementById('fab').onclick=()=>openEdit();
+  document.getElementById('fab').onclick=()=>chooseNewGoalMode();
   document.getElementById('settingsBtn').onclick=()=>show('settings');
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('detailBack').onclick=()=>{ show('home'); renderHome(); };
