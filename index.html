@@ -169,9 +169,16 @@ body::after{
 .btn.danger{color:var(--danger);border-color:var(--danger)}
 .btn.ghost{background:transparent}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-.btn-row-sub{margin-top:6px}
-.btn.minus{color:var(--muted)}
-.btn.minus:hover{color:#c0392b;border-color:#c0392b}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}
+.step-btn{flex-shrink:0;width:54px;height:54px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.step-btn:active{transform:scale(.93)}
+.step-btn.plus{border-color:var(--accent);color:var(--accent)}
+.step-btn.plus:hover:not(:disabled){background:var(--accent);color:#fff}
+.step-btn.minus:hover:not(:disabled){border-color:var(--muted);color:var(--ink)}
+.step-btn:disabled{opacity:.35;cursor:not-allowed}
+.step-val{flex:1;text-align:center;display:flex;flex-direction:column;gap:1px}
+.step-val b{font-size:30px;font-weight:700;line-height:1}
+.step-val span{font-size:14px;color:var(--muted)}
 .btn.block{width:100%;justify-content:center;padding:13px}
 
 /* Modal / sheet */

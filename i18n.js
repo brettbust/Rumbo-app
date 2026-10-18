@@ -51,6 +51,7 @@ var I18N = {
     saveNote: 'Guardar nota', savedOn: 'Guardada:',
     percentDone: 'completado', ofUnit: 'de', ofDays: 'de', daysUnit: 'días',
     howMuch: '¿Cuánto sumaste?', add: 'Sumar', adjustTotal: 'Ajustar total…',
+    addAmountPh: 'Suma una cantidad mayor…',
     firstStepMsg: 'Marca tu primer avance para arrancar.',
     darkMode: 'Tema oscuro', darkModeDesc: 'Cambia la apariencia',
     reminder: 'Recordatorio diario', reminderDesc: 'Un aviso para no perder el ritmo',

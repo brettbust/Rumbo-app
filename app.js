@@ -89,6 +89,7 @@ const ICONS = {
   message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
   calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
   plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  minus:'<line x1="5" y1="12" x2="19" y2="12"/>',
   trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   calClock:'<path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5.5"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="18" cy="18" r="4"/><path d="M18 16.5V18l1 1"/>',
   hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
@@ -284,14 +285,18 @@ function renderDetail(){
   </div>`;
 
   if(g.type==='number'){
+    const atMin = p.done<=0;
+    const atMax = g.target>0 && p.done>=g.target;
     html+=`<div class="num-panel">
-      <div class="num-row"><span class="cur">${p.done}</span><span class="of">/ ${p.total} ${esc(g.unit||'')}</span></div>
+      <div class="stepper">
+        <button class="step-btn minus" onclick="quickAdd(-1)" ${atMin?'disabled':''} aria-label="−1">${icon('minus',22)}</button>
+        <div class="step-val"><b>${p.done}</b><span>/ ${p.total} ${esc(g.unit||'')}</span></div>
+        <button class="step-btn plus" onclick="quickAdd(1)" ${atMax?'disabled':''} aria-label="+1">${icon('plus',22)}</button>
+      </div>
       <div class="num-add">
-        <input type="number" id="numInput" placeholder="${t('howMuch')}" inputmode="decimal">
+        <input type="number" id="numInput" placeholder="${t('addAmountPh')}" inputmode="decimal" min="0">
         <button class="btn primary" onclick="addNumber()">${t('add')}</button>
       </div>
-      <div class="btn-row"><button class="btn sm ghost" onclick="quickAdd(1)">+1</button><button class="btn sm ghost" onclick="quickAdd(5)">+5</button><button class="btn sm ghost" onclick="quickAdd(10)">+10</button><button class="btn sm ghost" onclick="setNumber()">${t('adjustTotal')}</button></div>
-      <div class="btn-row btn-row-sub"><button class="btn sm ghost minus" onclick="quickAdd(-1)">-1</button><button class="btn sm ghost minus" onclick="quickAdd(-5)">-5</button><button class="btn sm ghost minus" onclick="quickAdd(-10)">-10</button></div>
     </div>`;
   } else {
     html+=`<div class="days-head"><h3>${t('stages')} (${p.done}/${p.total})</h3></div>`;
@@ -518,8 +523,9 @@ function delNote(i){
 /* ---------- number actions ---------- */
 function addNumber(){
   const inp=document.getElementById('numInput');
-  const v=parseFloat(inp.value);
+  let v=parseFloat(inp.value);
   if(isNaN(v)){ toast(t('toastNeedNumber')); return; }
+  v=Math.abs(v);               // el campo siempre suma; usa los botones −/+ para ajustar
   applyNumber(v);
   inp.value='';
 }
@@ -542,14 +548,6 @@ function applyNumber(v){
   if(p.pct<100 && data.settings.aiMotiv!==false){
     fetchAiMotiv(g.title, p.done, p.total, p.pct);
   }
-}
-function setNumber(){
-  const g=data.goals.find(x=>x.id===currentGoalId);
-  confirmSheet(t('adjustTotal'),'',t('save'),()=>{
-    const v=parseFloat(document.getElementById('cfInput').value);
-    if(isNaN(v)){ toast(t('toastNeedNumber')); return; }
-    g.current=Math.max(0,v); save(); renderDetail();
-  },`<input class="field" id="cfInput" type="number" inputmode="decimal" value="${g.current}" style="width:100%;padding:12px 13px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;font-size:15px;margin-top:4px">`);
 }
 
 /* ---------- elegir modo de nueva meta: IA o manual ---------- */
