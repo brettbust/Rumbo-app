@@ -1296,16 +1296,8 @@ function init(){
   applyI18n();
   applyTheme();
   document.getElementById('notifSwitch').classList.toggle('on',data.settings.notif);
-  document.getElementById('aiMotivSwitch').classList.toggle('on',data.settings.aiMotiv!==false);
   renderHome();
 
-  document.getElementById('aiMotivSwitch').onclick=()=>{
-    const el=document.getElementById('aiMotivSwitch');
-    const on = !el.classList.contains('on');
-    el.classList.toggle('on',on);
-    data.settings.aiMotiv = on;
-    save();
-  };
   document.getElementById('fab').onclick=()=>chooseNewGoalMode();
   document.getElementById('settingsBtn').onclick=()=>show('settings');
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
