@@ -45,6 +45,37 @@ function motivShow(done){
 }
 function getFinishMsg(){ return t('finishMsg'); }
 const EMOJIS = ["🎯","📚","🏃","💪","🧠","💰","🎸","🎨","🧘","🌱","💻","✍️","🍎","💧","⭐","🔥"];
+/* Unidades comunes para metas numéricas. v = valor guardado (vacío = sin unidad), k = clave i18n */
+const UNITS = [
+  {v:'',   k:'unitNone'},
+  {v:'km', k:'unitKm'}, {v:'m', k:'unitM'}, {v:'pasos', k:'unitSteps'},
+  {v:'páginas', k:'unitPages'}, {v:'capítulos', k:'unitChapters'}, {v:'palabras', k:'unitWords'},
+  {v:'horas', k:'unitHours'}, {v:'minutos', k:'unitMinutes'},
+  {v:'sesiones', k:'unitSessions'}, {v:'repeticiones', k:'unitReps'}, {v:'series', k:'unitSets'},
+  {v:'litros', k:'unitLiters'}, {v:'vasos', k:'unitGlasses'}, {v:'calorías', k:'unitCalories'},
+  {v:'€', k:'unitEuro'}, {v:'$', k:'unitDollar'}
+];
+/* Mostrar/ocultar el campo de unidad propia al cambiar el selector */
+function onUnitChange(){
+  const sel=document.getElementById('fUnitSel');
+  const wrap=document.getElementById('unitOtherWrap');
+  if(!sel||!wrap) return;
+  wrap.style.display = sel.value==='__other__' ? '' : 'none';
+  if(sel.value==='__other__'){ const fu=document.getElementById('fUnit'); if(fu) fu.focus(); }
+}
+/* Validar una unidad escrita a mano: corta, sin letras repetidas en cadena, sin símbolos raros */
+function validateCustomUnit(raw){
+  let u=String(raw||'').trim();
+  if(!u) return {ok:false};
+  if(u.length>16) return {ok:false};
+  // 4+ letras iguales seguidas (kmmmm) -> inválido
+  if(/(.)\1{3,}/.test(u)) return {ok:false};
+  // permitir letras (con acentos), números, €, $, %, /, espacio y . -
+  if(!/^[\p{L}0-9€$%./\- ]+$/u.test(u)) return {ok:false};
+  // al menos una letra o un símbolo de moneda
+  if(!/[\p{L}€$%]/u.test(u)) return {ok:false};
+  return {ok:true, value:u};
+}
 // Modern line icons (Lucide-style). Usage: icon('name')
 const ICONS = {
   settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
@@ -498,10 +529,13 @@ function applyNumber(v){
   let next = Math.round((g.current+v)*100)/100;
   next = Math.max(0, next);                       // no bajar de 0
   if(g.target>0) next = Math.min(next, g.target); // no pasar del total definido
+  const wasAdded = next > g.current;              // solo subió el progreso
   g.current = next;
   save();
   const p=goalProgress(g);
   renderDetail();
+  // Restar (o no cambiar) es una corrección: no mostramos motivación
+  if(!wasAdded) return;
   const msg = p.pct===100 ? getFinishMsg() : motivFor(p.done);
   flashMotiv(p, msg);
   progressToast(p.pct, msg);
@@ -616,11 +650,19 @@ function renderTypeFields(g){
     renderFreqFields(g,start,n);
   } else {
     const tgt = g&&g.type==='number' ? g.target : '';
-    const unit = g&&g.type==='number' ? esc(g.unit||'') : '';
+    const curUnit = g&&g.type==='number' ? (g.unit||'') : '';
+    // valor de cada opción = texto mostrado en el idioma actual (se guarda tal cual en la meta)
+    const unitVals = UNITS.map(u=> u.v==='' ? '' : t(u.k));
+    const isKnown = curUnit==='' || unitVals.includes(curUnit);
+    const optsHtml = UNITS.map((u,i)=>{ const val=unitVals[i];
+      return `<option value="${esc(val)}"${val===curUnit?' selected':''}>${esc(t(u.k))}</option>`; }).join('')
+      + `<option value="__other__"${(!isKnown)?' selected':''}>${esc(t('unitOther'))}</option>`;
     el.innerHTML=`<div class="field"><label>${t('targetNum')}</label>
       <input id="fTarget" type="number" min="1" inputmode="decimal" placeholder="Ej: 100" value="${tgt}"></div>
       <div class="field"><label>${t('unitOpt')}</label>
-      <input id="fUnit" type="text" maxlength="20" placeholder="${t('unitPh')}" value="${unit}"></div>
+      <select id="fUnitSel" onchange="onUnitChange()">${optsHtml}</select></div>
+      <div class="field" id="unitOtherWrap" style="${isKnown?'display:none':''}"><label>${t('unitOtherLabel')}</label>
+      <input id="fUnit" type="text" maxlength="16" placeholder="${t('unitPh')}" value="${esc(isKnown?'':curUnit)}"></div>
       <div class="field"><label>${t('startDate')}</label>
       <input id="fStart" type="date" value="${g&&g.startDate?g.startDate:todayISO()}"></div>`;
   }
@@ -1084,7 +1126,17 @@ function commitGoal(id, forceDuplicate){
     const start=document.getElementById('fStart').value||todayISO();
     const target=parseFloat(document.getElementById('fTarget').value);
     if(isNaN(target)||target<=0){ toast(t('toastNeedTarget')); return; }
-    const unit=document.getElementById('fUnit').value.trim();
+    // Unidad: del selector, o personalizada validada
+    const sel=document.getElementById('fUnitSel');
+    let unit='';
+    if(sel && sel.value==='__other__'){
+      const raw=document.getElementById('fUnit').value;
+      const res=validateCustomUnit(raw);
+      if(!res.ok){ toast(t('toastBadUnit')); return; }
+      unit=res.value;
+    } else if(sel){
+      unit=sel.value;   // '' si eligió "Sin unidad"
+    }
     if(id){
       const g=data.goals.find(x=>x.id===id);
       g.title=title; g.emoji=draftEmoji; g.startDate=start; g.endDate='';
