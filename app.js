@@ -115,7 +115,24 @@ function load(){
   try{ const raw=localStorage.getItem(STORE_KEY); if(raw) data=JSON.parse(raw); }catch(e){}
   if(!data.settings) data.settings={theme:'light',notif:false};
   if(!data.goals) data.goals=[];
+  if(!Array.isArray(data.trophies)) data.trophies=[];
+  backfillTrophies();   // dar trofeo a metas que ya estaban completas antes de esta función
   cleanupBank();   // depurar frases malas que se hayan guardado antes
+}
+// Crea trofeos retroactivos para metas ya completadas al 100%
+function backfillTrophies(){
+  let changed=false;
+  data.goals.forEach(g=>{
+    const pct=goalProgress(g).pct;
+    if(pct===100){
+      g.celebrated=true;   // no volver a lanzar la celebración por una vieja
+      if(!data.trophies.some(tr=>tr.goalId===g.id)){
+        data.trophies.push({goalId:g.id,title:g.title,emoji:g.emoji||'🎯',type:g.type,date:g.endDate||todayISO()});
+        changed=true;
+      }
+    }
+  });
+  if(changed){ try{ save(); }catch(e){} }
 }
 // Revisa el banco de frases IA y quita las que ya no pasan el filtro de calidad
 function cleanupBank(){
@@ -259,6 +276,53 @@ function renderHome(){
   el.innerHTML=html;
 }
 
+/* ---------- SALÓN DE TROFEOS ---------- */
+function renderTrophies(){
+  const el=document.getElementById('trophiesContent');
+  if(!el) return;
+  const trophies = Array.isArray(data.trophies) ? data.trophies.slice().reverse() : [];
+  let html=`<div class="trophy-hero">
+    <h2>${t('trophiesTitle')}</h2>
+    <p>${trophies.length>0 ? (trophies.length+' '+(trophies.length===1?t('trophyOne'):t('trophyMany'))) : t('trophiesEmptySub')}</p>
+  </div>`;
+  if(trophies.length===0){
+    html+=`<div class="trophy-empty">
+      <div class="trophy-empty-ic">🏆</div>
+      <div class="trophy-empty-tx">${t('trophiesEmpty')}</div>
+    </div>`;
+  } else {
+    html+=`<div class="trophy-shelf">`;
+    trophies.forEach(tr=>{
+      html+=`<div class="trophy" onclick="flipTrophy(this)">
+        <div class="trophy-inner">
+          <div class="trophy-face trophy-front">
+            <div class="trophy-cup">${tr.emoji||'🏆'}</div>
+            <div class="trophy-name">${esc(tr.title)}</div>
+          </div>
+          <div class="trophy-face trophy-back">
+            <div class="trophy-badge">🏅</div>
+            <div class="trophy-name">${esc(tr.title)}</div>
+            <div class="trophy-date">${fmtDate(tr.date)}</div>
+            <button class="trophy-del" onclick="event.stopPropagation();deleteTrophy('${tr.goalId}','${esc(tr.date)}')" aria-label="${t('delete')}">${icon('trash',15)} ${t('delete')}</button>
+          </div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+  el.innerHTML=html;
+}
+// girar un trofeo (efecto 3D) para ver su detalle
+function flipTrophy(el){ el.classList.toggle('flipped'); }
+// borrar un trofeo del salón (el usuario decide qué conservar)
+function deleteTrophy(goalId, date){
+  confirmSheet(t('trophyDelTitle'), t('trophyDelMsg'), t('delete'), ()=>{
+    data.trophies = (data.trophies||[]).filter(tr=>!(tr.goalId===goalId && tr.date===date));
+    save();
+    renderTrophies();
+  });
+}
+
 /* ---------- DETAIL ---------- */
 function openDetail(id){
   currentGoalId=id;
@@ -366,11 +430,26 @@ function toggleDay(i){
 // Dispara la celebración solo la PRIMERA vez que la meta llega al 100%
 function maybeCelebrate(g, p){
   if(p.pct===100 && !g.celebrated){
-    g.celebrated=true; save();
+    g.celebrated=true;
+    awardTrophy(g);           // guardar el logro en el salón de trofeos
+    save();
     celebrateGoal(g.title);
   } else if(p.pct<100 && g.celebrated){
     g.celebrated=false; save();   // si vuelve a bajar, podrá celebrar de nuevo al recompletar
   }
+}
+// Añadir (o actualizar) un trofeo cuando se completa una meta
+function awardTrophy(g){
+  if(!Array.isArray(data.trophies)) data.trophies=[];
+  // si ya hay trofeo de esta meta, no duplicar
+  if(data.trophies.some(tr=>tr.goalId===g.id)) return;
+  data.trophies.push({
+    goalId: g.id,
+    title: g.title,
+    emoji: g.emoji || '🎯',
+    type: g.type,
+    date: todayISO()
+  });
 }
 // Las etapas en el DOM incluyen las de tipo festivo/orden; aquí el índice coincide 1:1
 function getDayDomIndex(i){ return i; }
@@ -1393,6 +1472,8 @@ function init(){
   document.getElementById('fab').onclick=()=>chooseNewGoalMode();
   document.getElementById('settingsBtn').onclick=()=>show('settings');
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
+  document.getElementById('trophiesBtn').onclick=()=>{ renderTrophies(); show('trophies'); };
+  document.getElementById('trophiesBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('detailBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('themeSwitch').onclick=toggleTheme;
   document.getElementById('notifSwitch').onclick=toggleNotif;
