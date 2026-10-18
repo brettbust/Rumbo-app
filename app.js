@@ -361,6 +361,16 @@ function toggleDay(i){
       fetchAiMotiv(g.title, p.done, p.total, p.pct);
     }
   }
+  maybeCelebrate(g, p);
+}
+// Dispara la celebración solo la PRIMERA vez que la meta llega al 100%
+function maybeCelebrate(g, p){
+  if(p.pct===100 && !g.celebrated){
+    g.celebrated=true; save();
+    celebrateGoal(g.title);
+  } else if(p.pct<100 && g.celebrated){
+    g.celebrated=false; save();   // si vuelve a bajar, podrá celebrar de nuevo al recompletar
+  }
 }
 // Las etapas en el DOM incluyen las de tipo festivo/orden; aquí el índice coincide 1:1
 function getDayDomIndex(i){ return i; }
@@ -492,7 +502,6 @@ function flashMotiv(p, msg){
     const ico=box.querySelector('.ico'); if(ico) ico.textContent=p.pct===100?'🎉':'🌟';
     box.style.opacity=1;
   },180);
-  if(p.pct===100) confetti();
 }
 function toggleNote(i){
   const nv=document.getElementById('nv-'+i), g=data.goals.find(x=>x.id===currentGoalId);
@@ -540,14 +549,15 @@ function applyNumber(v){
   save();
   const p=goalProgress(g);
   renderDetail();
-  // Restar (o no cambiar) es una corrección: no mostramos motivación
-  if(!wasAdded) return;
+  // Restar (o no cambiar) es una corrección: no mostramos motivación, pero sí ajustamos el estado de celebración
+  if(!wasAdded){ maybeCelebrate(g, p); return; }
   const msg = p.pct===100 ? getFinishMsg() : motivFor(p.done);
   flashMotiv(p, msg);
   progressToast(p.pct, msg);
   if(p.pct<100 && data.settings.aiMotiv!==false){
     fetchAiMotiv(g.title, p.done, p.total, p.pct);
   }
+  maybeCelebrate(g, p);
 }
 
 /* ---------- elegir modo de nueva meta: IA o manual ---------- */
@@ -1173,18 +1183,60 @@ function confirmSheet(title,msg,okLabel,cb,extraHtml){
 function closeConfirm(){ document.getElementById('confirmScrim').classList.remove('open'); confirmCb=null; }
 
 /* ---------- confetti ---------- */
+const CONFETTI_COLORS=['#0F6E56','#1D9E75','#F4B740','#7CE0BE','#C24A3E','#5BC0EB','#9B5DE5'];
 function confetti(){
-  const colors=['#0F6E56','#1D9E75','#F4B740','#7CE0BE','#C24A3E'];
-  for(let i=0;i<70;i++){
+  // lluvia desde arriba (fondo)
+  for(let i=0;i<80;i++){
     const c=document.createElement('div');
     c.className='confetti';
     c.style.left=Math.random()*100+'vw'; c.style.top='-20px';
-    c.style.background=colors[i%colors.length];
+    c.style.background=CONFETTI_COLORS[i%CONFETTI_COLORS.length];
     document.body.appendChild(c);
-    const dur=1800+Math.random()*1400;
-    c.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:`translateY(${innerHeight+40}px) rotate(${720*Math.random()}deg)`,opacity:.3}],{duration:dur,easing:'ease-in'});
+    const dur=1800+Math.random()*1600;
+    const delay=Math.random()*400;
+    c.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:`translateY(${innerHeight+40}px) rotate(${720*Math.random()}deg)`,opacity:.25}],{duration:dur,delay,easing:'cubic-bezier(.3,.6,.4,1)'});
+    setTimeout(()=>c.remove(),dur+delay);
+  }
+}
+// estallido de confeti desde un punto (centro de la pantalla)
+function confettiBurst(){
+  const cx=innerWidth/2, cy=innerHeight*0.42;
+  for(let i=0;i<60;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.left=cx+'px'; c.style.top=cy+'px';
+    c.style.background=CONFETTI_COLORS[i%CONFETTI_COLORS.length];
+    document.body.appendChild(c);
+    const ang=Math.random()*Math.PI*2, dist=120+Math.random()*260;
+    const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist;
+    const dur=900+Math.random()*700;
+    c.animate([
+      {transform:'translate(0,0) rotate(0) scale(1)',opacity:1},
+      {transform:`translate(${dx}px,${dy+120}px) rotate(${720*Math.random()}deg) scale(.6)`,opacity:0}
+    ],{duration:dur,easing:'cubic-bezier(.15,.7,.4,1)'});
     setTimeout(()=>c.remove(),dur);
   }
+}
+/* ---------- celebración al completar una meta ---------- */
+let celebrating=false;
+function celebrateGoal(goalTitle){
+  if(celebrating) return;
+  celebrating=true;
+  const ov=document.getElementById('celebrateOverlay');
+  if(!ov){ celebrating=false; confetti(); return; }
+  ov.querySelector('.cel-title').textContent=t('celTitle');
+  ov.querySelector('.cel-sub').textContent=goalTitle ? `"${goalTitle}"` : '';
+  ov.querySelector('.cel-msg').textContent=t('celMsg');
+  ov.querySelector('.cel-btn').textContent=t('celBtn');
+  ov.classList.add('open');
+  confetti(); confettiBurst();
+  setTimeout(confettiBurst,350);
+  setTimeout(confettiBurst,700);
+}
+function closeCelebrate(){
+  const ov=document.getElementById('celebrateOverlay');
+  if(ov) ov.classList.remove('open');
+  celebrating=false;
 }
 
 /* ---------- settings ---------- */
@@ -1220,32 +1272,71 @@ function importData(file){
 }
 
 /* ---------- notifications ---------- */
+let notifTimer = null;
 async function toggleNotif(){
   if(!data.settings.notif){
     if(!('Notification' in window)){ toast(t('toastNoNotif')); return; }
     const perm=await Notification.requestPermission();
     if(perm!=='granted'){ toast(t('toastNotifDenied')); return; }
-    data.settings.notif=true; save();
+    data.settings.notif=true;
+    if(!data.settings.notifTime) data.settings.notifTime='20:00';
+    save();
     document.getElementById('notifSwitch').classList.add('on');
     toast(t('toastNotifOn'));
+    renderSettingsNotifTime();   // mostrar el selector de hora
     scheduleNotif();
   } else {
     data.settings.notif=false; save();
     document.getElementById('notifSwitch').classList.remove('on');
     toast(t('toastNotifOff'));
+    renderSettingsNotifTime();   // ocultar el selector
+    if(notifTimer){ clearTimeout(notifTimer); notifTimer=null; }
+  }
+}
+// ¿hay metas sin completar?
+function hasPendingGoals(){
+  return data.goals.some(g=>goalProgress(g).pct < 100);
+}
+// mensaje variado para el recordatorio
+function reminderMessage(){
+  const L = I18N[CURRENT_LANG] || I18N.es;
+  const bank = Array.isArray(L.reminderMsgs) ? L.reminderMsgs : (I18N.es.reminderMsgs||[]);
+  if(bank.length===0) return t('reminderBody');
+  return bank[Math.floor(Math.random()*bank.length)];
+}
+function cambiarNotifTime(val){
+  if(!val) return;
+  data.settings.notifTime = val;
+  save();
+  scheduleNotif();
+}
+// mostrar u ocultar la fila de hora según el estado del recordatorio
+function renderSettingsNotifTime(){
+  const row=document.getElementById('notifTimeRow');
+  const inp=document.getElementById('notifTimeInput');
+  if(!row) return;
+  if(data.settings.notif){
+    row.style.display='';
+    if(inp) inp.value = data.settings.notifTime || '20:00';
+  } else {
+    row.style.display='none';
   }
 }
 function scheduleNotif(){
-  // lightweight: fires while app/tab is open, next 20:00
-  if(!data.settings.notif || Notification.permission!=='granted') return;
-  const now=new Date(); const t=new Date(); t.setHours(20,0,0,0);
-  if(t<=now) t.setDate(t.getDate()+1);
-  setTimeout(()=>{
-    if(data.settings.notif && Notification.permission==='granted'){
-      new Notification('Rumbo',{body:t('reminderBody')});
+  // Recordatorio local: se dispara mientras la app está abierta/instalada en segundo plano.
+  if(notifTimer){ clearTimeout(notifTimer); notifTimer=null; }
+  if(!data.settings.notif || !('Notification' in window) || Notification.permission!=='granted') return;
+  const [hh,mm] = (data.settings.notifTime||'20:00').split(':').map(Number);
+  const now=new Date();
+  const target=new Date();
+  target.setHours(hh||20, mm||0, 0, 0);
+  if(target<=now) target.setDate(target.getDate()+1);   // si ya pasó hoy, mañana
+  notifTimer=setTimeout(()=>{
+    if(data.settings.notif && Notification.permission==='granted' && hasPendingGoals()){
+      try{ new Notification('Rumbo', {body: reminderMessage()}); }catch(e){}
     }
-    scheduleNotif();
-  }, t-now);
+    scheduleNotif();   // reprogramar para el día siguiente
+  }, target-now);
 }
 
 /* ---------- init ---------- */
@@ -1296,6 +1387,7 @@ function init(){
   applyI18n();
   applyTheme();
   document.getElementById('notifSwitch').classList.toggle('on',data.settings.notif);
+  renderSettingsNotifTime();
   renderHome();
 
   document.getElementById('fab').onclick=()=>chooseNewGoalMode();

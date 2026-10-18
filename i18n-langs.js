@@ -51,6 +51,7 @@ Object.assign(I18N, {
     firstStepMsg: 'Mark your first progress to get going.',
     darkMode: 'Dark theme', darkModeDesc: 'Change the appearance',
     reminder: 'Daily reminder', reminderDesc: 'A nudge to keep the pace',
+    reminderTime: 'Reminder time', reminderTimeDesc: 'When should we remind you?',
     aiMotiv: 'AI messages', aiMotivDesc: 'Unique motivational phrases as you progress',
     aiPlanTitle: 'Create goal with AI', aiPlanSub: 'Write what you want to achieve and I will build the plan for you.',
     aiPlanPh: 'e.g. learn guitar, run a 5K, save for a trip…',
@@ -97,6 +98,12 @@ Object.assign(I18N, {
     importBadFormat: 'Unsupported format. Use CSV, Excel, PDF, image or Word.',
     importReadError: "Couldn't read the file:", importMore: 'more…',
     reminderBody: 'Have you made progress today? A small step counts.',
+    reminderMsgs: [
+      'You have goals to finish. Keep going, every day gets you closer.',
+      'Did you make progress today? A small step brings you closer.',
+      'Your goals are waiting. Take a step today and keep the pace.',
+      'Consistency builds big wins. Shall we move forward today?'
+    ],
     weekdays: ['S','M','T','W','T','F','S'],
     weekdaysFull: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
     motiv: [
@@ -116,7 +123,8 @@ Object.assign(I18N, {
       "The big thing isn't the step, it's not stopping.","You're doing it. Period. Keep going.",
       "Your commitment to yourself shows today.","Almost at the top. This progress counts. Let's go!"
     ],
-    finishMsg: "You did it! You completed your goal. Give yourself the credit you deserve. 🎉"
+    finishMsg: "You did it! You completed your goal. Give yourself the credit you deserve. 🎉",
+    celTitle: 'You did it!', celMsg: 'You completed your goal. Give yourself credit for every step.', celBtn: 'Continue'
   },
 
   pt: {
@@ -168,6 +176,7 @@ Object.assign(I18N, {
     firstStepMsg: 'Marque seu primeiro progresso para começar.',
     darkMode: 'Tema escuro', darkModeDesc: 'Muda a aparência',
     reminder: 'Lembrete diário', reminderDesc: 'Um aviso para manter o ritmo',
+    reminderTime: 'Hora do aviso', reminderTimeDesc: 'A que horas te lembramos?',
     aiMotiv: 'Mensagens com IA', aiMotivDesc: 'Frases motivadoras únicas ao avançar',
     aiPlanTitle: 'Criar meta com IA', aiPlanSub: 'Escreva o que quer alcançar e eu monto o plano para você.',
     aiPlanPh: 'Ex: aprender violão, correr 5K, poupar para uma viagem…',
@@ -214,6 +223,12 @@ Object.assign(I18N, {
     importBadFormat: 'Formato não suportado. Use CSV, Excel, PDF, imagem ou Word.',
     importReadError: 'Não foi possível ler o arquivo:', importMore: 'mais…',
     reminderBody: 'Já avançou hoje nas suas metas? Um pequeno passo conta.',
+    reminderMsgs: [
+      'Você tem metas por concluir. Continue, cada dia fica mais perto.',
+      'Avançou hoje? Um pequeno passo te deixa mais perto.',
+      'Suas metas esperam por você. Dê um passo hoje e mantenha o ritmo.',
+      'A constância constrói grandes conquistas. Avançamos hoje?'
+    ],
     weekdays: ['D','S','T','Q','Q','S','S'],
     weekdaysFull: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
     motiv: [
@@ -233,7 +248,8 @@ Object.assign(I18N, {
       "Grande não é o passo, grande é não parar.","Você está fazendo. Ponto. Continue.",
       "Seu compromisso consigo mesmo aparece hoje.","Quase no topo. Este avanço pesa. Vamos!"
     ],
-    finishMsg: "Você conseguiu! Completou sua meta. Dê a si mesmo o crédito que merece. 🎉"
+    finishMsg: "Você conseguiu! Completou sua meta. Dê a si mesmo o crédito que merece. 🎉",
+    celTitle: 'Você conseguiu!', celMsg: 'Completou sua meta. Dê o crédito que merece por cada passo.', celBtn: 'Continuar'
   },
 
   he: {
@@ -285,6 +301,7 @@ Object.assign(I18N, {
     firstStepMsg: 'סמן את ההתקדמות הראשונה כדי להתחיל.',
     darkMode: 'מצב כהה', darkModeDesc: 'שנה את המראה',
     reminder: 'תזכורת יומית', reminderDesc: 'תזכורת כדי לשמור על הקצב',
+    reminderTime: 'שעת התזכורת', reminderTimeDesc: 'באיזו שעה להזכיר לך?',
     aiMotiv: 'הודעות עם בינה מלאכותית', aiMotivDesc: 'משפטי מוטיבציה ייחודיים בכל התקדמות',
     aiPlanTitle: 'צור מטרה עם בינה מלאכותית', aiPlanSub: 'כתוב מה אתה רוצה להשיג ואבנה לך את התוכנית.',
     aiPlanPh: 'לדוגמה: ללמוד גיטרה, לרוץ 5 ק"מ, לחסוך לטיול…',
@@ -331,6 +348,12 @@ Object.assign(I18N, {
     importBadFormat: 'פורמט לא נתמך. השתמש ב-CSV, Excel, PDF, תמונה או Word.',
     importReadError: 'לא ניתן לקרוא את הקובץ:', importMore: 'עוד…',
     reminderBody: 'התקדמת היום במטרות שלך? צעד קטן נחשב.',
+    reminderMsgs: [
+      'יש לך מטרות לא גמורות. המשך, כל יום אתה מתקרב.',
+      'התקדמת היום? צעד קטן מקרב אותך למטרה.',
+      'המטרות שלך מחכות. עשה צעד היום ושמור על הקצב.',
+      'התמדה בונה הישגים גדולים. מתקדמים היום?'
+    ],
     weekdays: ['א','ב','ג','ד','ה','ו','ש'],
     weekdaysFull: ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'],
     motiv: [
@@ -350,7 +373,8 @@ Object.assign(I18N, {
       "הגדול הוא לא הצעד, אלא לא לעצור.","אתה עושה את זה. נקודה. תמשיך.",
       "המחויבות שלך לעצמך נראית היום.","כמעט בפסגה. ההתקדמות הזו משמעותית. קדימה!"
     ],
-    finishMsg: "הצלחת! השלמת את המטרה שלך. תן לעצמך את הקרדיט שמגיע לך. 🎉"
+    finishMsg: "הצלחת! השלמת את המטרה שלך. תן לעצמך את הקרדיט שמגיע לך. 🎉",
+    celTitle: 'הצלחת!', celMsg: 'השלמת את המטרה שלך. מגיע לך קרדיט על כל צעד.', celBtn: 'המשך'
   },
 
   ar: {
@@ -402,6 +426,7 @@ Object.assign(I18N, {
     firstStepMsg: 'سجّل أول تقدم لك للبدء.',
     darkMode: 'الوضع الداكن', darkModeDesc: 'غيّر المظهر',
     reminder: 'تذكير يومي', reminderDesc: 'تنبيه للحفاظ على الوتيرة',
+    reminderTime: 'وقت التذكير', reminderTimeDesc: 'متى نذكّرك؟',
     aiMotiv: 'رسائل بالذكاء الاصطناعي', aiMotivDesc: 'عبارات تحفيزية فريدة مع كل تقدم',
     aiPlanTitle: 'أنشئ هدفًا بالذكاء الاصطناعي', aiPlanSub: 'اكتب ما تريد تحقيقه وسأبني لك الخطة.',
     aiPlanPh: 'مثال: تعلم الجيتار، الجري 5 كم، الادخار لرحلة…',
@@ -448,6 +473,12 @@ Object.assign(I18N, {
     importBadFormat: 'تنسيق غير مدعوم. استخدم CSV أو Excel أو PDF أو صورة أو Word.',
     importReadError: 'تعذر قراءة الملف:', importMore: 'المزيد…',
     reminderBody: 'هل تقدمت اليوم في أهدافك؟ خطوة صغيرة تُحتسب.',
+    reminderMsgs: [
+      'لديك أهداف غير مكتملة. واصل، كل يوم تقترب أكثر.',
+      'هل تقدمت اليوم؟ خطوة صغيرة تقربك من هدفك.',
+      'أهدافك تنتظرك. اخطُ خطوة اليوم وحافظ على الوتيرة.',
+      'الاستمرار يبني إنجازات كبيرة. هل نتقدم اليوم؟'
+    ],
     weekdays: ['ح','ن','ث','ر','خ','ج','س'],
     weekdaysFull: ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],
     motiv: [
@@ -467,7 +498,8 @@ Object.assign(I18N, {
       "العظيم ليس الخطوة، بل ألا تتوقف.","أنت تفعلها. نقطة. واصل.",
       "التزامك تجاه نفسك يظهر اليوم.","على مشارف القمة. هذا التقدم مهم. هيا بنا!"
     ],
-    finishMsg: "لقد نجحت! أكملت هدفك. امنح نفسك التقدير الذي تستحقه. 🎉"
+    finishMsg: "لقد نجحت! أكملت هدفك. امنح نفسك التقدير الذي تستحقه. 🎉",
+    celTitle: 'لقد نجحت!', celMsg: 'أكملت هدفك. امنح نفسك التقدير عن كل خطوة.', celBtn: 'متابعة'
   },
 
   ru: {
@@ -519,6 +551,7 @@ Object.assign(I18N, {
     firstStepMsg: 'Отметьте первый прогресс, чтобы начать.',
     darkMode: 'Тёмная тема', darkModeDesc: 'Изменить вид',
     reminder: 'Ежедневное напоминание', reminderDesc: 'Напоминание, чтобы держать темп',
+    reminderTime: 'Время напоминания', reminderTimeDesc: 'Когда вам напомнить?',
     aiMotiv: 'Сообщения с ИИ', aiMotivDesc: 'Уникальные мотивирующие фразы по мере прогресса',
     aiPlanTitle: 'Создать цель с ИИ', aiPlanSub: 'Напишите, чего хотите достичь, и я составлю план.',
     aiPlanPh: 'Напр.: научиться играть на гитаре, пробежать 5 км, накопить на поездку…',
@@ -565,6 +598,12 @@ Object.assign(I18N, {
     importBadFormat: 'Формат не поддерживается. Используйте CSV, Excel, PDF, изображение или Word.',
     importReadError: 'Не удалось прочитать файл:', importMore: 'ещё…',
     reminderBody: 'Вы продвинулись сегодня к целям? Маленький шаг важен.',
+    reminderMsgs: [
+      'У вас есть незавершённые цели. Продолжайте, с каждым днём вы ближе.',
+      'Продвинулись сегодня? Маленький шаг приближает к цели.',
+      'Ваши цели ждут. Сделайте шаг сегодня и держите темп.',
+      'Постоянство строит большие достижения. Продвинемся сегодня?'
+    ],
     weekdays: ['В','П','В','С','Ч','П','С'],
     weekdaysFull: ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],
     motiv: [
@@ -584,7 +623,8 @@ Object.assign(I18N, {
       "Велик не шаг, а то, что вы не останавливаетесь.","Вы делаете это. Точка. Продолжайте.",
       "Ваша верность себе видна сегодня.","Почти на вершине. Этот прогресс важен. Вперёд!"
     ],
-    finishMsg: "Получилось! Вы достигли цели. Отдайте себе должное. 🎉"
+    finishMsg: "Получилось! Вы достигли цели. Отдайте себе должное. 🎉",
+    celTitle: 'Получилось!', celMsg: 'Вы достигли цели. Отдайте себе должное за каждый шаг.', celBtn: 'Продолжить'
   },
 
   zh: {
@@ -636,6 +676,7 @@ Object.assign(I18N, {
     firstStepMsg: '标记第一个进度即可开始。',
     darkMode: '深色主题', darkModeDesc: '更改外观',
     reminder: '每日提醒', reminderDesc: '提醒你保持节奏',
+    reminderTime: '提醒时间', reminderTimeDesc: '几点提醒你？',
     aiMotiv: 'AI 消息', aiMotivDesc: '每次进步都有独特的激励语',
     aiPlanTitle: '用 AI 创建目标', aiPlanSub: '写下你想实现的目标，我来为你制定计划。',
     aiPlanPh: '例如：学吉他、跑 5 公里、为旅行存钱…',
@@ -682,6 +723,12 @@ Object.assign(I18N, {
     importBadFormat: '不支持的格式。请使用 CSV、Excel、PDF、图片或 Word。',
     importReadError: '无法读取文件：', importMore: '更多…',
     reminderBody: '今天你的目标有进展吗？一小步也算数。',
+    reminderMsgs: [
+      '你还有目标没完成。继续前进，每天都更近一步。',
+      '今天有进展吗？一小步让你更接近目标。',
+      '你的目标在等你。今天迈出一步，保持节奏。',
+      '坚持成就大目标。今天要不要前进一下？'
+    ],
     weekdays: ['日','一','二','三','四','五','六'],
     weekdaysFull: ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'],
     motiv: [
@@ -701,7 +748,8 @@ Object.assign(I18N, {
       "伟大不在于那一步，而在于不停下。","你在做。就这样。继续。",
       "你对自己的承诺今天可见。","快到顶了。这份进步很重要。加油！"
     ],
-    finishMsg: "你做到了！你完成了目标。给自己应得的肯定。🎉"
+    finishMsg: "你做到了！你完成了目标。给自己应得的肯定。🎉",
+    celTitle: '你做到了！', celMsg: '你完成了目标。为每一步给自己应得的肯定。', celBtn: '继续'
   },
 
   it: {
@@ -753,6 +801,7 @@ Object.assign(I18N, {
     firstStepMsg: 'Segna il primo progresso per iniziare.',
     darkMode: 'Tema scuro', darkModeDesc: 'Cambia l\'aspetto',
     reminder: 'Promemoria giornaliero', reminderDesc: 'Un avviso per non perdere il ritmo',
+    reminderTime: 'Ora dell\'avviso', reminderTimeDesc: 'A che ora ti ricordiamo?',
     aiMotiv: 'Messaggi con IA', aiMotivDesc: 'Frasi motivazionali uniche mentre avanzi',
     aiPlanTitle: 'Crea obiettivo con IA', aiPlanSub: 'Scrivi cosa vuoi raggiungere e creo il piano per te.',
     aiPlanPh: 'Es: imparare la chitarra, correre 5K, risparmiare per un viaggio…',
@@ -799,6 +848,12 @@ Object.assign(I18N, {
     importBadFormat: 'Formato non supportato. Usa CSV, Excel, PDF, immagine o Word.',
     importReadError: 'Impossibile leggere il file:', importMore: 'altre…',
     reminderBody: 'Hai fatto progressi oggi? Un piccolo passo conta.',
+    reminderMsgs: [
+      'Hai obiettivi da completare. Continua, ogni giorno sei più vicino.',
+      'Hai fatto progressi oggi? Un piccolo passo ti avvicina.',
+      'I tuoi obiettivi ti aspettano. Fai un passo oggi e tieni il ritmo.',
+      'La costanza crea grandi traguardi. Andiamo avanti oggi?'
+    ],
     weekdays: ['D','L','M','M','G','V','S'],
     weekdaysFull: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
     motiv: [
@@ -818,7 +873,8 @@ Object.assign(I18N, {
       "Grande non è il passo, grande è non fermarsi.","Lo stai facendo. Punto. Continua.",
       "Il tuo impegno verso te stesso si vede oggi.","Quasi in cima. Questo progresso conta. Andiamo!"
     ],
-    finishMsg: "Ce l'hai fatta! Hai completato il tuo obiettivo. Datti il merito che meriti. 🎉"
+    finishMsg: "Ce l'hai fatta! Hai completato il tuo obiettivo. Datti il merito che meriti. 🎉",
+    celTitle: 'Ce l\'hai fatta!', celMsg: 'Hai completato il tuo obiettivo. Datti merito per ogni passo.', celBtn: 'Continua'
   },
 
   fr: {
@@ -870,6 +926,7 @@ Object.assign(I18N, {
     firstStepMsg: 'Marquez votre premier progrès pour démarrer.',
     darkMode: 'Thème sombre', darkModeDesc: 'Changer l\'apparence',
     reminder: 'Rappel quotidien', reminderDesc: 'Un rappel pour garder le rythme',
+    reminderTime: 'Heure du rappel', reminderTimeDesc: 'À quelle heure vous rappeler ?',
     aiMotiv: 'Messages avec IA', aiMotivDesc: 'Des phrases motivantes uniques à chaque progrès',
     aiPlanTitle: 'Créer un objectif avec IA', aiPlanSub: 'Écrivez ce que vous voulez accomplir et je crée le plan.',
     aiPlanPh: 'Ex : apprendre la guitare, courir 5 km, économiser pour un voyage…',
@@ -916,6 +973,12 @@ Object.assign(I18N, {
     importBadFormat: 'Format non pris en charge. Utilisez CSV, Excel, PDF, image ou Word.',
     importReadError: 'Impossible de lire le fichier :', importMore: 'de plus…',
     reminderBody: 'Avez-vous progressé aujourd\'hui ? Un petit pas compte.',
+    reminderMsgs: [
+      'Vous avez des objectifs à finir. Continuez, chaque jour vous rapproche.',
+      'Avez-vous progressé aujourd\'hui ? Un petit pas vous rapproche.',
+      'Vos objectifs vous attendent. Faites un pas aujourd\'hui et gardez le rythme.',
+      'La constance bâtit de grandes réussites. On avance aujourd\'hui ?'
+    ],
     weekdays: ['D','L','M','M','J','V','S'],
     weekdaysFull: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
     motiv: [
@@ -935,7 +998,8 @@ Object.assign(I18N, {
       "Le grand, ce n'est pas le pas, c'est de ne pas s'arrêter.","Vous le faites. Point. Continuez.",
       "Votre engagement envers vous-même se voit aujourd'hui.","Presque au sommet. Ce progrès compte. Allons-y !"
     ],
-    finishMsg: "Vous avez réussi ! Vous avez atteint votre objectif. Accordez-vous le mérite que vous méritez. 🎉"
+    finishMsg: "Vous avez réussi ! Vous avez atteint votre objectif. Accordez-vous le mérite que vous méritez. 🎉",
+    celTitle: 'Vous avez réussi !', celMsg: 'Vous avez atteint votre objectif. Félicitez-vous pour chaque pas.', celBtn: 'Continuer'
   },
 
   ja: {
@@ -987,6 +1051,7 @@ Object.assign(I18N, {
     firstStepMsg: '最初の進捗を記録して始めましょう。',
     darkMode: 'ダークテーマ', darkModeDesc: '外観を変更',
     reminder: '毎日のリマインダー', reminderDesc: 'ペースを保つための通知',
+    reminderTime: '通知の時刻', reminderTimeDesc: '何時にお知らせしますか？',
     aiMotiv: 'AIメッセージ', aiMotivDesc: '進むたびに新しい励ましの言葉',
     aiPlanTitle: 'AIで目標を作成', aiPlanSub: '達成したいことを書いてください。プランを作ります。',
     aiPlanPh: '例：ギターを習う、5km走る、旅行のために貯金…',
@@ -1033,6 +1098,12 @@ Object.assign(I18N, {
     importBadFormat: '対応していない形式です。CSV、Excel、PDF、画像、Wordを使ってください。',
     importReadError: 'ファイルを読み込めませんでした：', importMore: 'その他…',
     reminderBody: '今日は目標に向けて進みましたか？小さな一歩も大切です。',
+    reminderMsgs: [
+      '未完了の目標があります。続けましょう、毎日ゴールに近づきます。',
+      '今日は進みましたか？小さな一歩が目標に近づけます。',
+      '目標が待っています。今日一歩を踏み出し、ペースを保ちましょう。',
+      '継続が大きな成果を生みます。今日も前進しますか？'
+    ],
     weekdays: ['日','月','火','水','木','金','土'],
     weekdaysFull: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
     motiv: [
@@ -1052,6 +1123,7 @@ Object.assign(I18N, {
       "すごいのは一歩ではなく、止まらないこと。","あなたはやっている。以上。続けて。",
       "自分への約束が今日見えている。","もうすぐ頂上。この前進は重い。行こう！"
     ],
-    finishMsg: "やりました！目標を達成しました。自分に相応しい称賛を。🎉"
+    finishMsg: "やりました！目標を達成しました。自分に相応しい称賛を。🎉",
+    celTitle: 'やりました！', celMsg: '目標を達成しました。一歩ごとに自分を称えましょう。', celBtn: '続ける'
   }
 });

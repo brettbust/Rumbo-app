@@ -55,6 +55,7 @@ var I18N = {
     firstStepMsg: 'Marca tu primer avance para arrancar.',
     darkMode: 'Tema oscuro', darkModeDesc: 'Cambia la apariencia',
     reminder: 'Recordatorio diario', reminderDesc: 'Un aviso para no perder el ritmo',
+    reminderTime: 'Hora del aviso', reminderTimeDesc: '¿A qué hora te recordamos?',
     aiMotiv: 'Mensajes con IA', aiMotivDesc: 'Frases motivadoras únicas al avanzar',
     aiPlanTitle: 'Crear meta con IA', aiPlanSub: 'Escribe qué quieres lograr y armo el plan por ti.',
     aiPlanPh: 'Ej: aprender a tocar guitarra, correr 5K, ahorrar para un viaje…',
@@ -101,6 +102,14 @@ var I18N = {
     importBadFormat: 'Formato no admitido. Usa CSV, Excel, PDF, imagen o Word.',
     importReadError: 'No se pudo leer el archivo:', importMore: 'más…',
     reminderBody: '¿Ya avanzaste hoy en tus metas? Un pequeño paso cuenta.',
+    reminderMsgs: [
+      'Tienes objetivos sin completar. Sigue avanzando, cada día estás más cerca de tu meta.',
+      '¿Ya avanzaste hoy? Un pequeño paso te acerca a tu meta.',
+      'Tus metas te esperan. Da un paso hoy y mantén el ritmo.',
+      'La constancia construye grandes logros. ¿Avanzamos hoy?',
+      'Cada día cuenta. Dedica un momento a tus metas pendientes.',
+      'No pierdas el impulso. Un avance hoy te acerca a lograrlo.'
+    ],
     weekdays: ['D','L','M','X','J','V','S'],
     weekdaysFull: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
     motiv: [
@@ -120,7 +129,8 @@ var I18N = {
       "Grande no es el paso, grande es no detenerse.","Lo estás haciendo. Punto. Sigue adelante.",
       "Tu compromiso contigo mismo se ve hoy.","Casi en la cima. Este avance pesa. ¡Vamos!"
     ],
-    finishMsg: "¡Lo lograste! Completaste tu meta. Date el crédito que mereces. 🎉"
+    finishMsg: "¡Lo lograste! Completaste tu meta. Date el crédito que mereces. 🎉",
+    celTitle: '¡Lo lograste!', celMsg: 'Completaste tu meta. Date el crédito que mereces por cada paso.', celBtn: 'Seguir'
   }
 };
 
