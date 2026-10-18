@@ -292,12 +292,13 @@ function renderTrophies(){
     </div>`;
   } else {
     html+=`<div class="trophy-shelf">`;
-    trophies.forEach(tr=>{
+    trophies.forEach((tr,idx)=>{
+      // nombre que va en el centro del trofeo: por ahora el de la meta (con cuentas será el del usuario)
+      const centerName = trophyCenterText(tr);
       html+=`<div class="trophy" onclick="flipTrophy(this)">
         <div class="trophy-inner">
           <div class="trophy-face trophy-front">
-            <div class="trophy-cup">${tr.emoji||'🏆'}</div>
-            <div class="trophy-name">${esc(tr.title)}</div>
+            ${trophySVG(centerName, idx)}
           </div>
           <div class="trophy-face trophy-back">
             <div class="trophy-badge">🏅</div>
@@ -311,6 +312,71 @@ function renderTrophies(){
     html+=`</div>`;
   }
   el.innerHTML=html;
+}
+// Texto que va en el centro del trofeo (con cuentas: el nombre del usuario; por ahora: la meta)
+function trophyCenterText(tr){
+  const name = (data.user && data.user.name) ? data.user.name : tr.title;
+  return name;
+}
+// Divide un texto para que quepa en el centro del trofeo (1-2 líneas cortas)
+function fitTrophyText(txt){
+  txt=String(txt||'').trim();
+  if(txt.length<=12) return [txt];
+  const words=txt.split(/\s+/);
+  let l1='',l2='';
+  for(const w of words){
+    if((l1+' '+w).trim().length<=12 && !l2) l1=(l1+' '+w).trim();
+    else l2=(l2+' '+w).trim();
+  }
+  if(l2.length>13) l2=l2.slice(0,12)+'…';
+  return l2 ? [l1,l2] : [l1];
+}
+// SVG de una copa dorada premium con el nombre en el centro
+function trophySVG(centerText, idx){
+  const uid='tg'+idx;
+  const lines=fitTrophyText(centerText);
+  const plateY = lines.length===2 ? 70 : 74;
+  const plateH = lines.length===2 ? 42 : 34;
+  const nameSvg = lines.length===2
+    ? `<text x="100" y="88" text-anchor="middle" class="tname">${esc(lines[0])}</text><text x="100" y="104" text-anchor="middle" class="tname">${esc(lines[1])}</text>`
+    : `<text x="100" y="96" text-anchor="middle" class="tname">${esc(lines[0])}</text>`;
+  return `<svg class="trophy-svg" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="${uid}-gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FDF0B0"/><stop offset=".35" stop-color="#F4C040"/>
+        <stop offset=".6" stop-color="#E0A020"/><stop offset="1" stop-color="#B8860B"/>
+      </linearGradient>
+      <linearGradient id="${uid}-goldDark" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#E0A020"/><stop offset="1" stop-color="#8a6508"/>
+      </linearGradient>
+      <radialGradient id="${uid}-shine" cx=".35" cy=".3" r=".8">
+        <stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="${uid}-plate" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2a2320"/><stop offset="1" stop-color="#4a3c28"/>
+      </linearGradient>
+    </defs>
+    <!-- destello de fondo -->
+    <circle cx="100" cy="95" r="80" fill="url(#${uid}-shine)" opacity=".5"/>
+    <!-- asas -->
+    <path d="M55 55 C25 55 25 100 60 100" fill="none" stroke="url(#${uid}-goldDark)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M145 55 C175 55 175 100 140 100" fill="none" stroke="url(#${uid}-goldDark)" stroke-width="9" stroke-linecap="round"/>
+    <!-- copa -->
+    <path d="M52 40 L148 40 L140 92 Q100 120 60 92 Z" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="2"/>
+    <!-- placa central con el nombre -->
+    <rect x="56" y="${plateY}" width="88" height="${plateH}" rx="6" fill="url(#${uid}-plate)" stroke="#caa43a" stroke-width="1.5"/>
+    ${nameSvg}
+    <!-- borde superior brillante -->
+    <rect x="50" y="34" width="100" height="9" rx="4" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="1"/>
+    <!-- estrella sobre la copa -->
+    <path d="M100 12 l4 9 10 1 -7.5 7 2 10 -8.5 -5 -8.5 5 2 -10 -7.5 -7 10 -1 z" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="1"/>
+    <!-- cuello y base -->
+    <rect x="94" y="118" width="12" height="20" fill="url(#${uid}-goldDark)"/>
+    <path d="M74 138 L126 138 L132 152 L68 152 Z" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="1.5"/>
+    <rect x="62" y="152" width="76" height="12" rx="3" fill="url(#${uid}-goldDark)"/>
+    <!-- destello diagonal -->
+    <path d="M62 44 L80 44 L58 96 L50 80 Z" fill="#fff" opacity=".18"/>
+  </svg>`;
 }
 // girar un trofeo (efecto 3D) para ver su detalle
 function flipTrophy(el){ el.classList.toggle('flipped'); }

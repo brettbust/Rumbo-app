@@ -74,8 +74,9 @@ body::after{
 .trophy-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;box-shadow:0 10px 24px rgba(15,110,86,.18),inset 0 1px 0 rgba(255,255,255,.5)}
 .trophy-front{background:linear-gradient(160deg,var(--surface),var(--accent-soft));border:1px solid var(--accent-ring)}
 .trophy-back{background:linear-gradient(160deg,var(--accent),#0a5a46);color:#fff;transform:rotateY(180deg)}
-.trophy-cup{font-size:52px;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.2));animation:trophyFloat 3s ease-in-out infinite}
-@keyframes trophyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.trophy-svg{width:100%;height:auto;max-height:100%;filter:drop-shadow(0 6px 10px rgba(180,134,11,.35));animation:trophyFloat 3.2s ease-in-out infinite}
+.trophy-svg .tname{font-family:inherit;font-weight:800;font-size:13px;fill:#FDF0B0;letter-spacing:.3px}
+@keyframes trophyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .trophy-name{font-size:13px;font-weight:700;color:var(--ink);text-align:center;line-height:1.25;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .trophy-back .trophy-name{color:#fff}
 .trophy-badge{font-size:40px}
