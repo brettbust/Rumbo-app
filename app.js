@@ -90,6 +90,8 @@ const ICONS = {
   calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
   plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
   minus:'<line x1="5" y1="12" x2="19" y2="12"/>',
+  chevronLeft:'<polyline points="15 18 9 12 15 6"/>',
+  chevronRight:'<polyline points="9 18 15 12 9 6"/>',
   trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   calClock:'<path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5.5"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="18" cy="18" r="4"/><path d="M18 16.5V18l1 1"/>',
   hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
@@ -187,6 +189,8 @@ function genDates(start,count,freq,weekdays){
 function WD_LABEL(i){ return t('weekdays')[i]; }
 function WD_FULL_NAME(i){ return t('weekdaysFull')[i]; }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// Pone en mayúscula la primera letra (para mostrar el nombre del logro con estilo). No afecta a alfabetos sin mayúsculas.
+function capFirst(s){ s=String(s||'').trim(); return s ? s.charAt(0).toLocaleUpperCase()+s.slice(1) : s; }
 
 function goalProgress(g){
   if(g.type==='number'){
@@ -276,114 +280,100 @@ function renderHome(){
   el.innerHTML=html;
 }
 
-/* ---------- SALÓN DE TROFEOS ---------- */
+/* ---------- SALÓN DE TROFEOS (tarjetas 2D) ---------- */
+function trophyList(){
+  return Array.isArray(data.trophies)
+    ? data.trophies.map((tr,i)=>({tr,i})).sort((a,b)=> (b.tr.date||'').localeCompare(a.tr.date||'') || b.i-a.i).map(o=>o.tr)
+    : [];
+}
 function renderTrophies(){
   const el=document.getElementById('trophiesContent');
   if(!el) return;
-  const trophies = Array.isArray(data.trophies) ? data.trophies.slice().reverse() : [];
-  let html=`<div class="trophy-hero">
-    <h2>${t('trophiesTitle')}</h2>
-    <p>${trophies.length>0 ? (trophies.length+' '+(trophies.length===1?t('trophyOne'):t('trophyMany'))) : t('trophiesEmptySub')}</p>
-  </div>`;
-  if(trophies.length===0){
-    html+=`<div class="trophy-empty">
-      <div class="trophy-empty-ic">🏆</div>
-      <div class="trophy-empty-tx">${t('trophiesEmpty')}</div>
-    </div>`;
-  } else {
-    html+=`<div class="trophy-shelf">`;
-    trophies.forEach((tr,idx)=>{
-      // nombre que va en el centro del trofeo: por ahora el de la meta (con cuentas será el del usuario)
-      const centerName = trophyCenterText(tr);
-      html+=`<div class="trophy" onclick="flipTrophy(this)">
-        <div class="trophy-inner">
-          <div class="trophy-face trophy-front">
-            ${trophySVG(centerName, idx)}
-          </div>
-          <div class="trophy-face trophy-back">
-            <div class="trophy-badge">🏅</div>
-            <div class="trophy-name">${esc(tr.title)}</div>
-            <div class="trophy-date">${fmtDate(tr.date)}</div>
-            <button class="trophy-del" onclick="event.stopPropagation();deleteTrophy('${tr.goalId}','${esc(tr.date)}')" aria-label="${t('delete')}">${icon('trash',15)} ${t('delete')}</button>
-          </div>
-        </div>
-      </div>`;
-    });
-    html+=`</div>`;
+  const all = trophyList();
+  if(all.length===0){
+    el.innerHTML=`<div class="trophy-hero"><h2>${t('trophiesTitle')}</h2><p>${t('trophiesEmptySub')}</p></div>
+      <div class="trophy-empty"><div class="trophy-empty-ic">🏆</div><div class="trophy-empty-tx">${t('trophiesEmpty')}</div></div>`;
+    return;
   }
+  let html=`<div class="trophy-hero"><h2>${t('trophiesTitle')}</h2>
+    <p>${all.length+' '+(all.length===1?t('trophyOne'):t('trophyMany'))}</p></div>`;
+  // agrupar por mes-año (más reciente primero; trophyList ya viene ordenado desc)
+  const groups=[]; const idx={};
+  all.forEach(tr=>{
+    const d=parseISO(tr.date);
+    const key=d.getFullYear()+'-'+d.getMonth();
+    if(idx[key]===undefined){ idx[key]=groups.length; groups.push({key, date:d, items:[]}); }
+    groups[idx[key]].items.push(tr);
+  });
+  groups.forEach(g=>{
+    html+=`<div class="trophy-month">${esc(monthYearLabel(g.date))}</div>`;
+    html+=`<div class="trophy-grid">`;
+    g.items.forEach(tr=>{ html+=trophyCard(tr); });
+    html+=`</div>`;
+  });
   el.innerHTML=html;
 }
-// Texto que va en el centro del trofeo (con cuentas: el nombre del usuario; por ahora: la meta)
-function trophyCenterText(tr){
-  const name = (data.user && data.user.name) ? data.user.name : tr.title;
-  return name;
+// "Octubre 2026" en el idioma activo, con mayúscula inicial
+function monthYearLabel(d){
+  const loc=(typeof CURRENT_LANG!=='undefined'?CURRENT_LANG:'es');
+  let s;
+  try{ s=d.toLocaleDateString(loc,{month:'long',year:'numeric'}); }
+  catch(e){ s=d.toLocaleDateString('es',{month:'long',year:'numeric'}); }
+  return s.charAt(0).toLocaleUpperCase()+s.slice(1);
 }
-// Divide un texto para que quepa en el centro del trofeo (1-2 líneas cortas)
-function fitTrophyText(txt){
-  txt=String(txt||'').trim();
-  if(txt.length<=12) return [txt];
-  const words=txt.split(/\s+/);
-  let l1='',l2='';
-  for(const w of words){
-    if((l1+' '+w).trim().length<=12 && !l2) l1=(l1+' '+w).trim();
-    else l2=(l2+' '+w).trim();
-  }
-  if(l2.length>13) l2=l2.slice(0,12)+'…';
-  return l2 ? [l1,l2] : [l1];
+// mapa de emoji de meta -> icono de línea elegante para la medalla
+const MEDAL_ICONS={
+  target:'<circle cx="24" cy="24" r="14"/><circle cx="24" cy="24" r="8"/><circle cx="24" cy="24" r="2.5" fill="currentColor"/>',
+  book:'<path d="M12 10a3 3 0 0 1 3-3h20v30H15a3 3 0 0 0-3 3z"/><path d="M12 40a3 3 0 0 1 3-3h20"/>',
+  run:'<circle cx="28" cy="11" r="3.5"/><path d="M26 17l-6 5 4 5 2 9"/><path d="M20 22l-6 2"/><path d="M24 27l7 2 4 6"/>',
+  muscle:'<path d="M14 30c0-6 3-11 9-11 3 0 5 2 5 5 0 4-4 5-4 9 0 3 3 4 6 4 5 0 8-4 8-9"/><circle cx="12" cy="31" r="3"/>',
+  brain:'<path d="M24 12a6 6 0 0 0-6 6 5 5 0 0 0-2 9 5 5 0 0 0 8 4 5 5 0 0 0 8-4 5 5 0 0 0-2-9 6 6 0 0 0-6-6z"/><path d="M24 12v24"/>',
+  money:'<circle cx="24" cy="24" r="14"/><path d="M24 16v16M20 20h6a3 3 0 0 1 0 6h-4a3 3 0 0 0 0 6h6"/>',
+  music:'<path d="M20 32V14l14-3v18"/><circle cx="17" cy="33" r="3.5"/><circle cx="31" cy="30" r="3.5"/>',
+  art:'<path d="M24 10a14 14 0 1 0 0 28c2 0 3-1 3-3 0-1-1-2-1-3s1-2 3-2h3a6 6 0 0 0 6-6c0-7-7-14-14-14z"/><circle cx="18" cy="22" r="1.8" fill="currentColor"/><circle cx="24" cy="18" r="1.8" fill="currentColor"/><circle cx="30" cy="22" r="1.8" fill="currentColor"/>',
+  yoga:'<circle cx="24" cy="12" r="3"/><path d="M24 17v10M14 36l10-9 10 9M14 27h20"/>',
+  plant:'<path d="M24 38V22"/><path d="M24 26c-6 0-9-4-9-9 6 0 9 4 9 9z"/><path d="M24 22c5 0 8-3 8-8-5 0-8 3-8 8z"/>',
+  code:'<path d="M18 16l-8 8 8 8M30 16l8 8-8 8"/>',
+  pen:'<path d="M30 12l6 6-16 16-8 2 2-8z"/>',
+  apple:'<path d="M24 18c-3-4-10-3-11 3-1 8 5 16 11 16s12-8 11-16c-1-6-8-7-11-3z"/><path d="M24 18c0-3 2-6 5-6"/>',
+  water:'<path d="M24 10c6 8 10 13 10 19a10 10 0 0 1-20 0c0-6 4-11 10-19z"/>',
+  star:'<path d="M24 10l4 10 11 1-8 7 2 11-9-6-9 6 2-11-8-7 11-1z"/>',
+  fire:'<path d="M24 10c3 5 8 7 8 14a8 8 0 0 1-16 0c0-3 2-5 3-7 1 3 3 3 3 1 0-3-1-5 2-8z"/>'
+};
+const EMOJI_TO_MEDAL={'🎯':'target','📚':'book','🏃':'run','💪':'muscle','🧠':'brain','💰':'money','🎸':'music','🎨':'art','🧘':'yoga','🌱':'plant','💻':'code','✍️':'pen','🍎':'apple','💧':'water','⭐':'star','🔥':'fire'};
+// una tarjeta de trofeo premium (medalla con icono de línea grabado)
+function trophyCard(tr){
+  const gid = (tr.goalId||'x').replace(/[^a-zA-Z0-9]/g,'');
+  const iconKey = EMOJI_TO_MEDAL[tr.emoji] || 'star';   // estrella de respaldo
+  const iconPaths = MEDAL_ICONS[iconKey];
+  return `<div class="tcard2">
+    <button class="tcard2-del" onclick="deleteTrophy('${tr.goalId}','${esc(tr.date)}')" aria-label="${t('delete')}">${icon('trash',14)}</button>
+    <span class="tc2-star s1">✦</span><span class="tc2-star s2">✦</span>
+    <div class="tc2-badge">
+      <svg viewBox="0 0 100 112" width="88" height="98">
+        <defs>
+          <linearGradient id="tcg-${gid}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#FFE9A8"/><stop offset=".5" stop-color="#E8B23A"/><stop offset="1" stop-color="#B8860B"/>
+          </linearGradient>
+        </defs>
+        <path d="M31 76 l-7 32 13 -8 8 11 7 -25z" fill="#C8921E"/>
+        <path d="M69 76 l7 32 -13 -8 -8 11 -7 -25z" fill="#C8921E"/>
+        <circle cx="50" cy="46" r="42" fill="url(#tcg-${gid})"/>
+        <circle cx="50" cy="46" r="42" fill="none" stroke="#fff6d8" stroke-width="2" opacity=".55"/>
+        <circle cx="50" cy="46" r="33" fill="none" stroke="#8a6508" stroke-width="1.5"/>
+        <g transform="translate(26,22)" fill="none" stroke="#5a4208" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${iconPaths}</g>
+      </svg>
+    </div>
+    <div class="tc2-name" dir="auto">${esc(capFirst(tr.title))}</div>
+    <div class="tc2-date">${fmtDate(tr.date)}</div>
+  </div>`;
 }
-// SVG de una copa dorada premium con el nombre en el centro
-function trophySVG(centerText, idx){
-  const uid='tg'+idx;
-  const lines=fitTrophyText(centerText);
-  const plateY = lines.length===2 ? 70 : 74;
-  const plateH = lines.length===2 ? 42 : 34;
-  const nameSvg = lines.length===2
-    ? `<text x="100" y="88" text-anchor="middle" class="tname">${esc(lines[0])}</text><text x="100" y="104" text-anchor="middle" class="tname">${esc(lines[1])}</text>`
-    : `<text x="100" y="96" text-anchor="middle" class="tname">${esc(lines[0])}</text>`;
-  return `<svg class="trophy-svg" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="${uid}-gold" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#FDF0B0"/><stop offset=".35" stop-color="#F4C040"/>
-        <stop offset=".6" stop-color="#E0A020"/><stop offset="1" stop-color="#B8860B"/>
-      </linearGradient>
-      <linearGradient id="${uid}-goldDark" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#E0A020"/><stop offset="1" stop-color="#8a6508"/>
-      </linearGradient>
-      <radialGradient id="${uid}-shine" cx=".35" cy=".3" r=".8">
-        <stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="${uid}-plate" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#2a2320"/><stop offset="1" stop-color="#4a3c28"/>
-      </linearGradient>
-    </defs>
-    <!-- destello de fondo -->
-    <circle cx="100" cy="95" r="80" fill="url(#${uid}-shine)" opacity=".5"/>
-    <!-- asas -->
-    <path d="M55 55 C25 55 25 100 60 100" fill="none" stroke="url(#${uid}-goldDark)" stroke-width="9" stroke-linecap="round"/>
-    <path d="M145 55 C175 55 175 100 140 100" fill="none" stroke="url(#${uid}-goldDark)" stroke-width="9" stroke-linecap="round"/>
-    <!-- copa -->
-    <path d="M52 40 L148 40 L140 92 Q100 120 60 92 Z" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="2"/>
-    <!-- placa central con el nombre -->
-    <rect x="56" y="${plateY}" width="88" height="${plateH}" rx="6" fill="url(#${uid}-plate)" stroke="#caa43a" stroke-width="1.5"/>
-    ${nameSvg}
-    <!-- borde superior brillante -->
-    <rect x="50" y="34" width="100" height="9" rx="4" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="1"/>
-    <!-- estrella sobre la copa -->
-    <path d="M100 12 l4 9 10 1 -7.5 7 2 10 -8.5 -5 -8.5 5 2 -10 -7.5 -7 10 -1 z" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="1"/>
-    <!-- cuello y base -->
-    <rect x="94" y="118" width="12" height="20" fill="url(#${uid}-goldDark)"/>
-    <path d="M74 138 L126 138 L132 152 L68 152 Z" fill="url(#${uid}-gold)" stroke="#9a7510" stroke-width="1.5"/>
-    <rect x="62" y="152" width="76" height="12" rx="3" fill="url(#${uid}-goldDark)"/>
-    <!-- destello diagonal -->
-    <path d="M62 44 L80 44 L58 96 L50 80 Z" fill="#fff" opacity=".18"/>
-  </svg>`;
-}
-// girar un trofeo (efecto 3D) para ver su detalle
-function flipTrophy(el){ el.classList.toggle('flipped'); }
-// borrar un trofeo del salón (el usuario decide qué conservar)
+function trophyCenterText(tr){ return tr.title; }
 function deleteTrophy(goalId, date){
-  confirmSheet(t('trophyDelTitle'), t('trophyDelMsg'), t('delete'), ()=>{
-    data.trophies = (data.trophies||[]).filter(tr=>!(tr.goalId===goalId && tr.date===date));
+  const tr=(data.trophies||[]).find(x=>x.goalId===goalId && x.date===date);
+  const name = tr ? tr.title : '';
+  confirmSheet(t('trophyDelTitle'), t('trophyDelMsg1')+' "'+esc(name)+'". '+t('trophyDelMsg2'), t('delete'), ()=>{
+    data.trophies = (data.trophies||[]).filter(x=>!(x.goalId===goalId && x.date===date));
     save();
     renderTrophies();
   });
@@ -732,6 +722,7 @@ function openEdit(id, mode){
   let g = editing ? data.goals.find(x=>x.id===id) : null;
   draftType = g ? g.type : 'days';
   draftEmoji = g ? (g.emoji||'🎯') : '🎯';
+  iconUserPicked = !!g;   // al editar se respeta su icono; al crear, la app lo detecta sola
   draftFreq = g && g.freq ? g.freq : 'daily';
   draftWeekdays = g && g.weekdays ? g.weekdays.slice() : [];
   draftManualDates = g && g.type==='days' && g.freq==='manual' ? g.days.map(d=>d.date) : [];
@@ -756,10 +747,14 @@ function openEdit(id, mode){
     `}
 
     <div class="field"><label>${t('whatAchieve')}</label>
-      <input id="fTitle" type="text" maxlength="60" placeholder="${t('goalNamePh')}" value="${g?esc(g.title):''}"></div>
+      <input id="fTitle" type="text" maxlength="60" placeholder="${t('goalNamePh')}" value="${g?esc(g.title):''}" oninput="autoIcon(this.value)"></div>
 
     <div class="field"><label>${t('icon')}</label>
-      <div class="emoji-picker" id="emojiPicker">${EMOJIS.map(e=>`<button class="emoji-opt${e===draftEmoji?' sel':''}" onclick="pickEmoji('${e}',this)">${e}</button>`).join('')}</div></div>
+      <div class="icon-auto-row">
+        <div class="icon-auto-preview" id="iconPreview">${draftEmoji}</div>
+        <button type="button" class="icon-change-btn" id="iconChangeBtn" onclick="toggleIconPicker()">${t('changeIcon')}</button>
+      </div>
+      <div class="emoji-picker" id="emojiPicker" style="display:none;margin-top:10px">${EMOJIS.map(e=>`<button type="button" class="emoji-opt${e===draftEmoji?' sel':''}" onclick="pickEmoji('${e}',this)">${e}</button>`).join('')}</div></div>
 
     <div class="field"><label>${t('goalType')}</label>
       <div class="type-toggle">
@@ -778,7 +773,52 @@ function openEdit(id, mode){
   renderTypeFields(g);
   document.getElementById('editScrim').classList.add('open');
 }
-function pickEmoji(e,btn){ draftEmoji=e; document.querySelectorAll('#emojiPicker .emoji-opt').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
+let iconUserPicked=false;   // ¿el usuario eligió el icono a mano?
+function pickEmoji(e,btn){
+  draftEmoji=e; iconUserPicked=true;
+  document.querySelectorAll('#emojiPicker .emoji-opt').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel');
+  const pv=document.getElementById('iconPreview'); if(pv) pv.textContent=e;
+}
+function toggleIconPicker(){
+  const p=document.getElementById('emojiPicker'); if(!p) return;
+  p.style.display = p.style.display==='none' ? 'flex' : 'none';
+}
+/* Palabras clave -> emoji, para elegir el icono automáticamente según la meta.
+   Multilenguaje: incluye términos comunes en los 10 idiomas. */
+const ICON_KEYWORDS=[
+  ['🏃','corr|run|jog|troti|marat|5k|10k|ריצ|جري|бег|跑|courir|走|correr|caminar|walk|hik|senderis'],
+  ['💪','gimnas|gym|pesas|fuerz|muscul|workout|entren|fit|múscul|musculo|כושר|لياقة|силов|健身|muscu|flex'],
+  ['📚','le[eo]r|libro|lectur|read|book|idiom|langu|inglés|ingles|english|ספר|كتاب|قراءة|чита|книг|读书|lire|livre|読書'],
+  ['🎸','guitar|músic|music|cant|sing|piano|bater|instrument|מוסיק|موسيقى|музык|音乐|musique|音楽|toca'],
+  ['🎨','pint|dibuj|art|draw|paint|diseñ|design|craft|צייר|אמנות|رسم|فن|рисов|искусств|画|艺术|dessin|絵'],
+  ['💰','ahorr|dinero|money|save|invert|invest|budget|presup|financ|deud|debt|כסף|לחסוך|مال|توفير|деньг|накоп|钱|存钱|argent|épargn|お金|貯金'],
+  ['🧠','mente|medit|mindful|focus|concentr|memoria|brain|think|מדיט|تأمل|ум|медит|冥想|专注|médit|瞑想'],
+  ['🧘','yoga|pilat|estir|stretch|relaj|relax|respir|breath|calm|יוגה|يوغا|йог|瑜伽|yoga|ヨガ'],
+  ['🌱','plant|jardin|garden|cultiv|crec|grow|huert|siembr|צמח|גינ|نبات|زراعة|растен|сад|种植|植物|jardin|plante|植物'],
+  ['💻','program|código|code|develop|software|web|app|comput|tech|teclad|קוד|תכנות|برمجة|код|программ|编程|代码|code|プログラ'],
+  ['✍️','escrib|writ|redact|blog|diario|journal|novela|poem|כתיב|لكتابة|пис|写作|écri|書く'],
+  ['🍎','com[ei]r|aliment|diet|nutri|eat|food|cocin|cook|recet|saludable|healthy|אכיל|תזונ|طعام|أكل|еда|пита|吃|饮食|manger|食べ|食事|fruta|verdur|veget'],
+  ['💧','agua|water|hidrat|beber|drink|מים|ماء|вод|水|eau|hydrat|水を'],
+  ['🔥','rach|streak|hábito|habit|diari|daily|consist|constan|רצף|عادة|привыч|连续|习惯|habitude|継続'],
+  ['📚','aprend|estud|learn|study|curso|clase|ללמוד|学习|勉強|apprendre|étudier'],
+  ['⭐','meta|goal|objetiv|sueñ|dream|logr|achiev|propósit|מטרה|هدف|цель|目标|objectif|目標']
+];
+function detectIcon(text){
+  const s=String(text||'').toLowerCase();
+  if(!s.trim()) return '🎯';
+  for(const [emoji,pat] of ICON_KEYWORDS){
+    if(new RegExp(pat,'i').test(s)) return emoji;
+  }
+  return '🎯';   // genérico: la diana representa "una meta"
+}
+function autoIcon(text){
+  if(iconUserPicked) return;          // respetar la elección manual del usuario
+  const e=detectIcon(text);
+  draftEmoji=e;
+  const pv=document.getElementById('iconPreview'); if(pv) pv.textContent=e;
+  // reflejar en la rejilla por si está abierta
+  document.querySelectorAll('#emojiPicker .emoji-opt').forEach(b=>b.classList.toggle('sel', b.textContent===e));
+}
 function pickType(t){
   draftType=t;
   document.getElementById('typeDays').classList.toggle('sel',t==='days');
@@ -1088,7 +1128,7 @@ async function generatePlan(){
     if(stages.length===0){ if(statusEl) statusEl.innerHTML=`<div class="import-err">${t('aiPlanNoStages')}</div>`; return; }
     // Rellenar el formulario con el plan y pasarlo a modo "fechas manuales" (cada etapa su fecha)
     if(res.title){ const ft=document.getElementById('fTitle'); if(ft) ft.value=res.title.slice(0,60); }
-    if(res.emoji){ draftEmoji=res.emoji; }
+    if(res.emoji){ draftEmoji=res.emoji; iconUserPicked=true; const pv=document.getElementById('iconPreview'); if(pv) pv.textContent=res.emoji; }
     draftType='days';
     draftFreq='import';          // reutiliza el flujo de importación (etapas con fecha+nombre)
     draftImportStages = stages.slice().sort((a,b)=>a.date.localeCompare(b.date));
@@ -1538,7 +1578,7 @@ function init(){
   document.getElementById('fab').onclick=()=>chooseNewGoalMode();
   document.getElementById('settingsBtn').onclick=()=>show('settings');
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
-  document.getElementById('trophiesBtn').onclick=()=>{ renderTrophies(); show('trophies'); };
+  document.getElementById('trophiesBtn').onclick=()=>{ show('trophies'); renderTrophies(); };
   document.getElementById('trophiesBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('detailBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('themeSwitch').onclick=toggleTheme;

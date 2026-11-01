@@ -67,25 +67,20 @@ body::after{
 .trophy-empty{text-align:center;padding:50px 20px;color:var(--muted)}
 .trophy-empty-ic{font-size:64px;filter:grayscale(.4) opacity(.6);margin-bottom:14px}
 .trophy-empty-tx{font-size:15px;line-height:1.5;max-width:260px;margin:0 auto}
-.trophy-shelf{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;perspective:900px}
-.trophy{border:none;background:none;padding:0;cursor:pointer;font-family:inherit;aspect-ratio:3/4}
-.trophy-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.8,.3,1)}
-.trophy.flipped .trophy-inner{transform:rotateY(180deg)}
-.trophy-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;box-shadow:0 10px 24px rgba(15,110,86,.18),inset 0 1px 0 rgba(255,255,255,.5)}
-.trophy-front{background:linear-gradient(160deg,var(--surface),var(--accent-soft));border:1px solid var(--accent-ring)}
-.trophy-back{background:linear-gradient(160deg,var(--accent),#0a5a46);color:#fff;transform:rotateY(180deg)}
-.trophy-svg{width:100%;height:auto;max-height:100%;filter:drop-shadow(0 6px 10px rgba(180,134,11,.35));animation:trophyFloat 3.2s ease-in-out infinite}
-.trophy-svg .tname{font-family:inherit;font-weight:800;font-size:13px;fill:#FDF0B0;letter-spacing:.3px}
-@keyframes trophyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.trophy-name{font-size:13px;font-weight:700;color:var(--ink);text-align:center;line-height:1.25;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.trophy-back .trophy-name{color:#fff}
-.trophy-badge{font-size:40px}
-.trophy-date{font-size:12px;color:rgba(255,255,255,.85)}
-.trophy-del{margin-top:10px;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 12px;font-size:11.5px;font-family:inherit;cursor:pointer}
-.trophy-del:hover{background:rgba(255,80,60,.9);border-color:transparent}
-.trophy-del svg{width:13px;height:13px}
-.trophy:active .trophy-inner{transform:scale(.97)}
-.trophy.flipped:active .trophy-inner{transform:rotateY(180deg) scale(.97)}
+.trophy-month{font-size:14px;font-weight:800;color:var(--accent);margin:18px 2px 10px;display:flex;align-items:center;gap:10px}
+.trophy-month::after{content:"";flex:1;height:1px;background:var(--line)}
+.trophy-month:first-of-type{margin-top:4px}
+.trophy-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.tcard2{position:relative;border-radius:20px;background:linear-gradient(165deg,#1b2a24,#0d1713);padding:22px 14px 18px;display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.28)}
+.tcard2::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 24%,rgba(244,183,64,.22),transparent 58%);pointer-events:none}
+.tc2-badge{position:relative;z-index:1;margin-bottom:14px;filter:drop-shadow(0 6px 12px rgba(244,183,64,.4))}
+.tc2-name{font-size:14.5px;font-weight:800;color:#FFE9A8;line-height:1.2;z-index:1;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tc2-date{font-size:11.5px;color:#8fae9e;margin-top:5px;font-weight:600;letter-spacing:.03em;z-index:1}
+.tc2-star{position:absolute;font-size:10px;color:rgba(244,183,64,.5);z-index:1}
+.tc2-star.s1{top:16px;left:16px}.tc2-star.s2{top:26px;right:20px}
+.tcard2-del{position:absolute;top:8px;right:8px;z-index:2;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.08);color:#b8a888;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.5;transition:.15s}
+.tcard2-del:hover{opacity:1;background:#c0392b;color:#fff}
+.tcard2-del svg{width:14px;height:14px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
 .brand .logo{width:30px;height:30px;flex-shrink:0}
 .icon-btn{width:40px;height:40px;border:1px solid var(--line);background:var(--surface);border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:18px;transition:.15s}
@@ -300,6 +295,10 @@ body::after{
 .stage-edit input{padding:10px 12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;font-size:14px;font-family:inherit}
 .stage-edit input:focus{outline:2px solid var(--accent-ring);outline-offset:-1px}
 
+.icon-auto-row{display:flex;align-items:center;gap:14px}
+.icon-auto-preview{width:60px;height:60px;flex-shrink:0;border-radius:16px;background:linear-gradient(160deg,var(--accent-soft),var(--surface-2));border:1.5px solid var(--accent-ring);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 12px rgba(15,110,86,.12)}
+.icon-change-btn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:.15s}
+.icon-change-btn:hover{border-color:var(--accent);color:var(--accent)}
 .emoji-picker{display:flex;gap:8px;flex-wrap:wrap}
 .emoji-opt{width:44px;height:44px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
 .emoji-opt.sel{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.05)}
