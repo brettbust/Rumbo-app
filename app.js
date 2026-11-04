@@ -266,18 +266,24 @@ function renderHome(){
     const p=goalProgress(g);
     const sub = g.type==='number' ? `${p.done} / ${p.total} ${esc(g.unit||'')}` : `${p.done} / ${p.total} ${t('daysUnit')}`;
     const deadline = g.endDate ? t('goalDeadline')+' '+fmtDateShort(g.endDate) : '';
-    html+=`<div class="goal" onclick="openDetail('${g.id}')">
-      <div class="accent-strip"></div>
+    const doneClass = p.pct===100 ? ' is-done' : '';
+    html+=`<div class="goal${doneClass}" onclick="openDetail('${g.id}')">
       <div class="goal-head">
-        <div class="goal-emoji">${g.emoji||'🎯'}</div>
+        <div class="goal-disc">${goalIconSVG(g.emoji)}</div>
         <div class="goal-title"><h3 dir="auto">${esc(g.title)}</h3><div class="meta">${sub}</div></div>
-        <div class="goal-pct">${p.pct}%</div>
+        <div class="goal-pct">${p.pct}<span>%</span></div>
       </div>
       <div class="mini-track"><div class="mini-fill" style="width:${p.pct}%"></div></div>
-      <div class="goal-foot"><span>${p.pct===100?('✅ '+t('done')):t('inProgress')}</span><span>${deadline}</span></div>
+      <div class="goal-foot"><span class="gf-status">${p.pct===100?('✓ '+t('done')):t('inProgress')}</span><span>${deadline}</span></div>
     </div>`;
   });
   el.innerHTML=html;
+}
+// icono de línea (mismo set que las medallas) sobre un disco, para la tarjeta de meta
+function goalIconSVG(emoji){
+  const key = EMOJI_TO_MEDAL[emoji] || 'star';
+  const paths = MEDAL_ICONS[key];
+  return `<svg viewBox="0 0 48 48" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 }
 
 /* ---------- SALÓN DE TROFEOS (tarjetas 2D) ---------- */
@@ -396,8 +402,8 @@ function renderDetail(){
   const p=goalProgress(g);
   const el=document.getElementById('detailContent');
   let html=`<div class="detail-hero">
-    <div class="demoji">${g.emoji||'🎯'}</div>
-    <h2>${esc(g.title)}</h2>
+    <div class="ddisc">${goalIconSVG(g.emoji)}</div>
+    <h2>${esc(capFirst(g.title))}</h2>
     <div class="dmeta">${g.startDate?fmtDate(g.startDate):''}${g.endDate?' → '+fmtDate(g.endDate):''}</div>
     <div class="big-ring">${ring(p.pct,150,12)}<div class="lbl"><b>${p.pct}%</b><span>${t('percentDone')}</span></div></div>
     <div class="detail-count">${g.type==='number'?`${p.done} ${t('ofDays')} ${p.total} ${esc(g.unit||'')}`:`${p.done} ${t('ofDays')} ${p.total} ${t('daysUnit')}`}</div>
@@ -1368,7 +1374,7 @@ function confirmSheet(title,msg,okLabel,cb,extraHtml){
 function closeConfirm(){ document.getElementById('confirmScrim').classList.remove('open'); confirmCb=null; }
 
 /* ---------- confetti ---------- */
-const CONFETTI_COLORS=['#0F6E56','#1D9E75','#F4B740','#7CE0BE','#C24A3E','#5BC0EB','#9B5DE5'];
+const CONFETTI_COLORS=['#0F6E56','#1D9E75','#6EE7B7','#7CE0BE','#34D399','#A7F3D0','#059669'];
 function confetti(){
   // lluvia desde arriba (fondo)
   for(let i=0;i<80;i++){
