@@ -1,6 +1,6 @@
 # Política de privacidad de Rumbo
 
-Última actualización: 23/09/2026
+Última actualización: [pon la fecha]
 
 Rumbo es una aplicación de seguimiento de metas personales. Valoramos tu privacidad y
 hemos diseñado la app para que tus datos sean solo tuyos.
@@ -15,9 +15,9 @@ ningún servidor ni a terceros.
 
 ## Permisos
 
-* Notificaciones (opcional): si activas el recordatorio diario, la app usa el permiso de
-notificaciones de tu dispositivo únicamente para mostrarte un aviso. No se envía ningún
-dato con ello.
+- Notificaciones (opcional): si activas el recordatorio diario, la app usa el permiso de
+  notificaciones de tu dispositivo únicamente para mostrarte un aviso. No se envía ningún
+  dato con ello.
 
 ## Copias de seguridad
 
@@ -35,5 +35,4 @@ Si esta política cambia, publicaremos la versión actualizada en esta misma pá
 
 ## Contacto
 
-Para cualquier duda sobre privacidad, escribe a: bsbustamantez@gmail.com
-
+Para cualquier duda sobre privacidad, escribe a: [tu correo electrónico]

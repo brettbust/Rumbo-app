@@ -1615,41 +1615,79 @@ function finishWelcome(){
   const ov=document.getElementById('welOverlay');
   if(ov) ov.classList.remove('open');
   data.settings.seenWelcome=true; save();
+  // La primera vez, la bienvenida enlaza directo con la guía de globos
+  if(!data.settings.seenTour){ setTimeout(()=>startTour(true),320); }
 }
 
-/* ---------- Tour con globos (guía opcional) ---------- */
-let tourStep=0, tourItems=[];
-function startTour(){
-  // pasos: elemento a resaltar + texto
+/* ---------- Tour con globos (guía guiada paso a paso) ---------- */
+let tourStep=0, tourItems=[], tourFirstRun=false;
+function startTour(firstRun){
+  tourFirstRun=!!firstRun;
+  // Nos aseguramos de arrancar desde Inicio y cerrar cualquier hoja abierta
+  closeEdit(); show('home'); renderHome();
+  // Recorrido completo: cada paso resalta una parte real y explica para qué sirve.
+  // action: qué hacer al mostrar el paso (p.ej. abrir el selector de modo).
   tourItems=[
-    {sel:'#fab', text:t('tourFab')},
-    {sel:'#trophiesBtn', text:t('tourTrophies')},
-    {sel:'#settingsBtn', text:t('tourSettings')}
+    {sel:null,            title:t('tourWelcomeTitle'),  text:t('tourWelcomeText')},
+    {sel:'#fab',          title:t('tourFabTitle'),      text:t('tourFab')},
+    {sel:'.mode-choice',  title:t('tourModeTitle'),     text:t('tourMode'),   action:'openMode'},
+    {sel:'#trophiesBtn',  title:t('tourTrophiesTitle'), text:t('tourTrophies'), before:'closeMode'},
+    {sel:'#settingsBtn',  title:t('tourSettingsTitle'), text:t('tourSettings')},
+    {sel:null,            title:t('tourEndTitle'),      text:t('tourEnd')}
   ];
-  // si hay metas, añade un paso sobre la tarjeta de meta
+  // Si ya tiene una meta creada, insertamos un paso que la explica (antes de trofeos)
   const goalEl=document.querySelector('.goal');
-  if(goalEl) tourItems.splice(1,0,{sel:'.goal', text:t('tourGoal')});
+  if(goalEl){
+    tourItems.splice(3,0,{sel:'.goal', title:t('tourGoalTitle'), text:t('tourGoal'), before:'closeMode'});
+  }
   tourStep=0;
   const ov=document.getElementById('tourOverlay');
   if(!ov) return;
   ov.classList.add('open');
   renderTourStep();
 }
+function tourCloseMode(){
+  const scrim=document.getElementById('editScrim');
+  if(scrim && scrim.classList.contains('open')) closeEdit();
+}
 function renderTourStep(){
   const item=tourItems[tourStep];
-  const el=document.querySelector(item.sel);
+  if(item.before==='closeMode') tourCloseMode();
+  // Acción previa a resaltar (abrir el selector de modo para enseñarlo de verdad)
+  if(item.action==='openMode'){
+    const scrim=document.getElementById('editScrim');
+    if(!(scrim && scrim.classList.contains('open'))) chooseNewGoalMode();
+  }
+  // Damos un respiro para que el DOM se acomode tras abrir/cerrar hojas
+  setTimeout(()=>positionTour(item),item.action==='openMode'?260:0);
+}
+function positionTour(item){
   const spot=document.getElementById('tourSpot');
   const bub=document.getElementById('tourBubble');
-  if(!el){ tourNext(); return; }
+  const el=item.sel ? document.querySelector(item.sel) : null;
+  const last=tourStep===tourItems.length-1;
+  // Texto del globo (título en negrita + descripción)
+  document.getElementById('tourText').innerHTML =
+    (item.title?`<b class="tour-h">${esc(item.title)}</b>`:'')+`<span>${esc(item.text)}</span>`;
+  document.getElementById('tourCount').textContent=(tourStep+1)+' / '+tourItems.length;
+  document.getElementById('tourBtn').textContent = last ? t('tourDone') : t('tourNext');
+  const skip=document.getElementById('tourSkip');
+  if(skip){ skip.textContent=t('tourSkip'); skip.style.visibility = last ? 'hidden' : 'visible'; }
+  const bw=Math.min(300, innerWidth-24);
+  const bh=bub.offsetHeight||140;
+  if(!el){
+    // Paso sin elemento: globo centrado, sin foco
+    spot.style.width='0px'; spot.style.height='0px';
+    spot.style.left=(innerWidth/2)+'px'; spot.style.top=(innerHeight/2)+'px';
+    bub.style.left=Math.max(12,(innerWidth-bw)/2)+'px';
+    bub.style.top=Math.max(12,(innerHeight-bh)/2)+'px';
+    bub.style.maxWidth=bw+'px';
+    return;
+  }
   const r=el.getBoundingClientRect();
   const pad=8;
   spot.style.left=(r.left-pad)+'px'; spot.style.top=(r.top-pad)+'px';
   spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
-  document.getElementById('tourText').textContent=item.text;
-  document.getElementById('tourCount').textContent=(tourStep+1)+' / '+tourItems.length;
-  document.getElementById('tourBtn').textContent = tourStep===tourItems.length-1 ? t('tourDone') : t('tourNext');
-  // posicionar el globo: debajo del elemento si hay espacio, si no arriba
-  const bw=280, bh=bub.offsetHeight||120;
   let left=Math.min(Math.max(12, r.left+r.width/2-bw/2), innerWidth-bw-12);
   let top = r.bottom+14;
   if(top+bh > innerHeight-12) top = r.top - bh - 14;
@@ -1658,8 +1696,15 @@ function renderTourStep(){
 }
 function tourNext(){
   if(tourStep < tourItems.length-1){ tourStep++; renderTourStep(); }
-  else { const ov=document.getElementById('tourOverlay'); if(ov) ov.classList.remove('open'); }
+  else endTour();
 }
+function endTour(){
+  tourCloseMode();
+  const ov=document.getElementById('tourOverlay'); if(ov) ov.classList.remove('open');
+  data.settings.seenTour=true; save();
+  show('home'); renderHome();
+}
+function skipTour(){ endTour(); }
 
 function init(){
   load();
@@ -1704,9 +1749,11 @@ function init(){
 
   // Botón de Ajustes para volver a ver la guía con globos cuando el usuario quiera
   const htb=document.getElementById('howToBtn');
-  if(htb) htb.onclick=()=>{ show('home'); renderHome(); setTimeout(startTour,350); };
+  if(htb) htb.onclick=()=>{ show('home'); renderHome(); setTimeout(()=>startTour(false),350); };
 
-  // Bienvenida la primera vez
+  // Primera vez que el usuario abre la app: bienvenida y, al terminar, la guía de globos.
+  // Si ya vio la bienvenida pero no la guía (p.ej. versión anterior), le mostramos la guía.
   if(!data.settings.seenWelcome){ setTimeout(showWelcome,300); }
+  else if(!data.settings.seenTour){ setTimeout(()=>startTour(true),400); }
 }
 init();

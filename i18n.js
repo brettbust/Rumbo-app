@@ -146,11 +146,23 @@ var I18N = {
     wel3Title: 'Gana trofeos', wel3Text: 'Cada meta que completas se convierte en un trofeo en tu salón. Tu esfuerzo queda para siempre.',
     wel4Title: 'Empieza hoy', wel4Text: 'Crea tu primera meta a mano o deja que la IA arme el plan por ti. Tu rumbo empieza ahora.',
     howTo: 'Cómo funciona la app', howToDesc: 'Un recorrido guiado paso a paso',
-    tourNext: 'Siguiente', tourDone: 'Entendido',
-    tourFab: 'Toca aquí para crear una meta nueva, a mano o con IA.',
-    tourTrophies: 'Aquí está tu salón de trofeos: cada meta completada deja su medalla.',
-    tourSettings: 'Ajustes: tema, idioma, recordatorios y tus datos.',
-    tourGoal: 'Cada meta muestra tu progreso. Tócala para marcar tu avance.'
+    tourNext: 'Siguiente', tourDone: '¡Listo, a por ello!', tourSkip: 'Saltar guía',
+    tourWelcomeTitle: 'Te muestro cómo funciona',
+    tourWelcomeText: 'En menos de un minuto vas a dominar Rumbo. Sigue los globos: cada uno te enseña una parte y para qué sirve. ¿Empezamos?',
+    tourFabTitle: 'Aquí nace todo',
+    tourFab: 'Este botón crea una meta nueva. Es el corazón de la app: cada vez que tengas un objetivo, empieza aquí. Toca para ver cómo.',
+    tourModeTitle: 'Dos formas de crear',
+    tourMode: 'Puedes crear tu meta a mano, o dejar que la IA arme un plan paso a paso por ti. Si no sabes por dónde empezar, prueba la IA: te sorprenderá.',
+    tourTypeTitle: 'Elige el tipo de meta',
+    tourType: 'Metas de hábito (correr cada día), de cantidad (leer 100 páginas) o de fechas. La app se adapta a cómo mides tu progreso.',
+    tourGoalTitle: 'Tu progreso, siempre visible',
+    tourGoal: 'Cada meta muestra una barra que se llena con tu avance. Tócala para sumar progreso, y mírala crecer. Ese impulso es lo que te mantiene.',
+    tourTrophiesTitle: 'Tu salón de trofeos',
+    tourTrophies: 'Cada meta que completas deja una medalla aquí para siempre. Es tu prueba de que lo lograste. Vuelve cuando necesites recordar de qué eres capaz.',
+    tourSettingsTitle: 'Todo bajo tu control',
+    tourSettings: 'Tema claro u oscuro, idioma, recordatorio diario y tus datos. Y si alguna vez quieres repetir esta guía, está aquí dentro.',
+    tourEndTitle: '¡Eso es todo!',
+    tourEnd: 'Ya sabes lo esencial. Ahora lo importante: crea tu primera meta y da el primer paso. El mejor momento para empezar es hoy.'
   }
 };
 
