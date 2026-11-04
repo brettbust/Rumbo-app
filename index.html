@@ -5,39 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rumbo - Sigue tus metas</title>
 <meta name="description" content="Crea tus metas, marca tu avance cada día y mira cómo progresas.">
-<meta name="theme-color" content="#0F6E56">
+<meta name="theme-color" content="#F5F3EF">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230F6E56'/%3E%3Cpath d='M20 40 L32 20 L44 40 Z' fill='none' stroke='%237CE0BE' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='44' r='4' fill='%23F4B740'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230F6E56'/%3E%3Cpath d='M20 40 L32 20 L44 40 Z' fill='none' stroke='%237CE0BE' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='44' r='4' fill='%23F4B740'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23E8A93C'/%3E%3Cpath d='M32 17 L39 32 L32 27.5 L25 32 Z' fill='%23241A06'/%3E%3Cpath d='M32 47 L25 32 L32 36.5 L39 32 Z' fill='%23fff8e8'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23241A06'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23E8A93C'/%3E%3Cpath d='M32 17 L39 32 L32 27.5 L25 32 Z' fill='%23241A06'/%3E%3Cpath d='M32 47 L25 32 L32 36.5 L39 32 Z' fill='%23fff8e8'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23241A06'/%3E%3C/svg%3E">
 <style>
-/* Paleta: Carbón + Lima neón. Acento lima, neutros sofisticados. */
+/* Paleta: Grafito + Ámbar oro. Acento ámbar, neutros sofisticados.
+   (--lime y --ink-on-lime se conservan como nombres, ahora con valores ámbar) */
 :root{
-  /* MODO CLARO: base gris clarísima, acento lima profundo (legible sobre claro) */
-  --bg:#F3F4F1; --surface:#FFFFFF; --surface-2:#F7F8F4;
-  --ink:#1A1D16; --muted:#767A6E; --faint:#A6A99E;
-  --line:rgba(20,25,10,.09);
-  --accent:#4D7C0F; --accent-2:#65A30D; --accent-soft:#EDF3DE; --accent-ring:#C6F24E;
-  --gold:#65A30D; --danger:#C2412E; --danger-soft:#FBE9E5;
-  --lime:#C6F24E; --ink-on-lime:#1A1D16;
-  --hero-g1:#1C1F17; --hero-g2:#111309; --hero-ink:#F0F2E8;
-  --shadow:0 1px 2px rgba(20,25,10,.05),0 8px 24px rgba(20,25,10,.06);
-  --bg-top:#EEF0EA; --glow-a:rgba(198,242,78,.22); --glow-b:rgba(101,163,13,.10);
+  /* MODO CLARO: base cálida clara, acento ámbar profundo (legible sobre claro) */
+  --bg:#F5F3EF; --surface:#FFFFFF; --surface-2:#FAF8F3;
+  --ink:#231F18; --muted:#817A6E; --faint:#ABA496;
+  --line:rgba(30,22,8,.09);
+  --accent:#B07E1A; --accent-2:#C98A22; --accent-soft:#F6EEDC; --accent-ring:#F0C06A;
+  --gold:#C98A22; --danger:#C2412E; --danger-soft:#FBE9E5;
+  --lime:#E8A93C; --ink-on-lime:#241A06;
+  --hero-g1:#211F18; --hero-g2:#13120D; --hero-ink:#F1EFE9;
+  --shadow:0 1px 2px rgba(30,22,8,.05),0 8px 24px rgba(30,22,8,.06);
+  --bg-top:#F0EDE6; --glow-a:rgba(232,169,60,.22); --glow-b:rgba(201,138,34,.10);
   --peaks-op:1; --peaks-fade:var(--bg);
   --radius:18px; --radius-sm:12px;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 :root[data-theme="dark"]{
-  /* MODO OSCURO: carbón profundo + lima neón brillante */
-  --bg:#0E0F0B; --surface:#18190F; --surface-2:#141509;
-  --ink:#F0F2E6; --muted:#8E9183; --faint:#60635A;
+  /* MODO OSCURO: carbón profundo + ámbar oro brillante */
+  --bg:#111110; --surface:#1B1A17; --surface-2:#17160F;
+  --ink:#F1EFE9; --muted:#8E8B82; --faint:#605D55;
   --line:rgba(255,255,255,.09);
-  --accent:#C6F24E; --accent-2:#A3E635; --accent-soft:#232a12; --accent-ring:#C6F24E;
-  --gold:#C6F24E; --danger:#E0705C; --danger-soft:#2A1A16;
-  --lime:#C6F24E; --ink-on-lime:#15180A;
-  --hero-g1:#1E2016; --hero-g2:#111309; --hero-ink:#F0F2E8;
+  --accent:#E8A93C; --accent-2:#F0C06A; --accent-soft:#2A2416; --accent-ring:#E8A93C;
+  --gold:#E8A93C; --danger:#E0705C; --danger-soft:#2A1A16;
+  --lime:#E8A93C; --ink-on-lime:#241A06;
+  --hero-g1:#211F18; --hero-g2:#13120D; --hero-ink:#F1EFE9;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
-  --bg-top:#111208; --glow-a:rgba(198,242,78,.14); --glow-b:rgba(163,230,53,.08);
+  --bg-top:#141208; --glow-a:rgba(232,169,60,.14); --glow-b:rgba(240,192,106,.08);
   --peaks-op:.5; --peaks-fade:var(--bg);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -60,7 +61,7 @@ body::after{
   content:"";position:fixed;left:0;right:0;bottom:0;height:38vh;z-index:-1;pointer-events:none;opacity:var(--peaks-op);
   background:
     linear-gradient(180deg,transparent, var(--peaks-fade) 92%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='300' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M0 300 L0 190 L180 90 L330 200 L520 60 L700 210 L860 120 L1040 220 L1200 140 L1200 300 Z' fill='%230F6E56' fill-opacity='0.10'/%3E%3Cpath d='M0 300 L0 235 L150 160 L360 250 L560 150 L780 255 L980 175 L1200 250 L1200 300 Z' fill='%231D9E75' fill-opacity='0.10'/%3E%3C/svg%3E") bottom center / cover no-repeat;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='300' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M0 300 L0 190 L180 90 L330 200 L520 60 L700 210 L860 120 L1040 220 L1200 140 L1200 300 Z' fill='%23E8A93C' fill-opacity='0.08'/%3E%3Cpath d='M0 300 L0 235 L150 160 L360 250 L560 150 L780 255 L980 175 L1200 250 L1200 300 Z' fill='%23C98A22' fill-opacity='0.08'/%3E%3C/svg%3E") bottom center / cover no-repeat;
 }
 .app{max-width:640px;margin:0 auto;padding:0 16px 120px}
 
@@ -100,7 +101,7 @@ body::after{
 
 /* Summary hero */
 .hero{background:linear-gradient(150deg,var(--hero-g1),var(--hero-g2));border-radius:24px;padding:22px 22px;margin-bottom:22px;box-shadow:0 18px 40px rgba(0,0,0,.28);position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(198,242,78,.28),transparent 70%)}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(232,169,60,.3),transparent 70%)}
 .hero .hero-txt h2,.hero .ring-label{color:var(--hero-ink)}
 .hero-top{display:flex;align-items:center;gap:18px;position:relative;z-index:1}
 .ring-wrap{position:relative;width:88px;height:88px;flex-shrink:0}
@@ -144,7 +145,7 @@ body::after{
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 
 /* FAB */
-.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + var(--safe-bottom));background:var(--lime);color:var(--ink-on-lime);border:none;border-radius:99px;padding:15px 26px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(198,242,78,.4);display:flex;align-items:center;gap:8px;z-index:50;transition:.15s}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + var(--safe-bottom));background:var(--lime);color:var(--ink-on-lime);border:none;border-radius:99px;padding:15px 26px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 8px 24px rgba(232,169,60,.4);display:flex;align-items:center;gap:8px;z-index:50;transition:.15s}
 .fab:active{transform:translateX(-50%) scale(.96)}
 .fab svg{width:18px;height:18px}
 .scrolltop{position:fixed;right:18px;bottom:calc(88px + var(--safe-bottom));width:46px;height:46px;border-radius:50%;background:var(--surface);color:var(--accent);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:49;transition:.2s;opacity:0}
@@ -159,7 +160,7 @@ body::after{
 .icon-btn.danger{color:var(--danger)}
 .icon-btn.danger:active{background:var(--danger-soft)}
 .detail-hero{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px 20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(20,30,25,.08);text-align:center}
-.detail-hero .ddisc{width:60px;height:60px;margin:0 auto 12px;border-radius:18px;background:var(--lime);color:var(--ink-on-lime);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(198,242,78,.35)}
+.detail-hero .ddisc{width:60px;height:60px;margin:0 auto 12px;border-radius:18px;background:var(--lime);color:var(--ink-on-lime);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(232,169,60,.35)}
 .detail-hero .ddisc svg{width:32px;height:32px}
 .detail-hero h2{font-size:21px;font-weight:800;margin-bottom:4px}
 .detail-hero .dmeta{font-size:13px;color:var(--muted);margin-bottom:18px}
@@ -315,7 +316,7 @@ body::after{
 .stage-edit input:focus{outline:2px solid var(--accent-ring);outline-offset:-1px}
 
 .icon-auto-row{display:flex;align-items:center;gap:14px}
-.icon-auto-preview{width:60px;height:60px;flex-shrink:0;border-radius:16px;background:linear-gradient(160deg,var(--accent-soft),var(--surface-2));border:1.5px solid var(--accent-ring);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 12px rgba(15,110,86,.12)}
+.icon-auto-preview{width:60px;height:60px;flex-shrink:0;border-radius:16px;background:linear-gradient(160deg,var(--accent-soft),var(--surface-2));border:1.5px solid var(--accent-ring);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 12px rgba(232,169,60,.12)}
 .icon-change-btn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:.15s}
 .icon-change-btn:hover{border-color:var(--accent);color:var(--accent)}
 .emoji-picker{display:flex;gap:8px;flex-wrap:wrap}
@@ -367,6 +368,33 @@ body::after{
 .cel-sub{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:12px}
 .cel-msg{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:22px}
 .cel-btn{margin-top:0}
+/* Tour con globos */
+.tour-overlay{position:fixed;inset:0;z-index:155;pointer-events:none;opacity:0;transition:opacity .2s}
+.tour-overlay.open{opacity:1;pointer-events:auto}
+.tour-overlay::before{content:"";position:absolute;inset:0;background:rgba(10,8,2,.6)}
+.tour-spot{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(10,8,2,.6);border:2px solid var(--lime);transition:all .3s cubic-bezier(.3,.8,.3,1);pointer-events:none}
+.tour-bubble{position:absolute;max-width:280px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 12px 30px rgba(0,0,0,.4);transition:all .3s}
+.tour-text{font-size:14.5px;color:var(--ink);line-height:1.5;margin-bottom:14px}
+.tour-foot{display:flex;align-items:center;justify-content:space-between}
+.tour-count{font-size:12px;color:var(--muted);font-weight:600}
+.tour-btn{padding:8px 18px;font-size:13px}
+/* Bienvenida / onboarding */
+.wel-overlay{position:fixed;inset:0;z-index:160;background:linear-gradient(160deg,#211F18,#13120D);display:flex;align-items:center;justify-content:center;padding:28px 24px;opacity:0;pointer-events:none;transition:opacity .3s}
+.wel-overlay.open{opacity:1;pointer-events:auto}
+.wel-card{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.wel-slide{display:flex;flex-direction:column;align-items:center;min-height:360px;justify-content:center}
+.wel-ic{width:110px;height:110px;border-radius:30px;display:flex;align-items:center;justify-content:center;margin-bottom:28px;background:linear-gradient(150deg,#E8A93C,#C98A22);box-shadow:0 16px 40px rgba(232,169,60,.35);animation:welPop .5s cubic-bezier(.2,1.4,.4,1)}
+.wel-ic svg{width:58px;height:58px}
+@keyframes welPop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.wel-title{font-size:25px;font-weight:800;color:#F1EFE9;margin-bottom:12px;line-height:1.2}
+.wel-text{font-size:15px;color:#B8B3A6;line-height:1.55;max-width:300px}
+.wel-dots{display:flex;gap:8px;margin:26px 0 20px}
+.wel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:.25s}
+.wel-dot.on{background:#E8A93C;width:22px;border-radius:99px}
+.wel-actions{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+.wel-next{width:100%;max-width:320px}
+.wel-skip{background:none;border:none;color:#8E8B82;font-size:14px;font-family:inherit;cursor:pointer;padding:4px}
+.wel-skip:hover{color:#F1EFE9}
 .foot-note{text-align:center;font-size:11.5px;color:var(--faint);margin-top:22px;line-height:1.6}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -375,7 +403,7 @@ body::after{
 <div class="app">
   <div class="topbar">
     <div class="brand">
-      <svg class="logo" viewBox="0 0 64 64"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17B890"/><stop offset="1" stop-color="#0C7A5E"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><circle cx="32" cy="32" r="19" fill="none" stroke="#fff" stroke-width="1.6" opacity=".35"/><path d="M32 15 L38.5 32 L32 28 L25.5 32 Z" fill="#fff"/><path d="M32 49 L25.5 32 L32 36 L38.5 32 Z" fill="var(--gold)"/><circle cx="32" cy="32" r="2.6" fill="#fff"/></svg>
+      <svg class="logo" viewBox="0 0 64 64"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0C06A"/><stop offset="1" stop-color="#D4941A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><circle cx="32" cy="32" r="18" fill="none" stroke="#2a2008" stroke-width="1.6" opacity=".4"/><path d="M32 17 L39 32 L32 27.5 L25 32 Z" fill="#241A06"/><path d="M32 47 L25 32 L32 36.5 L39 32 Z" fill="#fff8e8"/><circle cx="32" cy="32" r="2.4" fill="#241A06"/></svg>
       <span id="brandText">Rumbo</span>
     </div>
     <div class="topbar-actions">
@@ -421,6 +449,10 @@ body::after{
       <div class="set-row" id="langRow" style="cursor:pointer">
         <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><div class="txt"><b data-i18n="language">Idioma</b><span data-i18n="languageDesc">Elige el idioma de la app</span></div></div>
         <span id="langCurrent" style="color:var(--muted);font-size:13px">Español ›</span>
+      </div>
+      <div class="set-row" id="howToBtn" style="cursor:pointer">
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><div class="txt"><b data-i18n="howTo">Cómo funciona la app</b><span data-i18n="howToDesc">Un recorrido guiado paso a paso</span></div></div>
+        <span style="color:var(--muted)">›</span>
       </div>
     </div>
     <div class="set-group">
@@ -477,6 +509,27 @@ body::after{
     <div class="cel-sub"></div>
     <div class="cel-msg"></div>
     <button class="btn primary block cel-btn" onclick="closeCelebrate()"></button>
+  </div>
+</div>
+
+<!-- Tour con globos (guía opcional) -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-spot" id="tourSpot"></div>
+  <div class="tour-bubble" id="tourBubble">
+    <div class="tour-text" id="tourText"></div>
+    <div class="tour-foot"><span class="tour-count" id="tourCount"></span><button class="btn primary tour-btn" id="tourBtn" onclick="tourNext()"></button></div>
+  </div>
+</div>
+
+<!-- Bienvenida (onboarding) -->
+<div class="wel-overlay" id="welOverlay">
+  <div class="wel-card">
+    <div class="wel-slide" id="welSlide"></div>
+    <div class="wel-dots" id="welDots"></div>
+    <div class="wel-actions">
+      <button class="wel-skip" id="welSkip" onclick="skipWelcome()"></button>
+      <button class="btn primary wel-next" id="welNext" onclick="nextWelcome()"></button>
+    </div>
   </div>
 </div>
 

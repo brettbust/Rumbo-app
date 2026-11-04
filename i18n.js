@@ -139,7 +139,18 @@ var I18N = {
       "Tu compromiso contigo mismo se ve hoy.","Casi en la cima. Este avance pesa. ¡Vamos!"
     ],
     finishMsg: "¡Lo lograste! Completaste tu meta. Date el crédito que mereces. 🎉",
-    celTitle: '¡Lo lograste!', celMsg: 'Completaste tu meta. Date el crédito que mereces por cada paso.', celBtn: 'Seguir'
+    celTitle: '¡Lo lograste!', celMsg: 'Completaste tu meta. Date el crédito que mereces por cada paso.', celBtn: 'Seguir',
+    welNext: 'Siguiente', welSkip: 'Saltar', welStart: 'Empezar',
+    wel1Title: 'Bienvenido a Rumbo', wel1Text: 'Convierte lo que sueñas en logros reales. Define tus metas y avanza hacia ellas, un paso a la vez.',
+    wel2Title: 'Mira tu progreso crecer', wel2Text: 'Cada avance llena tu barra y te acerca a la meta. Ver cuánto has recorrido te mantiene en marcha.',
+    wel3Title: 'Gana trofeos', wel3Text: 'Cada meta que completas se convierte en un trofeo en tu salón. Tu esfuerzo queda para siempre.',
+    wel4Title: 'Empieza hoy', wel4Text: 'Crea tu primera meta a mano o deja que la IA arme el plan por ti. Tu rumbo empieza ahora.',
+    howTo: 'Cómo funciona la app', howToDesc: 'Un recorrido guiado paso a paso',
+    tourNext: 'Siguiente', tourDone: 'Entendido',
+    tourFab: 'Toca aquí para crear una meta nueva, a mano o con IA.',
+    tourTrophies: 'Aquí está tu salón de trofeos: cada meta completada deja su medalla.',
+    tourSettings: 'Ajustes: tema, idioma, recordatorios y tus datos.',
+    tourGoal: 'Cada meta muestra tu progreso. Tócala para marcar tu avance.'
   }
 };
 

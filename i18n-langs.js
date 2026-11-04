@@ -133,7 +133,26 @@ Object.assign(I18N, {
       "Your commitment to yourself shows today.","Almost at the top. This progress counts. Let's go!"
     ],
     finishMsg: "You did it! You completed your goal. Give yourself the credit you deserve. 🎉",
-    celTitle: 'You did it!', celMsg: 'You completed your goal. Give yourself credit for every step.', celBtn: 'Continue'
+    celTitle: 'You did it!', celMsg: 'You completed your goal. Give yourself credit for every step.', celBtn: 'Continue',
+    welNext: 'Next',
+    welSkip: 'Skip',
+    welStart: 'Get started',
+    wel1Title: 'Welcome to Rumbo',
+    wel1Text: 'Turn what you dream of into real achievements. Set your goals and move toward them, one step at a time.',
+    wel2Title: 'Watch your progress grow',
+    wel2Text: 'Every step fills your bar and brings the goal closer. Seeing how far you have come keeps you going.',
+    wel3Title: 'Earn trophies',
+    wel3Text: 'Every goal you complete becomes a trophy in your hall. Your effort stays forever.',
+    wel4Title: 'Start today',
+    wel4Text: 'Create your first goal by hand or let AI build the plan for you. Your journey starts now.',
+    howTo: 'How the app works',
+    howToDesc: 'A step-by-step guided tour',
+    tourNext: 'Next',
+    tourDone: 'Got it',
+    tourFab: 'Tap here to create a new goal, by hand or with AI.',
+    tourTrophies: 'Here is your trophy hall: every completed goal leaves its medal.',
+    tourSettings: 'Settings: theme, language, reminders and your data.',
+    tourGoal: 'Each goal shows your progress. Tap it to mark your advance.'
   },
 
   pt: {
@@ -267,7 +286,26 @@ Object.assign(I18N, {
       "Seu compromisso consigo mesmo aparece hoje.","Quase no topo. Este avanço pesa. Vamos!"
     ],
     finishMsg: "Você conseguiu! Completou sua meta. Dê a si mesmo o crédito que merece. 🎉",
-    celTitle: 'Você conseguiu!', celMsg: 'Completou sua meta. Dê o crédito que merece por cada passo.', celBtn: 'Continuar'
+    celTitle: 'Você conseguiu!', celMsg: 'Completou sua meta. Dê o crédito que merece por cada passo.', celBtn: 'Continuar',
+    welNext: 'Próximo',
+    welSkip: 'Pular',
+    welStart: 'Começar',
+    wel1Title: 'Bem-vindo ao Rumbo',
+    wel1Text: 'Transforme o que você sonha em conquistas reais. Defina suas metas e avance rumo a elas, um passo de cada vez.',
+    wel2Title: 'Veja seu progresso crescer',
+    wel2Text: 'Cada avanço enche sua barra e aproxima a meta. Ver o quanto você já percorreu mantém você em movimento.',
+    wel3Title: 'Ganhe troféus',
+    wel3Text: 'Cada meta concluída vira um troféu no seu salão. Seu esforço fica para sempre.',
+    wel4Title: 'Comece hoje',
+    wel4Text: 'Crie sua primeira meta à mão ou deixe a IA montar o plano. Seu rumo começa agora.',
+    howTo: 'Como o app funciona',
+    howToDesc: 'Um tour guiado passo a passo',
+    tourNext: 'Próximo',
+    tourDone: 'Entendi',
+    tourFab: 'Toque aqui para criar uma meta nova, à mão ou com IA.',
+    tourTrophies: 'Aqui está seu salão de troféus: cada meta concluída deixa sua medalha.',
+    tourSettings: 'Ajustes: tema, idioma, lembretes e seus dados.',
+    tourGoal: 'Cada meta mostra seu progresso. Toque para marcar seu avanço.'
   },
 
   he: {
@@ -401,7 +439,26 @@ Object.assign(I18N, {
       "המחויבות שלך לעצמך נראית היום.","כמעט בפסגה. ההתקדמות הזו משמעותית. קדימה!"
     ],
     finishMsg: "הצלחת! השלמת את המטרה שלך. תן לעצמך את הקרדיט שמגיע לך. 🎉",
-    celTitle: 'הצלחת!', celMsg: 'השלמת את המטרה שלך. מגיע לך קרדיט על כל צעד.', celBtn: 'המשך'
+    celTitle: 'הצלחת!', celMsg: 'השלמת את המטרה שלך. מגיע לך קרדיט על כל צעד.', celBtn: 'המשך',
+    welNext: 'הבא',
+    welSkip: 'דלג',
+    welStart: 'בואו נתחיל',
+    wel1Title: 'ברוכים הבאים ל-Rumbo',
+    wel1Text: 'הפוך את מה שאתה חולם עליו להישגים אמיתיים. הגדר מטרות והתקדם אליהן, צעד אחר צעד.',
+    wel2Title: 'צפה בהתקדמות שלך גדלה',
+    wel2Text: 'כל התקדמות ממלאת את הפס ומקרבת את המטרה. לראות כמה עשית שומר עליך בתנועה.',
+    wel3Title: 'זכה בגביעים',
+    wel3Text: 'כל מטרה שתשלים הופכת לגביע בהיכל שלך. המאמץ שלך נשאר לנצח.',
+    wel4Title: 'התחל היום',
+    wel4Text: 'צור מטרה ראשונה ידנית או תן ל-AI לבנות את התוכנית. הדרך שלך מתחילה עכשיו.',
+    howTo: 'איך האפליקציה עובדת',
+    howToDesc: 'סיור מודרך שלב אחר שלב',
+    tourNext: 'הבא',
+    tourDone: 'הבנתי',
+    tourFab: 'הקש כאן ליצירת מטרה חדשה, ידנית או עם AI.',
+    tourTrophies: 'כאן היכל הגביעים: כל מטרה שהושלמה משאירה מדליה.',
+    tourSettings: 'הגדרות: ערכת נושא, שפה, תזכורות והנתונים שלך.',
+    tourGoal: 'כל מטרה מציגה את ההתקדמות. הקש כדי לסמן את ההתקדמות שלך.'
   },
 
   ar: {
@@ -535,7 +592,26 @@ Object.assign(I18N, {
       "التزامك تجاه نفسك يظهر اليوم.","على مشارف القمة. هذا التقدم مهم. هيا بنا!"
     ],
     finishMsg: "لقد نجحت! أكملت هدفك. امنح نفسك التقدير الذي تستحقه. 🎉",
-    celTitle: 'لقد نجحت!', celMsg: 'أكملت هدفك. امنح نفسك التقدير عن كل خطوة.', celBtn: 'متابعة'
+    celTitle: 'لقد نجحت!', celMsg: 'أكملت هدفك. امنح نفسك التقدير عن كل خطوة.', celBtn: 'متابعة',
+    welNext: 'التالي',
+    welSkip: 'تخطٍ',
+    welStart: 'ابدأ',
+    wel1Title: 'مرحبًا بك في Rumbo',
+    wel1Text: 'حوّل ما تحلم به إلى إنجازات حقيقية. حدّد أهدافك وتقدّم نحوها خطوة بخطوة.',
+    wel2Title: 'شاهد تقدّمك ينمو',
+    wel2Text: 'كل خطوة تملأ شريطك وتقرّبك من الهدف. رؤية ما قطعته تبقيك مستمرًا.',
+    wel3Title: 'اربح الجوائز',
+    wel3Text: 'كل هدف تكمله يصبح جائزة في قاعتك. مجهودك يبقى للأبد.',
+    wel4Title: 'ابدأ اليوم',
+    wel4Text: 'أنشئ هدفك الأول يدويًا أو دع الذكاء الاصطناعي يبني الخطة. رحلتك تبدأ الآن.',
+    howTo: 'كيف يعمل التطبيق',
+    howToDesc: 'جولة إرشادية خطوة بخطوة',
+    tourNext: 'التالي',
+    tourDone: 'فهمت',
+    tourFab: 'اضغط هنا لإنشاء هدف جديد، يدويًا أو بالذكاء الاصطناعي.',
+    tourTrophies: 'هذه قاعة جوائزك: كل هدف مكتمل يترك ميداليته.',
+    tourSettings: 'الإعدادات: المظهر واللغة والتذكيرات وبياناتك.',
+    tourGoal: 'كل هدف يعرض تقدّمك. اضغط عليه لتسجيل تقدّمك.'
   },
 
   ru: {
@@ -669,7 +745,26 @@ Object.assign(I18N, {
       "Ваша верность себе видна сегодня.","Почти на вершине. Этот прогресс важен. Вперёд!"
     ],
     finishMsg: "Получилось! Вы достигли цели. Отдайте себе должное. 🎉",
-    celTitle: 'Получилось!', celMsg: 'Вы достигли цели. Отдайте себе должное за каждый шаг.', celBtn: 'Продолжить'
+    celTitle: 'Получилось!', celMsg: 'Вы достигли цели. Отдайте себе должное за каждый шаг.', celBtn: 'Продолжить',
+    welNext: 'Далее',
+    welSkip: 'Пропустить',
+    welStart: 'Начать',
+    wel1Title: 'Добро пожаловать в Rumbo',
+    wel1Text: 'Превратите мечты в реальные достижения. Ставьте цели и двигайтесь к ним шаг за шагом.',
+    wel2Title: 'Следите за ростом прогресса',
+    wel2Text: 'Каждый шаг заполняет полосу и приближает цель. Видеть пройденный путь помогает не останавливаться.',
+    wel3Title: 'Получайте трофеи',
+    wel3Text: 'Каждая выполненная цель становится трофеем в вашем зале. Ваши усилия остаются навсегда.',
+    wel4Title: 'Начните сегодня',
+    wel4Text: 'Создайте первую цель вручную или доверьте план ИИ. Ваш путь начинается сейчас.',
+    howTo: 'Как работает приложение',
+    howToDesc: 'Пошаговый гид',
+    tourNext: 'Далее',
+    tourDone: 'Понятно',
+    tourFab: 'Нажмите здесь, чтобы создать новую цель вручную или с ИИ.',
+    tourTrophies: 'Это ваш зал трофеев: каждая выполненная цель оставляет медаль.',
+    tourSettings: 'Настройки: тема, язык, напоминания и ваши данные.',
+    tourGoal: 'Каждая цель показывает прогресс. Нажмите, чтобы отметить продвижение.'
   },
 
   zh: {
@@ -803,7 +898,26 @@ Object.assign(I18N, {
       "你对自己的承诺今天可见。","快到顶了。这份进步很重要。加油！"
     ],
     finishMsg: "你做到了！你完成了目标。给自己应得的肯定。🎉",
-    celTitle: '你做到了！', celMsg: '你完成了目标。为每一步给自己应得的肯定。', celBtn: '继续'
+    celTitle: '你做到了！', celMsg: '你完成了目标。为每一步给自己应得的肯定。', celBtn: '继续',
+    welNext: '下一步',
+    welSkip: '跳过',
+    welStart: '开始',
+    wel1Title: '欢迎来到 Rumbo',
+    wel1Text: '把你的梦想变成真正的成就。设定目标，一步步迈向它们。',
+    wel2Title: '见证你的进度增长',
+    wel2Text: '每一步都会填满进度条，让目标更近。看到走过的路会让你坚持下去。',
+    wel3Title: '赢得奖杯',
+    wel3Text: '每完成一个目标，就会在你的奖杯厅留下一枚奖杯。你的努力永远保留。',
+    wel4Title: '今天就开始',
+    wel4Text: '手动创建第一个目标，或让 AI 为你制定计划。你的旅程现在开始。',
+    howTo: '应用如何使用',
+    howToDesc: '逐步引导教程',
+    tourNext: '下一步',
+    tourDone: '知道了',
+    tourFab: '点这里创建新目标，手动或用 AI。',
+    tourTrophies: '这是你的奖杯厅：每个完成的目标都会留下奖牌。',
+    tourSettings: '设置：主题、语言、提醒和你的数据。',
+    tourGoal: '每个目标都显示你的进度。点击它来记录进展。'
   },
 
   it: {
@@ -937,7 +1051,26 @@ Object.assign(I18N, {
       "Il tuo impegno verso te stesso si vede oggi.","Quasi in cima. Questo progresso conta. Andiamo!"
     ],
     finishMsg: "Ce l'hai fatta! Hai completato il tuo obiettivo. Datti il merito che meriti. 🎉",
-    celTitle: 'Ce l\'hai fatta!', celMsg: 'Hai completato il tuo obiettivo. Datti merito per ogni passo.', celBtn: 'Continua'
+    celTitle: 'Ce l\'hai fatta!', celMsg: 'Hai completato il tuo obiettivo. Datti merito per ogni passo.', celBtn: 'Continua',
+    welNext: 'Avanti',
+    welSkip: 'Salta',
+    welStart: 'Inizia',
+    wel1Title: 'Benvenuto su Rumbo',
+    wel1Text: 'Trasforma ciò che sogni in traguardi reali. Definisci i tuoi obiettivi e avvicinati, un passo alla volta.',
+    wel2Title: 'Guarda crescere i progressi',
+    wel2Text: 'Ogni avanzamento riempie la barra e avvicina il traguardo. Vedere quanto hai fatto ti tiene in cammino.',
+    wel3Title: 'Vinci trofei',
+    wel3Text: 'Ogni obiettivo completato diventa un trofeo nella tua sala. Il tuo impegno resta per sempre.',
+    wel4Title: 'Inizia oggi',
+    wel4Text: 'Crea il primo obiettivo a mano o lascia che l\'IA crei il piano. Il tuo percorso inizia ora.',
+    howTo: 'Come funziona l\'app',
+    howToDesc: 'Un tour guidato passo passo',
+    tourNext: 'Avanti',
+    tourDone: 'Capito',
+    tourFab: 'Tocca qui per creare un nuovo obiettivo, a mano o con IA.',
+    tourTrophies: 'Ecco la tua sala dei trofei: ogni obiettivo completato lascia la medaglia.',
+    tourSettings: 'Impostazioni: tema, lingua, promemoria e i tuoi dati.',
+    tourGoal: 'Ogni obiettivo mostra i progressi. Toccalo per segnare l\'avanzamento.'
   },
 
   fr: {
@@ -1071,7 +1204,26 @@ Object.assign(I18N, {
       "Votre engagement envers vous-même se voit aujourd'hui.","Presque au sommet. Ce progrès compte. Allons-y !"
     ],
     finishMsg: "Vous avez réussi ! Vous avez atteint votre objectif. Accordez-vous le mérite que vous méritez. 🎉",
-    celTitle: 'Vous avez réussi !', celMsg: 'Vous avez atteint votre objectif. Félicitez-vous pour chaque pas.', celBtn: 'Continuer'
+    celTitle: 'Vous avez réussi !', celMsg: 'Vous avez atteint votre objectif. Félicitez-vous pour chaque pas.', celBtn: 'Continuer',
+    welNext: 'Suivant',
+    welSkip: 'Passer',
+    welStart: 'Commencer',
+    wel1Title: 'Bienvenue sur Rumbo',
+    wel1Text: 'Transformez vos rêves en réussites concrètes. Fixez vos objectifs et avancez vers eux, pas à pas.',
+    wel2Title: 'Voyez vos progrès grandir',
+    wel2Text: 'Chaque avancée remplit votre barre et rapproche l\'objectif. Voir le chemin parcouru vous fait continuer.',
+    wel3Title: 'Gagnez des trophées',
+    wel3Text: 'Chaque objectif atteint devient un trophée dans votre salle. Votre effort reste pour toujours.',
+    wel4Title: 'Commencez aujourd\'hui',
+    wel4Text: 'Créez votre premier objectif à la main ou laissez l\'IA bâtir le plan. Votre parcours commence maintenant.',
+    howTo: 'Comment l\'app fonctionne',
+    howToDesc: 'Une visite guidée pas à pas',
+    tourNext: 'Suivant',
+    tourDone: 'Compris',
+    tourFab: 'Touchez ici pour créer un nouvel objectif, à la main ou avec l\'IA.',
+    tourTrophies: 'Voici votre salle des trophées : chaque objectif atteint laisse sa médaille.',
+    tourSettings: 'Paramètres : thème, langue, rappels et vos données.',
+    tourGoal: 'Chaque objectif montre vos progrès. Touchez-le pour marquer votre avancée.'
   },
 
   ja: {
@@ -1205,6 +1357,25 @@ Object.assign(I18N, {
       "自分への約束が今日見えている。","もうすぐ頂上。この前進は重い。行こう！"
     ],
     finishMsg: "やりました！目標を達成しました。自分に相応しい称賛を。🎉",
-    celTitle: 'やりました！', celMsg: '目標を達成しました。一歩ごとに自分を称えましょう。', celBtn: '続ける'
+    celTitle: 'やりました！', celMsg: '目標を達成しました。一歩ごとに自分を称えましょう。', celBtn: '続ける',
+    welNext: '次へ',
+    welSkip: 'スキップ',
+    welStart: 'はじめる',
+    wel1Title: 'Rumbo へようこそ',
+    wel1Text: '夢を実際の達成に変えましょう。目標を決めて、一歩ずつ近づいていきます。',
+    wel2Title: '進み具合を見守ろう',
+    wel2Text: '一歩ごとにバーが満ち、目標に近づきます。歩んだ分を見ることが継続の力になります。',
+    wel3Title: 'トロフィーを獲得',
+    wel3Text: '達成した目標はルームのトロフィーになります。あなたの努力はずっと残ります。',
+    wel4Title: '今日から始めよう',
+    wel4Text: '最初の目標を手動で作るか、AIに計画を任せましょう。あなたの道はいま始まります。',
+    howTo: 'アプリの使い方',
+    howToDesc: 'ステップごとのガイドツアー',
+    tourNext: '次へ',
+    tourDone: 'わかった',
+    tourFab: 'ここをタップして新しい目標を作成（手動またはAI）。',
+    tourTrophies: 'ここはトロフィールーム：達成した目標ごとにメダルが残ります。',
+    tourSettings: '設定：テーマ・言語・リマインダー・データ。',
+    tourGoal: '各目標は進捗を表示します。タップして進み具合を記録。'
   }
 });

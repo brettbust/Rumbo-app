@@ -1374,7 +1374,7 @@ function confirmSheet(title,msg,okLabel,cb,extraHtml){
 function closeConfirm(){ document.getElementById('confirmScrim').classList.remove('open'); confirmCb=null; }
 
 /* ---------- confetti ---------- */
-const CONFETTI_COLORS=['#0F6E56','#1D9E75','#6EE7B7','#7CE0BE','#34D399','#A7F3D0','#059669'];
+const CONFETTI_COLORS=['#E8A93C','#F0C06A','#C98A22','#FBD88A','#D4941A','#FFE9B8','#B07E1A'];
 function confetti(){
   // lluvia desde arriba (fondo)
   for(let i=0;i<80;i++){
@@ -1434,7 +1434,7 @@ function closeCelebrate(){
 function applyTheme(){
   document.documentElement.setAttribute('data-theme',data.settings.theme);
   document.getElementById('themeSwitch').classList.toggle('on',data.settings.theme==='dark');
-  document.querySelector('meta[name=theme-color]').setAttribute('content',data.settings.theme==='dark'?'#141714':'#0F6E56');
+  document.querySelector('meta[name=theme-color]').setAttribute('content',data.settings.theme==='dark'?'#111110':'#F5F3EF');
 }
 function toggleTheme(){ data.settings.theme=data.settings.theme==='dark'?'light':'dark'; save(); applyTheme(); }
 
@@ -1571,6 +1571,96 @@ function chooseLang(lang){
   show('settings');
 }
 
+/* ---------- Bienvenida (onboarding) ---------- */
+let welStep=0;
+function welSlides(){
+  // iconos de línea grandes para cada slide
+  const ic=(p)=>`<svg viewBox="0 0 48 48" fill="none" stroke="#241A06" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  return [
+    { ic: ic('<path d="M24 15 L30 24 L24 21 L18 24 Z" fill="#241A06" stroke="none"/><path d="M24 33 L18 24 L24 27 L30 24 Z" fill="#fff8e8" stroke="none"/><circle cx="24" cy="24" r="17"/>'),
+      title: t('wel1Title'), text: t('wel1Text') },
+    { ic: ic('<circle cx="24" cy="24" r="15"/><path d="M24 24 L24 13 M24 24 L32 29"/>'),
+      title: t('wel2Title'), text: t('wel2Text') },
+    { ic: ic('<path d="M24 8l4 9 10 1-7.5 7 2 10-8.5-5-8.5 5 2-10L10 18l10-1z"/>'),
+      title: t('wel3Title'), text: t('wel3Text') },
+    { ic: ic('<path d="M14 24l7 7 13-14"/>'),
+      title: t('wel4Title'), text: t('wel4Text') }
+  ];
+}
+function showWelcome(){
+  welStep=0;
+  const ov=document.getElementById('welOverlay');
+  if(!ov) return;
+  renderWelcome();
+  ov.classList.add('open');
+}
+function renderWelcome(){
+  const slides=welSlides();
+  const s=slides[welStep];
+  const sl=document.getElementById('welSlide');
+  sl.innerHTML=`<div class="wel-ic">${s.ic}</div><div class="wel-title">${esc(s.title)}</div><div class="wel-text">${esc(s.text)}</div>`;
+  document.getElementById('welDots').innerHTML=slides.map((_,i)=>`<span class="wel-dot${i===welStep?' on':''}"></span>`).join('');
+  const last=welStep===slides.length-1;
+  document.getElementById('welNext').textContent = last ? t('welStart') : t('welNext');
+  const skip=document.getElementById('welSkip');
+  skip.textContent=t('welSkip'); skip.style.visibility = last ? 'hidden' : 'visible';
+}
+function nextWelcome(){
+  const slides=welSlides();
+  if(welStep < slides.length-1){ welStep++; renderWelcome(); }
+  else finishWelcome();
+}
+function skipWelcome(){ finishWelcome(); }
+function finishWelcome(){
+  const ov=document.getElementById('welOverlay');
+  if(ov) ov.classList.remove('open');
+  data.settings.seenWelcome=true; save();
+}
+
+/* ---------- Tour con globos (guía opcional) ---------- */
+let tourStep=0, tourItems=[];
+function startTour(){
+  // pasos: elemento a resaltar + texto
+  tourItems=[
+    {sel:'#fab', text:t('tourFab')},
+    {sel:'#trophiesBtn', text:t('tourTrophies')},
+    {sel:'#settingsBtn', text:t('tourSettings')}
+  ];
+  // si hay metas, añade un paso sobre la tarjeta de meta
+  const goalEl=document.querySelector('.goal');
+  if(goalEl) tourItems.splice(1,0,{sel:'.goal', text:t('tourGoal')});
+  tourStep=0;
+  const ov=document.getElementById('tourOverlay');
+  if(!ov) return;
+  ov.classList.add('open');
+  renderTourStep();
+}
+function renderTourStep(){
+  const item=tourItems[tourStep];
+  const el=document.querySelector(item.sel);
+  const spot=document.getElementById('tourSpot');
+  const bub=document.getElementById('tourBubble');
+  if(!el){ tourNext(); return; }
+  const r=el.getBoundingClientRect();
+  const pad=8;
+  spot.style.left=(r.left-pad)+'px'; spot.style.top=(r.top-pad)+'px';
+  spot.style.width=(r.width+pad*2)+'px'; spot.style.height=(r.height+pad*2)+'px';
+  document.getElementById('tourText').textContent=item.text;
+  document.getElementById('tourCount').textContent=(tourStep+1)+' / '+tourItems.length;
+  document.getElementById('tourBtn').textContent = tourStep===tourItems.length-1 ? t('tourDone') : t('tourNext');
+  // posicionar el globo: debajo del elemento si hay espacio, si no arriba
+  const bw=280, bh=bub.offsetHeight||120;
+  let left=Math.min(Math.max(12, r.left+r.width/2-bw/2), innerWidth-bw-12);
+  let top = r.bottom+14;
+  if(top+bh > innerHeight-12) top = r.top - bh - 14;
+  if(top<12) top=12;
+  bub.style.left=left+'px'; bub.style.top=top+'px'; bub.style.maxWidth=bw+'px';
+}
+function tourNext(){
+  if(tourStep < tourItems.length-1){ tourStep++; renderTourStep(); }
+  else { const ov=document.getElementById('tourOverlay'); if(ov) ov.classList.remove('open'); }
+}
+
 function init(){
   load();
   // Idioma: el guardado en ajustes, o el del dispositivo
@@ -1611,5 +1701,12 @@ function init(){
 
   if(data.settings.notif) scheduleNotif();
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+
+  // Botón de Ajustes para volver a ver la guía con globos cuando el usuario quiera
+  const htb=document.getElementById('howToBtn');
+  if(htb) htb.onclick=()=>{ show('home'); renderHome(); setTimeout(startTour,350); };
+
+  // Bienvenida la primera vez
+  if(!data.settings.seenWelcome){ setTimeout(showWelcome,300); }
 }
 init();
