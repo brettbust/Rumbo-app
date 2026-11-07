@@ -112,6 +112,7 @@ let draftWeekdays = [];            // 0=Dom ... 6=Sáb
 let draftManualDates = [];         // ISO strings
 let draftStart = '';               // fecha de inicio en edición
 let draftCount = 30;               // cantidad de etapas en edición
+let aiPlanMode = false;            // true cuando las etapas vienen de la IA (no de importar archivo)
 
 /* ---------- storage ---------- */
 function load(){
@@ -816,6 +817,7 @@ function openEdit(id, mode){
   draftWeekdays = g && g.weekdays ? g.weekdays.slice() : [];
   draftManualDates = g && g.type==='days' && g.freq==='manual' ? g.days.map(d=>d.date) : [];
   draftImportStages = [];
+  aiPlanMode = false;
   draftStart = g && g.startDate ? g.startDate : todayISO();
   draftCount = g && g.type==='days' ? g.days.length : 30;
   const sheet=document.getElementById('editSheet');
@@ -920,17 +922,24 @@ function renderTypeFields(g){
   if(draftType==='days'){
     const n = g&&g.type==='days' ? g.days.length : 30;
     const start = g&&g.startDate ? g.startDate : todayISO();
-    el.innerHTML=`
-      <div class="field"><label>${t('frequency')}</label>
-        <div class="freq-toggle">
-          <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">${icon('calendar',17)} ${t('freqDaily')}</button>
-          <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">${icon('calClock',17)} ${t('freqWeekly')}</button>
-          <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">${icon('pen',17)} ${t('freqManual')}</button>
-          <button type="button" class="freq-opt${draftFreq==='import'?' sel':''}" onclick="pickFreq('import')">${icon('upload',17)} ${t('freqImport')}</button>
+    if(aiPlanMode){
+      // Plan creado por la IA: solo mostramos la vista previa de las etapas, sin selector
+      // de frecuencia ni zona de subir archivo (no se está importando nada).
+      el.innerHTML=`<div id="freqFields"></div>`;
+      renderFreqFields(g,start,n);
+    } else {
+      el.innerHTML=`
+        <div class="field"><label>${t('frequency')}</label>
+          <div class="freq-toggle">
+            <button type="button" class="freq-opt${draftFreq==='daily'?' sel':''}" onclick="pickFreq('daily')">${icon('calendar',17)} ${t('freqDaily')}</button>
+            <button type="button" class="freq-opt${draftFreq==='weekly'?' sel':''}" onclick="pickFreq('weekly')">${icon('calClock',17)} ${t('freqWeekly')}</button>
+            <button type="button" class="freq-opt${draftFreq==='manual'?' sel':''}" onclick="pickFreq('manual')">${icon('pen',17)} ${t('freqManual')}</button>
+            <button type="button" class="freq-opt${draftFreq==='import'?' sel':''}" onclick="pickFreq('import')">${icon('upload',17)} ${t('freqImport')}</button>
+          </div>
         </div>
-      </div>
-      <div id="freqFields"></div>`;
-    renderFreqFields(g,start,n);
+        <div id="freqFields"></div>`;
+      renderFreqFields(g,start,n);
+    }
   } else {
     const tgt = g&&g.type==='number' ? g.target : '';
     const curUnit = g&&g.type==='number' ? (g.unit||'') : '';
@@ -967,6 +976,14 @@ function renderFreqFields(g,start,n){
   start = start || draftStart || todayISO();
   n = n || draftCount || 30;
   if(draftFreq==='import'){
+    if(aiPlanMode){
+      // Plan de la IA: sin zona de subir archivo, solo la vista previa de las etapas
+      el.innerHTML=`
+        <div class="field"><label>${t('aiPlanStagesLabel')}</label></div>
+        <div id="importStatus"></div>
+        <div id="importPreview"></div>`;
+      return;
+    }
     el.innerHTML=`
       <div class="field">
         <label>${t('uploadSchedule')}</label>
@@ -1222,13 +1239,11 @@ async function generatePlan(){
     if(res.title){ const ft=document.getElementById('fTitle'); if(ft) ft.value=res.title.slice(0,60); }
     if(res.emoji){ draftEmoji=res.emoji; iconUserPicked=true; const pv=document.getElementById('iconPreview'); if(pv) pv.textContent=res.emoji; }
     draftType='days';
-    draftFreq='import';          // reutiliza el flujo de importación (etapas con fecha+nombre)
+    draftFreq='import';          // reutiliza el flujo de etapas con fecha+nombre
+    aiPlanMode=true;             // ...pero en modo IA: sin selector ni zona de subir archivo
     draftImportStages = stages.slice().sort((a,b)=>a.date.localeCompare(b.date));
-    // refrescar la vista del formulario para que muestre el tipo días + vista previa
+    // refrescar la vista del formulario para que muestre solo la vista previa de etapas
     renderTypeFields(null);
-    pickType('days');
-    // seleccionar la opción import y mostrar la vista previa
-    if(typeof pickFreq==='function') pickFreq('import');
     finishImport(draftImportStages);   // muestra la vista previa de etapas
     if(statusEl) statusEl.innerHTML=`<div class="import-ok">${icon('star',14)} ${t('aiPlanReady')}</div>`;
     // llevar al usuario a la vista previa

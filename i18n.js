@@ -79,6 +79,7 @@ var I18N = {
     aiPlanBtn: 'Crear mi plan', aiPlanOr: 'o créala manualmente',
     aiPlanLoading: 'Creando tu plan con IA… un momento.',
     aiPlanReady: 'Plan listo. Revisa las etapas abajo y crea la meta.',
+    aiPlanStagesLabel: 'Tu plan, paso a paso',
     aiPlanNeedText: 'Escribe qué quieres lograr.',
     aiPlanNoStages: 'No pude crear un plan. Prueba a describir la meta de otra forma.',
     aiPlanError: 'No se pudo crear el plan. Inténtalo de nuevo.',
