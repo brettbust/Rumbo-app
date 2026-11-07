@@ -98,7 +98,7 @@ var I18N = {
     dupName: 'Nombre repetido', createAnyway: 'Crear igual',
     dupMsg1: 'Ya tienes una meta llamada', dupMsg2: '¿Quieres crear otra con el mismo nombre de todas formas?',
     toastSaved: 'Guardado', toastGoalCreated: '¡Meta creada!', toastGoalUpdated: 'Meta actualizada',
-    toastGoalImported: '¡Meta creada desde tu cronograma!', toastStageUpdated: 'Etapa actualizada',
+    toastGoalImported: '¡Meta creada desde tu cronograma!', toastGoalAi: '¡Meta creada con tu plan de IA!', toastStageUpdated: 'Etapa actualizada',
     toastStageAdded: 'Etapa añadida. Pulsa el lápiz para nombrarla.', toastNoteSaved: 'Nota guardada',
     toastNeedName: 'Ponle un nombre a tu meta.', toastNeedStages: 'Indica cuántas etapas.',
     toastNeedWeekday: 'Elige al menos un día de la semana.', toastNeedDate: 'Añade al menos una fecha.',

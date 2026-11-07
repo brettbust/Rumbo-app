@@ -1397,7 +1397,8 @@ function commitGoal(id, forceDuplicate){
       save(); closeEdit();
       if(id){ renderDetail(); } else { show('home'); }
       renderHome();
-      toast(t('toastGoalImported'));
+      // Mensaje correcto según el origen de las etapas: IA o archivo importado
+      toast(aiPlanMode ? t('toastGoalAi') : t('toastGoalImported'));
       return;
     }
     // Build the list of dates according to frequency
