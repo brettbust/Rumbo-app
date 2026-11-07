@@ -1882,7 +1882,10 @@ function showLogin(){
 function renderAuth(){
   const signup = authMode==='signup';
   document.getElementById('authTitle').textContent = signup ? t('authSignupTitle') : t('authLoginTitle');
-  document.getElementById('authSub').textContent   = signup ? t('authSignupSub')   : t('authLoginSub');
+  // El login no lleva subtítulo (más limpio); el registro sí lo explica
+  const sub=document.getElementById('authSub');
+  if(signup){ sub.textContent=t('authSignupSub'); sub.style.display=''; }
+  else { sub.textContent=''; sub.style.display='none'; }
   document.getElementById('authMainBtn').textContent = signup ? t('authSignupBtn') : t('authLoginBtn');
   document.getElementById('authForgot').textContent = t('authForgot');
   document.getElementById('authForgot').style.display = signup ? 'none':'';
@@ -1893,16 +1896,34 @@ function renderAuth(){
     ? t('authHaveAccount')+' <b>'+t('authLoginBtn')+'</b>'
     : t('authNoAccount')+' <b>'+t('authSignupBtn')+'</b>';
   document.getElementById('authPass').setAttribute('autocomplete', signup?'new-password':'current-password');
+  const ph=document.getElementById('authPassHint');
+  if(ph){ ph.style.display = signup ? '' : 'none'; ph.textContent = t('authPassRule'); }
   document.getElementById('authErr').textContent='';
   const wl=document.getElementById('authLangName'); if(wl) wl.textContent=(I18N[CURRENT_LANG]?._name||'Español');
 }
 function toggleAuthMode(){ authMode = authMode==='login'?'signup':'login'; renderAuth(); }
+// Devuelve la lista de requisitos que le FALTAN a la contraseña
+function passwordMissing(p){
+  const m=[];
+  if((p||'').length<8) m.push(t('authPassLen'));
+  if(!/[A-ZÁÉÍÓÚÑ]/.test(p)) m.push(t('authPassUpper'));
+  if(!/[a-záéíóúñ]/.test(p)) m.push(t('authPassLower'));
+  if(!/[0-9]/.test(p)) m.push(t('authPassNum'));
+  if(!/[^A-Za-z0-9]/.test(p)) m.push(t('authPassSym'));
+  return m;
+}
 function authErr(msg){ const e=document.getElementById('authErr'); if(e) e.textContent=msg||''; }
 async function submitAuth(){
   const email=(document.getElementById('authEmail').value||'').trim();
   const pass=(document.getElementById('authPass').value||'');
   authErr('');
   if(!email || !pass){ authErr(t('authFillAll')); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ authErr(t('authBadEmail')); return; }
+  // Al registrarse, exigir contraseña robusta
+  if(authMode==='signup'){
+    const miss=passwordMissing(pass);
+    if(miss.length){ authErr(t('authPassWeak')+miss.join(', ')+'.'); return; }
+  }
   const btn=document.getElementById('authMainBtn');
   btn.disabled=true; const old=btn.textContent; btn.textContent='…';
   try{

@@ -430,6 +430,7 @@ body::after{
 #authFields{width:100%;display:flex;flex-direction:column;gap:11px;margin-bottom:6px}
 .auth-input{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);font-size:15px;font-family:inherit}
 .auth-input:focus{outline:none;border-color:var(--accent)}
+.auth-passhint{font-size:12px;color:var(--muted);line-height:1.4;text-align:left;padding:2px 4px 0}
 .auth-err{width:100%;color:var(--danger);font-size:13px;min-height:18px;margin:6px 0 2px;text-align:left;padding-left:2px}
 #authMainBtn{margin-top:4px}
 .auth-link{background:none;border:none;color:var(--accent);font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:12px 6px;margin-top:2px}
@@ -621,6 +622,7 @@ body::after{
     <div id="authFields">
       <input class="auth-input" id="authEmail" type="email" autocomplete="email" placeholder="email@ejemplo.com">
       <input class="auth-input" id="authPass" type="password" autocomplete="current-password" placeholder="••••••••">
+      <div class="auth-passhint" id="authPassHint" style="display:none"></div>
     </div>
     <div class="auth-err" id="authErr"></div>
     <button class="btn primary block" id="authMainBtn"></button>
