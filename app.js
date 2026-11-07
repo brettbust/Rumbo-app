@@ -1934,6 +1934,7 @@ async function submitAuth(){
     // Entrar: sincronizar y abrir la app
     await syncOnLogin(isSignup);
     document.getElementById('authOverlay').classList.remove('open');
+    if(isSignup) toast(t('authCreatedOk'));   // aviso discreto de que la cuenta se creó
     enterApp();
   } finally { btn.disabled=false; btn.textContent=old; }
 }

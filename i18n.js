@@ -172,6 +172,7 @@ var I18N = {
     signOut: 'Cerrar sesión', deleteAccount: 'Borrar mi cuenta',
     deleteAccountMsg: 'Se borrarán tu cuenta y todas tus metas de la nube. Esta acción no se puede deshacer.',
     account: 'Cuenta', loggedInAs: 'Sesión iniciada como',
+    authCreatedOk: '¡Cuenta creada!',
     signOutMsg: '¿Seguro que quieres cerrar sesión? Tus metas quedan guardadas en la nube.',
     footerCloud: 'Tus metas se sincronizan en la nube con tu cuenta.',
     welNext: 'Siguiente', welSkip: 'Saltar', welStart: 'Empezar',
