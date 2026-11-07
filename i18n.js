@@ -119,6 +119,7 @@ var I18N = {
     importNotSchedule: 'Este archivo no parece un cronograma, así que no puedo crear etapas con él. Sube un documento o imagen con una lista de fechas y temas (por ejemplo, un calendario de clases o un plan de entrenamiento). También puedes crear tu meta a mano o con el generador de IA.',
     importBadFormat: 'Formato no admitido. Usa CSV, Excel, PDF, imagen o Word.',
     importReadError: 'No se pudo leer el archivo:', importMore: 'más…',
+    previewShowAll: 'Ver todas', previewShowLess: 'Ver menos',
     reminderBody: '¿Ya avanzaste hoy en tus metas? Un pequeño paso cuenta.',
     reminderMsgs: [
       'Tienes objetivos sin completar. Sigue avanzando, cada día estás más cerca de tu meta.',

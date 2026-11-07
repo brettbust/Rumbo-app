@@ -107,6 +107,7 @@ Object.assign(I18N, {
     importNotSchedule: "This file doesn't look like a schedule, so I can't create stages from it. Upload a document or image with a list of dates and topics (for example, a class calendar or a training plan). You can also create your goal by hand or with the AI generator.",
     importBadFormat: 'Unsupported format. Use CSV, Excel, PDF, image or Word.',
     importReadError: "Couldn't read the file:", importMore: 'more…',
+    previewShowAll: 'See all', previewShowLess: 'See less',
     reminderBody: 'Have you made progress today? A small step counts.',
     reminderMsgs: [
       'You have goals to finish. Keep going, every day gets you closer.',
@@ -290,6 +291,7 @@ Object.assign(I18N, {
     importNotSchedule: 'Este arquivo não parece um cronograma, então não posso criar etapas com ele. Envie um documento ou imagem com uma lista de datas e temas (por exemplo, um calendário de aulas ou um plano de treino). Você também pode criar sua meta manualmente ou com o gerador de IA.',
     importBadFormat: 'Formato não suportado. Use CSV, Excel, PDF, imagem ou Word.',
     importReadError: 'Não foi possível ler o arquivo:', importMore: 'mais…',
+    previewShowAll: 'Ver todas', previewShowLess: 'Ver menos',
     reminderBody: 'Já avançou hoje nas suas metas? Um pequeno passo conta.',
     reminderMsgs: [
       'Você tem metas por concluir. Continue, cada dia fica mais perto.',
@@ -473,6 +475,7 @@ Object.assign(I18N, {
     importNotSchedule: 'הקובץ הזה לא נראה כמו לוח זמנים, אז אי אפשר ליצור ממנו שלבים. העלה מסמך או תמונה עם רשימת תאריכים ונושאים (למשל לוח שיעורים או תוכנית אימונים). אפשר גם ליצור את המטרה ידנית או בעזרת מחולל ה-AI.',
     importBadFormat: 'פורמט לא נתמך. השתמש ב-CSV, Excel, PDF, תמונה או Word.',
     importReadError: 'לא ניתן לקרוא את הקובץ:', importMore: 'עוד…',
+    previewShowAll: 'הצג הכל', previewShowLess: 'הצג פחות',
     reminderBody: 'התקדמת היום במטרות שלך? צעד קטן נחשב.',
     reminderMsgs: [
       'יש לך מטרות לא גמורות. המשך, כל יום אתה מתקרב.',
@@ -656,6 +659,7 @@ Object.assign(I18N, {
     importNotSchedule: 'لا يبدو هذا الملف جدولًا زمنيًا، لذا لا يمكنني إنشاء مراحل منه. ارفع مستندًا أو صورة تحتوي على قائمة بالتواريخ والمواضيع (مثل جدول حصص أو خطة تدريب). يمكنك أيضًا إنشاء هدفك يدويًا أو باستخدام مولّد الذكاء الاصطناعي.',
     importBadFormat: 'تنسيق غير مدعوم. استخدم CSV أو Excel أو PDF أو صورة أو Word.',
     importReadError: 'تعذر قراءة الملف:', importMore: 'المزيد…',
+    previewShowAll: 'عرض الكل', previewShowLess: 'عرض أقل',
     reminderBody: 'هل تقدمت اليوم في أهدافك؟ خطوة صغيرة تُحتسب.',
     reminderMsgs: [
       'لديك أهداف غير مكتملة. واصل، كل يوم تقترب أكثر.',
@@ -839,6 +843,7 @@ Object.assign(I18N, {
     importNotSchedule: 'Этот файл не похож на расписание, поэтому из него нельзя создать этапы. Загрузите документ или изображение со списком дат и тем (например, календарь занятий или план тренировок). Вы также можете создать цель вручную или с помощью ИИ-генератора.',
     importBadFormat: 'Формат не поддерживается. Используйте CSV, Excel, PDF, изображение или Word.',
     importReadError: 'Не удалось прочитать файл:', importMore: 'ещё…',
+    previewShowAll: 'Показать все', previewShowLess: 'Свернуть',
     reminderBody: 'Вы продвинулись сегодня к целям? Маленький шаг важен.',
     reminderMsgs: [
       'У вас есть незавершённые цели. Продолжайте, с каждым днём вы ближе.',
@@ -1022,6 +1027,7 @@ Object.assign(I18N, {
     importNotSchedule: '这个文件看起来不是日程表，所以无法据此创建阶段。请上传包含日期和主题列表的文档或图片（例如课程表或训练计划）。你也可以手动创建目标，或使用 AI 生成器。',
     importBadFormat: '不支持的格式。请使用 CSV、Excel、PDF、图片或 Word。',
     importReadError: '无法读取文件：', importMore: '更多…',
+    previewShowAll: '查看全部', previewShowLess: '收起',
     reminderBody: '今天你的目标有进展吗？一小步也算数。',
     reminderMsgs: [
       '你还有目标没完成。继续前进，每天都更近一步。',
@@ -1205,6 +1211,7 @@ Object.assign(I18N, {
     importNotSchedule: 'Questo file non sembra un calendario, quindi non posso creare delle tappe. Carica un documento o un\'immagine con un elenco di date e argomenti (ad esempio un calendario di lezioni o un piano di allenamento). Puoi anche creare il tuo obiettivo a mano o con il generatore IA.',
     importBadFormat: 'Formato non supportato. Usa CSV, Excel, PDF, immagine o Word.',
     importReadError: 'Impossibile leggere il file:', importMore: 'altre…',
+    previewShowAll: 'Vedi tutte', previewShowLess: 'Vedi meno',
     reminderBody: 'Hai fatto progressi oggi? Un piccolo passo conta.',
     reminderMsgs: [
       'Hai obiettivi da completare. Continua, ogni giorno sei più vicino.',
@@ -1388,6 +1395,7 @@ Object.assign(I18N, {
     importNotSchedule: 'Ce fichier ne ressemble pas à un calendrier, je ne peux donc pas en créer des étapes. Importez un document ou une image avec une liste de dates et de thèmes (par exemple un calendrier de cours ou un plan d\'entraînement). Vous pouvez aussi créer votre objectif à la main ou avec le générateur IA.',
     importBadFormat: 'Format non pris en charge. Utilisez CSV, Excel, PDF, image ou Word.',
     importReadError: 'Impossible de lire le fichier :', importMore: 'de plus…',
+    previewShowAll: 'Voir tout', previewShowLess: 'Voir moins',
     reminderBody: 'Avez-vous progressé aujourd\'hui ? Un petit pas compte.',
     reminderMsgs: [
       'Vous avez des objectifs à finir. Continuez, chaque jour vous rapproche.',
@@ -1571,6 +1579,7 @@ Object.assign(I18N, {
     importNotSchedule: 'このファイルはスケジュール表ではないようなので、ステージを作成できません。日付とテーマの一覧が入った書類や画像（授業カレンダーやトレーニング計画など）をアップロードしてください。手動またはAIジェネレーターで目標を作ることもできます。',
     importBadFormat: '対応していない形式です。CSV、Excel、PDF、画像、Wordを使ってください。',
     importReadError: 'ファイルを読み込めませんでした：', importMore: 'その他…',
+    previewShowAll: 'すべて表示', previewShowLess: '表示を減らす',
     reminderBody: '今日は目標に向けて進みましたか？小さな一歩も大切です。',
     reminderMsgs: [
       '未完了の目標があります。続けましょう、毎日ゴールに近づきます。',

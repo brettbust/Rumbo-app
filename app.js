@@ -1333,6 +1333,7 @@ function normalizeDate(raw){
 }
 
 /* ---- Mostrar vista previa de etapas importadas ---- */
+let previewExpanded=false;
 function finishImport(stages){
   if(!stages || stages.length===0){
     importStatus(`<div class="import-err">${t('importNoDates')}</div>`);
@@ -1340,11 +1341,27 @@ function finishImport(stages){
   }
   stages.sort((a,b)=>a.date.localeCompare(b.date));
   draftImportStages = stages;
+  previewExpanded=false;   // siempre empieza colapsada
   importStatus(`<div class="import-ok">${icon('calendar',14)} ${t('importFound')} ${stages.length} ${stages.length===1?t('importFoundStage'):t('importFoundStages')}</div>`);
-  const prev = stages.slice(0,8).map(s=>`<div class="prev-row"><span class="prev-date">${fmtDateShort(s.date)}</span><span class="prev-label">${esc(s.label)}</span></div>`).join('');
-  const more = stages.length>8 ? `<div class="prev-more">${stages.length-8} ${t('importMore')}</div>` : '';
-  document.getElementById('importPreview').innerHTML=`<div class="import-prev">${prev}${more}</div>`;
+  renderPreviewRows();
 }
+// Dibuja las etapas; si hay más de 8 y no está expandida, muestra solo 8 + botón "Ver todas"
+function renderPreviewRows(){
+  const stages=draftImportStages||[];
+  const COLLAPSED=8;
+  const showAll = previewExpanded || stages.length<=COLLAPSED;
+  const list = showAll ? stages : stages.slice(0,COLLAPSED);
+  const rows = list.map(s=>`<div class="prev-row"><span class="prev-date">${fmtDateShort(s.date)}</span><span class="prev-label">${esc(s.label)}</span></div>`).join('');
+  let toggle='';
+  if(stages.length>COLLAPSED){
+    toggle = previewExpanded
+      ? `<button type="button" class="prev-toggle" onclick="togglePreview()">${t('previewShowLess')}</button>`
+      : `<button type="button" class="prev-toggle" onclick="togglePreview()">${t('previewShowAll')} (${stages.length})</button>`;
+  }
+  const el=document.getElementById('importPreview');
+  if(el) el.innerHTML=`<div class="import-prev${previewExpanded?' full':''}">${rows}</div>${toggle}`;
+}
+function togglePreview(){ previewExpanded=!previewExpanded; renderPreviewRows(); }
 
 function commitGoal(id, forceDuplicate){
   const title=document.getElementById('fTitle').value.trim();

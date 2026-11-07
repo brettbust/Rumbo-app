@@ -305,7 +305,11 @@ body::after{
 .prev-row:last-child{border-bottom:none}
 .prev-date{color:var(--accent);font-weight:600;flex-shrink:0;min-width:54px}
 .prev-label{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.import-prev.full .prev-label{white-space:normal;overflow:visible;text-overflow:clip}
 .prev-more{padding:9px 13px;font-size:12.5px;color:var(--muted);text-align:center;background:var(--surface-2)}
+.prev-toggle{width:100%;margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--accent);font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s}
+.prev-toggle:active{transform:scale(.98)}
+.prev-toggle:hover{background:var(--accent-soft)}
 
 /* Selector de idioma */
 .lang-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
