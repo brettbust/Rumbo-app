@@ -1919,10 +1919,14 @@ async function submitAuth(){
   authErr('');
   if(!email || !pass){ authErr(t('authFillAll')); return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ authErr(t('authBadEmail')); return; }
-  // Al registrarse, exigir contraseña robusta
+  // Al registrarse, exigir contraseña robusta. Decimos EXACTAMENTE qué falta.
   if(authMode==='signup'){
     const miss=passwordMissing(pass);
-    if(miss.length){ authErr(t('authPassWeak')+miss.join(', ')+'.'); return; }
+    if(miss.length===1){ authErr(t('authPassMissingOne')+' '+miss[0]+'.'); return; }
+    if(miss.length>1){
+      const last=miss.pop();
+      authErr(t('authPassWeak')+miss.join(', ')+' '+t('authPassAnd')+' '+last+'.'); return;
+    }
   }
   const btn=document.getElementById('authMainBtn');
   btn.disabled=true; const old=btn.textContent; btn.textContent='…';
