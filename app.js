@@ -95,7 +95,8 @@ const ICONS = {
   trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
   calClock:'<path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5.5"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="18" cy="18" r="4"/><path d="M18 16.5V18l1 1"/>',
   hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
-  pen:'<path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'
+  pen:'<path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  undo:'<path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/>'
 };
 function icon(name,size){
   const s=size||18;
@@ -347,41 +348,123 @@ const MEDAL_ICONS={
   fire:'<path d="M24 10c3 5 8 7 8 14a8 8 0 0 1-16 0c0-3 2-5 3-7 1 3 3 3 3 1 0-3-1-5 2-8z"/>'
 };
 const EMOJI_TO_MEDAL={'🎯':'target','📚':'book','🏃':'run','💪':'muscle','🧠':'brain','💰':'money','🎸':'music','🎨':'art','🧘':'yoga','🌱':'plant','💻':'code','✍️':'pen','🍎':'apple','💧':'water','⭐':'star','🔥':'fire'};
-// una tarjeta de trofeo premium (medalla con icono de línea grabado)
-function trophyCard(tr){
-  const gid = (tr.goalId||'x').replace(/[^a-zA-Z0-9]/g,'');
-  const iconKey = EMOJI_TO_MEDAL[tr.emoji] || 'star';   // estrella de respaldo
+// Dibuja una COPA/TROFEO dorado hermoso con el icono grabado en la copa.
+// size: alto en px. En papelera se usa un poco más pequeño y grisáceo.
+function trophyCupSVG(tr, size){
+  const gid = ((tr.goalId||'x')+'-'+(tr.date||'')).replace(/[^a-zA-Z0-9]/g,'');
+  const iconKey = EMOJI_TO_MEDAL[tr.emoji] || 'star';
   const iconPaths = MEDAL_ICONS[iconKey];
+  const h = size || 104;
+  const w = Math.round(h*0.82);
+  return `<svg viewBox="0 0 100 122" width="${w}" height="${h}">
+    <defs>
+      <linearGradient id="cup-${gid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FFF0C2"/><stop offset=".42" stop-color="#F2C042"/><stop offset="1" stop-color="#B07E1A"/>
+      </linearGradient>
+      <linearGradient id="cupSh-${gid}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset=".35" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- asas -->
+    <path d="M27 20 C9 20 9 48 30 50" fill="none" stroke="url(#cup-${gid})" stroke-width="6" stroke-linecap="round"/>
+    <path d="M73 20 C91 20 91 48 70 50" fill="none" stroke="url(#cup-${gid})" stroke-width="6" stroke-linecap="round"/>
+    <!-- copa (bowl) -->
+    <path d="M24 16 H76 V36 C76 56 65 68 50 68 C35 68 24 56 24 36 Z" fill="url(#cup-${gid})" stroke="#8a6508" stroke-width="1.4"/>
+    <!-- borde superior -->
+    <rect x="21" y="12" width="58" height="7" rx="3.5" fill="url(#cup-${gid})" stroke="#8a6508" stroke-width="1"/>
+    <!-- brillo -->
+    <path d="M30 18 H48 V34 C48 48 42 56 33 58 C29 52 28 42 28 34 Z" fill="url(#cupSh-${gid})"/>
+    <!-- icono grabado -->
+    <g transform="translate(29,22) scale(0.9)" fill="none" stroke="#6a4e08" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity=".92">${iconPaths}</g>
+    <!-- cuello -->
+    <path d="M45 68 H55 L54 78 H46 Z" fill="url(#cup-${gid})" stroke="#8a6508" stroke-width="1"/>
+    <!-- base -->
+    <rect x="38" y="78" width="24" height="7" rx="2.5" fill="url(#cup-${gid})" stroke="#8a6508" stroke-width="1"/>
+    <rect x="30" y="86" width="40" height="10" rx="3.5" fill="url(#cup-${gid})" stroke="#8a6508" stroke-width="1.2"/>
+  </svg>`;
+}
+// una tarjeta de trofeo premium (copa dorada con icono grabado)
+function trophyCard(tr){
   return `<div class="tcard2">
     <button class="tcard2-del" onclick="deleteTrophy('${tr.goalId}','${esc(tr.date)}')" aria-label="${t('delete')}">${icon('trash',14)}</button>
     <span class="tc2-star s1">✦</span><span class="tc2-star s2">✦</span>
-    <div class="tc2-badge">
-      <svg viewBox="0 0 100 112" width="88" height="98">
-        <defs>
-          <linearGradient id="tcg-${gid}" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#FFE9A8"/><stop offset=".5" stop-color="#E8B23A"/><stop offset="1" stop-color="#B8860B"/>
-          </linearGradient>
-        </defs>
-        <path d="M31 76 l-7 32 13 -8 8 11 7 -25z" fill="#C8921E"/>
-        <path d="M69 76 l7 32 -13 -8 -8 11 -7 -25z" fill="#C8921E"/>
-        <circle cx="50" cy="46" r="42" fill="url(#tcg-${gid})"/>
-        <circle cx="50" cy="46" r="42" fill="none" stroke="#fff6d8" stroke-width="2" opacity=".55"/>
-        <circle cx="50" cy="46" r="33" fill="none" stroke="#8a6508" stroke-width="1.5"/>
-        <g transform="translate(26,22)" fill="none" stroke="#5a4208" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${iconPaths}</g>
-      </svg>
-    </div>
+    <div class="tc2-badge">${trophyCupSVG(tr,104)}</div>
     <div class="tc2-name" dir="auto">${esc(capFirst(tr.title))}</div>
     <div class="tc2-date">${fmtDate(tr.date)}</div>
   </div>`;
 }
 function trophyCenterText(tr){ return tr.title; }
+// Borrar un trofeo = enviarlo a la PAPELERA (borrado reversible)
 function deleteTrophy(goalId, date){
   const tr=(data.trophies||[]).find(x=>x.goalId===goalId && x.date===date);
   const name = tr ? tr.title : '';
-  confirmSheet(t('trophyDelTitle'), t('trophyDelMsg1')+' "'+esc(name)+'". '+t('trophyDelMsg2'), t('delete'), ()=>{
+  confirmSheet(t('trophyDelTitle'), t('trophyToTrashMsg1')+' "'+esc(name)+'". '+t('trophyToTrashMsg2'), t('trophyToTrashBtn'), ()=>{
+    if(!Array.isArray(data.trash)) data.trash=[];
+    if(tr){ data.trash.push(Object.assign({}, tr, {trashedAt: todayISO()})); }
     data.trophies = (data.trophies||[]).filter(x=>!(x.goalId===goalId && x.date===date));
     save();
     renderTrophies();
+    toast(t('trophyToTrashDone'));
+  });
+}
+
+/* ---------- PAPELERA DE TROFEOS ---------- */
+function trashList(){
+  return Array.isArray(data.trash)
+    ? data.trash.map((tr,i)=>({tr,i})).sort((a,b)=> (b.tr.trashedAt||'').localeCompare(a.tr.trashedAt||'') || b.i-a.i).map(o=>o.tr)
+    : [];
+}
+function openTrash(){ show('trash'); renderTrash(); }
+function renderTrash(){
+  const el=document.getElementById('trashContent');
+  if(!el) return;
+  const all=trashList();
+  if(all.length===0){
+    el.innerHTML=`<div class="trophy-hero"><h2>${t('trashTitle')}</h2><p>${t('trashSub')}</p></div>
+      <div class="trophy-empty"><div class="trophy-empty-ic">🗑️</div><div class="trophy-empty-tx">${t('trashEmpty')}</div></div>`;
+    return;
+  }
+  let html=`<div class="trophy-hero"><h2>${t('trashTitle')}</h2><p>${t('trashSub')}</p></div>`;
+  html+=`<button class="btn ghost block trash-empty-btn" onclick="emptyTrash()">${icon('trash',16)} ${t('trashEmptyAll')}</button>`;
+  html+=`<div class="trophy-grid">`;
+  all.forEach(tr=>{ html+=trashCard(tr); });
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+function trashCard(tr){
+  return `<div class="tcard2 trashed">
+    <span class="tc2-star s1">✦</span><span class="tc2-star s2">✦</span>
+    <div class="tc2-badge">${trophyCupSVG(tr,92)}</div>
+    <div class="tc2-name" dir="auto">${esc(capFirst(tr.title))}</div>
+    <div class="tc2-date">${fmtDate(tr.date)}</div>
+    <div class="trash-acts">
+      <button class="trash-restore" onclick="restoreTrophy('${tr.goalId}','${esc(tr.date)}')">${icon('undo',14)} ${t('trashRestore')}</button>
+      <button class="trash-del" onclick="purgeTrophy('${tr.goalId}','${esc(tr.date)}')" aria-label="${t('trashDeleteForever')}">${icon('trash',14)}</button>
+    </div>
+  </div>`;
+}
+function restoreTrophy(goalId, date){
+  const tr=(data.trash||[]).find(x=>x.goalId===goalId && x.date===date);
+  if(tr){
+    if(!Array.isArray(data.trophies)) data.trophies=[];
+    const copy=Object.assign({},tr); delete copy.trashedAt;
+    data.trophies.push(copy);
+  }
+  data.trash=(data.trash||[]).filter(x=>!(x.goalId===goalId && x.date===date));
+  save(); renderTrash(); toast(t('trashRestored'));
+}
+function purgeTrophy(goalId, date){
+  const tr=(data.trash||[]).find(x=>x.goalId===goalId && x.date===date);
+  const name=tr?tr.title:'';
+  confirmSheet(t('trashDeleteForever'), t('trashPurgeMsg1')+' "'+esc(name)+'". '+t('trashPurgeMsg2'), t('trashDeleteForever'), ()=>{
+    data.trash=(data.trash||[]).filter(x=>!(x.goalId===goalId && x.date===date));
+    save(); renderTrash();
+  });
+}
+function emptyTrash(){
+  if(!(data.trash||[]).length) return;
+  confirmSheet(t('trashEmptyAll'), t('trashEmptyMsg'), t('trashDeleteForever'), ()=>{
+    data.trash=[]; save(); renderTrash();
   });
 }
 
@@ -1418,6 +1501,7 @@ function celebrateGoal(goalTitle){
   ov.querySelector('.cel-title').textContent=t('celTitle');
   ov.querySelector('.cel-sub').textContent=goalTitle ? `"${goalTitle}"` : '';
   ov.querySelector('.cel-msg').textContent=t('celMsg');
+  ov.querySelector('.cel-see').textContent=t('celSeeTrophy');
   ov.querySelector('.cel-btn').textContent=t('celBtn');
   ov.classList.add('open');
   confetti(); confettiBurst();
@@ -1428,6 +1512,11 @@ function closeCelebrate(){
   const ov=document.getElementById('celebrateOverlay');
   if(ov) ov.classList.remove('open');
   celebrating=false;
+}
+// Desde la celebración, ir directo al salón a ver el trofeo recién ganado
+function seeMyTrophy(){
+  closeCelebrate();
+  show('trophies'); renderTrophies();
 }
 
 /* ---------- settings ---------- */
@@ -1560,7 +1649,9 @@ function openLangPicker(){
     <div style="height:8px"></div><button class="btn ghost block" onclick="closeLang()">${t('cancel')}</button>`;
   document.getElementById('langScrim').classList.add('open');
 }
-function closeLang(){ document.getElementById('langScrim').classList.remove('open'); }
+function closeLang(){ const s=document.getElementById('langScrim'); s.classList.remove('open'); s.classList.remove('above-welcome'); }
+let langFromWelcome=false;
+function openLangFromWelcome(){ langFromWelcome=true; openLangPicker(); document.getElementById('langScrim').classList.add('above-welcome'); }
 function chooseLang(lang){
   setLang(lang);
   data.settings.lang = lang;
@@ -1568,7 +1659,12 @@ function chooseLang(lang){
   applyI18n();
   renderHome();
   closeLang();
-  show('settings');
+  if(langFromWelcome){
+    langFromWelcome=false;
+    renderWelcome();          // re-dibuja la bienvenida en el nuevo idioma
+  } else {
+    show('settings');
+  }
 }
 
 /* ---------- Bienvenida (onboarding) ---------- */
@@ -1604,6 +1700,9 @@ function renderWelcome(){
   document.getElementById('welNext').textContent = last ? t('welStart') : t('welNext');
   const skip=document.getElementById('welSkip');
   skip.textContent=t('welSkip'); skip.style.visibility = last ? 'hidden' : 'visible';
+  // nombre del idioma actual en el selector de la bienvenida
+  const wl=document.getElementById('welLangName');
+  if(wl) wl.textContent = (I18N[CURRENT_LANG]?._name || 'Español');
 }
 function nextWelcome(){
   const slides=welSlides();
@@ -1652,11 +1751,13 @@ function tourCloseMode(){
 }
 function renderTourStep(){
   const item=tourItems[tourStep];
-  if(item.before==='closeMode') tourCloseMode();
   // Acción previa a resaltar (abrir el selector de modo para enseñarlo de verdad)
   if(item.action==='openMode'){
     const scrim=document.getElementById('editScrim');
     if(!(scrim && scrim.classList.contains('open'))) chooseNewGoalMode();
+  } else {
+    // Cualquier paso que no sea el del selector debe cerrar el selector si está abierto
+    tourCloseMode();
   }
   // Damos un respiro para que el DOM se acomode tras abrir/cerrar hojas
   setTimeout(()=>positionTour(item),item.action==='openMode'?260:0);
@@ -1672,7 +1773,9 @@ function positionTour(item){
   document.getElementById('tourCount').textContent=(tourStep+1)+' / '+tourItems.length;
   document.getElementById('tourBtn').textContent = last ? t('tourDone') : t('tourNext');
   const skip=document.getElementById('tourSkip');
-  if(skip){ skip.textContent=t('tourSkip'); skip.style.visibility = last ? 'hidden' : 'visible'; }
+  if(skip){ skip.textContent=t('tourSkip'); skip.style.display = (last||tourStep>0) ? 'none' : ''; }
+  const back=document.getElementById('tourBack');
+  if(back){ back.textContent=t('tourBack'); back.style.display = tourStep>0 ? '' : 'none'; }
   const bw=Math.min(300, innerWidth-24);
   const bh=bub.offsetHeight||140;
   if(!el){
@@ -1698,6 +1801,9 @@ function tourNext(){
   if(tourStep < tourItems.length-1){ tourStep++; renderTourStep(); }
   else endTour();
 }
+function tourPrev(){
+  if(tourStep > 0){ tourStep--; renderTourStep(); }
+}
 function endTour(){
   tourCloseMode();
   const ov=document.getElementById('tourOverlay'); if(ov) ov.classList.remove('open');
@@ -1721,6 +1827,8 @@ function init(){
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('trophiesBtn').onclick=()=>{ show('trophies'); renderTrophies(); };
   document.getElementById('trophiesBack').onclick=()=>{ show('home'); renderHome(); };
+  const tb=document.getElementById('trashBtn'); if(tb) tb.onclick=()=>openTrash();
+  const tbk=document.getElementById('trashBack'); if(tbk) tbk.onclick=()=>{ show('trophies'); renderTrophies(); };
   document.getElementById('detailBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('themeSwitch').onclick=toggleTheme;
   document.getElementById('notifSwitch').onclick=toggleNotif;
