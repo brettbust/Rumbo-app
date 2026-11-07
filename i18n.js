@@ -82,6 +82,8 @@ var I18N = {
     aiPlanStagesLabel: 'Tu plan, paso a paso',
     aiPlanNeedText: 'Escribe qué quieres lograr.',
     aiPlanNoStages: 'No pude crear un plan. Prueba a describir la meta de otra forma.',
+    aiRefuseHarmful: 'No podemos ayudarte con esta solicitud. Rumbo es para metas de superación personal.',
+    aiRefuseUnclear: 'No entendimos tu meta. Descríbela con otras palabras, por ejemplo: "aprender a cocinar" o "correr 5K".',
     aiPlanError: 'No se pudo crear el plan. Inténtalo de nuevo.',
     modeAiTitle: 'Crear con IA', modeAiDesc: 'Describe tu meta y la IA arma el plan por ti.',
     modeManualTitle: 'Crear manualmente', modeManualDesc: 'Tú defines las etapas, fechas y detalles.',

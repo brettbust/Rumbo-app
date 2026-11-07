@@ -1223,6 +1223,12 @@ async function generatePlan(){
       body: JSON.stringify({ action:'plan', lang: activeLangName(), goalText, startDate })
     });
     const res = await resp.json();
+    // La IA/servidor rechazó la meta (dañina o sin sentido): mensaje digno, sin detalles
+    if(res.refuse){
+      const msg = res.refuse==='harmful' ? t('aiRefuseHarmful') : t('aiRefuseUnclear');
+      if(statusEl) statusEl.innerHTML=`<div class="import-err">${esc(msg)}</div>`;
+      return;
+    }
     if(res.error){ if(statusEl) statusEl.innerHTML=`<div class="import-err">${esc(res.error)}</div>`; return; }
     const stages = (Array.isArray(res.stages)?res.stages:[])
       .map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||t('stageLabel')).trim()}))
