@@ -1,5 +1,5 @@
-const CACHE='rumbo-v58';
-const ASSETS=['./','./index.html','./app.js','./i18n.js','./i18n-langs.js','./manifest.json','./icon-192.png','./icon-512.png'];
+const CACHE='rumbo-v62';
+const ASSETS=['./','./index.html','./app.js','./auth.js','./i18n.js','./i18n-langs.js','./manifest.json','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });

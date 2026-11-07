@@ -153,7 +153,7 @@ function cleanupBank(){
   });
   if(changed){ try{ save(); }catch(e){} }
 }
-function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast(t('toastNoSpace')); } }
+function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast(t('toastNoSpace')); } if(typeof cloudSync==='function') cloudSync(); }
 
 /* ---------- helpers ---------- */
 function uid(){ return 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
@@ -225,12 +225,7 @@ function progressToast(pct, msg){
 }
 
 /* ---------- navigation ---------- */
-function show(view){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+view).classList.add('active');
-  window.scrollTo(0,0);
-  document.getElementById('fab').style.display = view==='home' ? 'flex':'none';
-}
+/* show(view) está definido más abajo (maneja también las pantallas de cuenta) */
 
 /* ---------- ring svg ---------- */
 function ring(pct,size,stroke){
@@ -1695,7 +1690,10 @@ function chooseLang(lang){
   applyI18n();
   renderHome();
   closeLang();
-  if(langFromWelcome){
+  if(langFromAuth){
+    langFromAuth=false;
+    renderAuth();             // re-dibuja la pantalla de cuenta en el nuevo idioma
+  } else if(langFromWelcome){
     langFromWelcome=false;
     renderWelcome();          // re-dibuja la bienvenida en el nuevo idioma
   } else {
@@ -1736,9 +1734,6 @@ function renderWelcome(){
   document.getElementById('welNext').textContent = last ? t('welStart') : t('welNext');
   const skip=document.getElementById('welSkip');
   skip.textContent=t('welSkip'); skip.style.visibility = last ? 'hidden' : 'visible';
-  // nombre del idioma actual en el selector de la bienvenida
-  const wl=document.getElementById('welLangName');
-  if(wl) wl.textContent = (I18N[CURRENT_LANG]?._name || 'Español');
 }
 function nextWelcome(){
   const slides=welSlides();
@@ -1860,6 +1855,81 @@ function endTour(){
 }
 function skipTour(){ endTour(); }
 
+/* ---------- Pantallas de cuenta (login / registro) ---------- */
+let authMode='login';   // 'login' | 'signup'
+function show(view){
+  // Las pantallas de cuenta son overlays, no vistas normales
+  const lo=document.getElementById('loadingOverlay');
+  const ao=document.getElementById('authOverlay');
+  if(view==='loading'){ if(lo) lo.classList.add('open'); return; }
+  if(lo) lo.classList.remove('open');
+  if(view!=='auth' && ao) ao.classList.remove('open');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('view-'+view);
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+  const fab=document.getElementById('fab');
+  if(fab) fab.style.display = view==='home' ? 'flex':'none';
+}
+function showLogin(){
+  authMode='login';
+  const ao=document.getElementById('authOverlay');
+  const lo=document.getElementById('loadingOverlay');
+  if(lo) lo.classList.remove('open');
+  if(ao) ao.classList.add('open');
+  renderAuth();
+}
+function renderAuth(){
+  const signup = authMode==='signup';
+  document.getElementById('authTitle').textContent = signup ? t('authSignupTitle') : t('authLoginTitle');
+  document.getElementById('authSub').textContent   = signup ? t('authSignupSub')   : t('authLoginSub');
+  document.getElementById('authMainBtn').textContent = signup ? t('authSignupBtn') : t('authLoginBtn');
+  document.getElementById('authForgot').textContent = t('authForgot');
+  document.getElementById('authForgot').style.display = signup ? 'none':'';
+  document.getElementById('authOrText').textContent = t('authOr');
+  document.getElementById('authGoogleText').textContent = t('authGoogle');
+  document.getElementById('authFacebookText').textContent = t('authFacebook');
+  document.getElementById('authSwitch').innerHTML = signup
+    ? t('authHaveAccount')+' <b>'+t('authLoginBtn')+'</b>'
+    : t('authNoAccount')+' <b>'+t('authSignupBtn')+'</b>';
+  document.getElementById('authPass').setAttribute('autocomplete', signup?'new-password':'current-password');
+  document.getElementById('authErr').textContent='';
+  const wl=document.getElementById('authLangName'); if(wl) wl.textContent=(I18N[CURRENT_LANG]?._name||'Español');
+}
+function toggleAuthMode(){ authMode = authMode==='login'?'signup':'login'; renderAuth(); }
+function authErr(msg){ const e=document.getElementById('authErr'); if(e) e.textContent=msg||''; }
+async function submitAuth(){
+  const email=(document.getElementById('authEmail').value||'').trim();
+  const pass=(document.getElementById('authPass').value||'');
+  authErr('');
+  if(!email || !pass){ authErr(t('authFillAll')); return; }
+  const btn=document.getElementById('authMainBtn');
+  btn.disabled=true; const old=btn.textContent; btn.textContent='…';
+  try{
+    const res = authMode==='signup' ? await authSignUp(email,pass) : await authSignIn(email,pass);
+    if(res.error){ authErr(res.error); return; }
+    if(res.needsConfirm){ authErr(t('authConfirmEmail')); return; }
+    // Entrar: sincronizar y abrir la app
+    await syncOnLogin();
+    document.getElementById('authOverlay').classList.remove('open');
+    enterApp();
+  } finally { btn.disabled=false; btn.textContent=old; }
+}
+async function authForgotPass(){
+  const email=(document.getElementById('authEmail').value||'').trim();
+  if(!email){ authErr(t('authNeedEmailReset')); return; }
+  const res=await authResetPassword(email);
+  if(res.error){ authErr(res.error); } else { authErr(''); toast(t('authResetSent')); }
+}
+async function authProvider(p){
+  authErr('');
+  const res=await authSignInProvider(p);
+  if(res.error) authErr(res.error);
+  // si ok, el navegador redirige al proveedor
+}
+function openLangFromAuth(){ langFromAuth=true; openLangPicker(); document.getElementById('langScrim').classList.add('above-welcome'); }
+let langFromAuth=false;
+
 function init(){
   load();
   // Idioma: el guardado en ajustes, o el del dispositivo
@@ -1871,7 +1941,7 @@ function init(){
   renderHome();
 
   document.getElementById('fab').onclick=()=>chooseNewGoalMode();
-  document.getElementById('settingsBtn').onclick=()=>show('settings');
+  document.getElementById('settingsBtn').onclick=()=>{ renderAccountRow(); show('settings'); };
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('trophiesBtn').onclick=()=>{ show('trophies'); renderTrophies(); };
   document.getElementById('trophiesBack').onclick=()=>{ show('home'); renderHome(); };
@@ -1907,8 +1977,84 @@ function init(){
   const htb=document.getElementById('howToBtn');
   if(htb) htb.onclick=()=>{ show('home'); renderHome(); setTimeout(()=>startTour(false),350); };
 
-  // Primera vez que el usuario abre la app: bienvenida y, al terminar, la guía de globos.
-  // Si ya vio la bienvenida pero no la guía (p.ej. versión anterior), le mostramos la guía.
+  // ---- Botones de la pantalla de cuenta ----
+  document.getElementById('authMainBtn').onclick=submitAuth;
+  document.getElementById('authForgot').onclick=authForgotPass;
+  document.getElementById('authSwitch').onclick=toggleAuthMode;
+  document.getElementById('authGoogle').onclick=()=>authProvider('google');
+  document.getElementById('authFacebook').onclick=()=>authProvider('facebook');
+  document.getElementById('authPass').addEventListener('keydown',e=>{ if(e.key==='Enter') submitAuth(); });
+
+  // ---- Cerrar sesión y borrar cuenta (Ajustes) ----
+  const soR=document.getElementById('signOutRow');
+  if(soR) soR.onclick=()=>confirmSheet(t('signOut'), t('signOutMsg'), t('signOut'), async()=>{
+    await authSignOut();
+    location.reload();   // volver a la pantalla de login limpia
+  });
+  const daR=document.getElementById('deleteAccountRow');
+  if(daR) daR.onclick=()=>confirmSheet(t('deleteAccount'), t('deleteAccountMsg'), t('deleteAccount'), async()=>{
+    const res=await authDeleteAccount();
+    if(res && res.error){ toast(res.error); return; }
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+    location.reload();
+  });
+
+  // ---- Cuentas: la app requiere iniciar sesión ----
+  bootAuth();
+}
+// Muestra u oculta el bloque de cuenta en Ajustes según haya sesión
+function renderAccountRow(){
+  const grp=document.getElementById('accountGroup');
+  if(!grp) return;
+  if(typeof isLoggedIn==='function' && isLoggedIn()){
+    grp.style.display='';
+    const em=document.getElementById('accountEmail');
+    if(em) em.textContent=userEmail();
+  } else {
+    grp.style.display='none';
+  }
+}
+
+// Arranca la autenticación: si no hay sesión, muestra el login; si la hay, sincroniza.
+async function bootAuth(){
+  show('loading');
+  let user=null;
+  try{ user = await initAuth(); }catch(e){ user=null; }
+  if(!cloudReady){
+    // Sin conexión con el servidor de cuentas: dejamos entrar en modo local para no bloquear.
+    enterApp();
+    return;
+  }
+  if(user){
+    await syncOnLogin();
+    enterApp();
+  } else {
+    showLogin();
+  }
+}
+
+// Tras iniciar sesión: baja los datos de la nube y los funde con lo local.
+async function syncOnLogin(){
+  const cloud = await cloudPull();
+  if(cloud){
+    // La nube manda para metas/trofeos; conservamos ajustes locales de este dispositivo
+    // (tema/idioma) salvo que la nube los tenga.
+    const localSettings = data.settings || {};
+    data.goals = cloud.goals || [];
+    data.trophies = cloud.trophies || [];
+    data.trash = cloud.trash || [];
+    data.settings = Object.assign({}, localSettings, cloud.settings||{});
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
+    setLang(data.settings.lang || CURRENT_LANG);
+    applyI18n(); applyTheme();
+  }
+  // Empuja de vuelta por si había cambios locales previos al login
+  doCloudPush();
+}
+
+// Entra a la app ya autenticado (o en modo local): muestra inicio y onboarding si toca.
+function enterApp(){
+  renderHome(); show('home');
   if(!data.settings.seenWelcome){ setTimeout(showWelcome,300); }
   else if(!data.settings.seenTour){ setTimeout(()=>startTour(true),400); }
 }

@@ -403,7 +403,7 @@ body::after{
 .wel-card{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
 .wel-lang{align-self:flex-end;display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:8px 14px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--shadow);margin-bottom:6px}
 .wel-lang:active{transform:scale(.96)}
-.scrim.above-welcome{z-index:180}
+.scrim.above-welcome{z-index:210}
 .wel-slide{display:flex;flex-direction:column;align-items:center;min-height:340px;justify-content:center}
 .wel-ic{width:110px;height:110px;border-radius:30px;display:flex;align-items:center;justify-content:center;margin-bottom:28px;background:linear-gradient(150deg,#E8A93C,#C98A22);box-shadow:0 16px 40px rgba(232,169,60,.35);animation:welPop .5s cubic-bezier(.2,1.4,.4,1)}
 .wel-ic svg{width:58px;height:58px}
@@ -419,6 +419,29 @@ body::after{
 .wel-skip:hover{color:#F1EFE9}
 .foot-note{text-align:center;font-size:11.5px;color:var(--faint);margin-top:22px;line-height:1.6}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* ---- Pantallas de cuenta (login / carga) ---- */
+.auth-overlay{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;align-items:center;justify-content:center;padding:28px 22px;overflow-y:auto}
+.auth-overlay.open{display:flex}
+.spinner.big{width:34px;height:34px;border-width:3px}
+.auth-card{width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 0}
+.auth-logo{margin-bottom:16px;filter:drop-shadow(0 8px 18px rgba(208,126,26,.3))}
+.auth-title{font-size:25px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.auth-sub{font-size:14.5px;color:var(--muted);line-height:1.5;margin-bottom:22px;max-width:320px}
+#authFields{width:100%;display:flex;flex-direction:column;gap:11px;margin-bottom:6px}
+.auth-input{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);font-size:15px;font-family:inherit}
+.auth-input:focus{outline:none;border-color:var(--accent)}
+.auth-err{width:100%;color:var(--danger);font-size:13px;min-height:18px;margin:6px 0 2px;text-align:left;padding-left:2px}
+#authMainBtn{margin-top:4px}
+.auth-link{background:none;border:none;color:var(--accent);font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;padding:12px 6px;margin-top:2px}
+.auth-divider{display:flex;align-items:center;gap:12px;width:100%;margin:16px 0;color:var(--faint);font-size:12.5px}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.auth-social{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;transition:.15s}
+.auth-social:active{transform:scale(.98)}
+.auth-social:hover{background:var(--accent-soft)}
+.auth-switch{background:none;border:none;color:var(--muted);font-size:14px;font-family:inherit;cursor:pointer;padding:16px 6px 6px}
+.auth-switch b{color:var(--accent);font-weight:700}
+.auth-lang{margin-top:14px}
+.auth-lang button{display:inline-flex;align-items:center;gap:7px;background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;padding:8px}
 </style>
 </head>
 <body>
@@ -455,6 +478,19 @@ body::after{
   <div class="view" id="view-settings">
     <button class="back-btn" id="settingsBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Volver</span></button>
     <h2 style="font-size:22px;font-weight:700;margin:4px 4px 18px" data-i18n="settings">Ajustes</h2>
+    <div class="set-group" id="accountGroup" style="display:none">
+      <div class="set-row">
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div class="txt"><b data-i18n="account">Cuenta</b><span id="accountEmail" style="word-break:break-all"></span></div></div>
+      </div>
+      <div class="set-row" id="signOutRow" style="cursor:pointer">
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><div class="txt"><b data-i18n="signOut">Cerrar sesión</b></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+      <div class="set-row" id="deleteAccountRow" style="cursor:pointer">
+        <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span><div class="txt"><b style="color:var(--danger)" data-i18n="deleteAccount">Borrar mi cuenta</b></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+    </div>
     <div class="set-group">
       <div class="set-row">
         <div class="lft"><span class="ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="0"/><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span><div class="txt"><b data-i18n="darkMode">Tema oscuro</b><span data-i18n="darkModeDesc">Cambia la apariencia</span></div></div>
@@ -491,7 +527,7 @@ body::after{
         <span style="color:var(--muted)">›</span>
       </div>
     </div>
-    <div class="foot-note">Rumbo · <span data-i18n="footer">Tus datos se guardan solo en este dispositivo.</span><br><span data-i18n="version">Versión</span> 1.0</div>
+    <div class="foot-note">Rumbo · <span data-i18n="footerCloud">Tus metas se sincronizan en la nube con tu cuenta.</span><br><span data-i18n="version">Versión</span> 1.0</div>
     <input type="file" id="importFile" accept="application/json" style="display:none">
   </div>
 
@@ -555,10 +591,6 @@ body::after{
 <!-- Bienvenida (onboarding) -->
 <div class="wel-overlay" id="welOverlay">
   <div class="wel-card">
-    <button class="wel-lang" id="welLang" onclick="openLangFromWelcome()">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <span id="welLangName"></span>
-    </button>
     <div class="wel-slide" id="welSlide"></div>
     <div class="wel-dots" id="welDots"></div>
     <div class="wel-actions">
@@ -571,6 +603,40 @@ body::after{
 <!-- Selector de idioma -->
 <div class="scrim" id="langScrim">
   <div class="sheet" id="langSheet"></div>
+</div>
+
+<!-- Pantalla de carga mientras se comprueba la sesión -->
+<div class="auth-overlay" id="loadingOverlay">
+  <div class="auth-loading"><div class="spinner big"></div></div>
+</div>
+
+<!-- Pantalla de inicio de sesión / registro -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg viewBox="0 0 64 64" width="56" height="56"><defs><linearGradient id="alg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0C06A"/><stop offset="1" stop-color="#D4941A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#alg)"/><path d="M32 17 L39 32 L32 27.5 L25 32 Z" fill="#241A06"/><path d="M32 47 L25 32 L32 36.5 L39 32 Z" fill="#fff8e8"/><circle cx="32" cy="32" r="2.4" fill="#241A06"/></svg>
+    </div>
+    <h1 class="auth-title" id="authTitle"></h1>
+    <p class="auth-sub" id="authSub"></p>
+    <div id="authFields">
+      <input class="auth-input" id="authEmail" type="email" autocomplete="email" placeholder="email@ejemplo.com">
+      <input class="auth-input" id="authPass" type="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="btn primary block" id="authMainBtn"></button>
+    <button class="auth-link" id="authForgot"></button>
+    <div class="auth-divider"><span id="authOrText"></span></div>
+    <button class="auth-social" id="authGoogle">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>
+      <span id="authGoogleText"></span>
+    </button>
+    <button class="auth-social" id="authFacebook">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.67 4.53-4.67 1.31 0 2.68.24 2.68.24v2.95h-1.51c-1.49 0-1.95.93-1.95 1.87V12h3.32l-.53 3.47h-2.79v8.38A12 12 0 0 0 24 12z"/></svg>
+      <span id="authFacebookText"></span>
+    </button>
+    <button class="auth-switch" id="authSwitch"></button>
+    <div class="auth-lang"><button id="authLangBtn" onclick="openLangFromAuth()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span id="authLangName"></span></button></div>
+  </div>
 </div>
 
 <script>
@@ -727,6 +793,27 @@ var I18N = {
     ],
     finishMsg: "¡Lo lograste! Completaste tu meta. Date el crédito que mereces. 🎉",
     celTitle: '¡Lo lograste!', celMsg: 'Completaste tu meta. Date el crédito que mereces por cada paso.', celBtn: 'Seguir', celSeeTrophy: 'Ver mi trofeo',
+    authLoginTitle: 'Bienvenido de nuevo', authLoginSub: 'Inicia sesión para acceder a tus metas en cualquier dispositivo.',
+    authSignupTitle: 'Crea tu cuenta', authSignupSub: 'Regístrate para guardar tus metas y verlas en todos tus dispositivos.',
+    authLoginBtn: 'Iniciar sesión', authSignupBtn: 'Crear cuenta',
+    authForgot: '¿Olvidaste tu contraseña?',
+    authOr: 'o', authGoogle: 'Continuar con Google', authFacebook: 'Continuar con Facebook',
+    authNoAccount: '¿No tienes cuenta?', authHaveAccount: '¿Ya tienes cuenta?',
+    authFillAll: 'Escribe tu email y contraseña.',
+    authNeedEmailReset: 'Escribe tu email para recuperar la contraseña.',
+    authResetSent: 'Te enviamos un email para restablecer la contraseña.',
+    authConfirmEmail: 'Revisa tu email para confirmar la cuenta y luego inicia sesión.',
+    authBadLogin: 'Email o contraseña incorrectos.',
+    authEmailTaken: 'Ese email ya está registrado. Inicia sesión.',
+    authWeakPass: 'La contraseña debe tener al menos 6 caracteres.',
+    authBadEmail: 'El email no es válido.',
+    authNoConn: 'No hay conexión con el servidor. Inténtalo más tarde.',
+    authError: 'Algo salió mal. Inténtalo de nuevo.',
+    signOut: 'Cerrar sesión', deleteAccount: 'Borrar mi cuenta',
+    deleteAccountMsg: 'Se borrarán tu cuenta y todas tus metas de la nube. Esta acción no se puede deshacer.',
+    account: 'Cuenta', loggedInAs: 'Sesión iniciada como',
+    signOutMsg: '¿Seguro que quieres cerrar sesión? Tus metas quedan guardadas en la nube.',
+    footerCloud: 'Tus metas se sincronizan en la nube con tu cuenta.',
     welNext: 'Siguiente', welSkip: 'Saltar', welStart: 'Empezar',
     wel1Title: 'Bienvenido a Rumbo', wel1Text: 'Convierte lo que sueñas en logros reales. Define tus metas y avanza hacia ellas, un paso a la vez.',
     wel2Title: 'Mira tu progreso crecer', wel2Text: 'Cada avance llena tu barra y te acerca a la meta. Ver cuánto has recorrido te mantiene en marcha.',
@@ -929,6 +1016,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "You did it! You completed your goal. Give yourself the credit you deserve. 🎉",
     celTitle: 'You did it!', celMsg: 'You completed your goal. Give yourself credit for every step.', celBtn: 'Continue',
+    authLoginTitle: 'Welcome back',
+    authLoginSub: 'Sign in to access your goals on any device.',
+    authSignupTitle: 'Create your account',
+    authSignupSub: 'Sign up to save your goals and see them on all your devices.',
+    authLoginBtn: 'Sign in',
+    authSignupBtn: 'Create account',
+    authForgot: 'Forgot your password?',
+    authOr: 'or',
+    authGoogle: 'Continue with Google',
+    authFacebook: 'Continue with Facebook',
+    authNoAccount: 'Don\'t have an account?',
+    authHaveAccount: 'Already have an account?',
+    authFillAll: 'Enter your email and password.',
+    authNeedEmailReset: 'Enter your email to reset the password.',
+    authResetSent: 'We sent you an email to reset your password.',
+    authConfirmEmail: 'Check your email to confirm your account, then sign in.',
+    authBadLogin: 'Wrong email or password.',
+    authEmailTaken: 'That email is already registered. Sign in.',
+    authWeakPass: 'Password must be at least 6 characters.',
+    authBadEmail: 'The email is not valid.',
+    authNoConn: 'No connection to the server. Try again later.',
+    authError: 'Something went wrong. Try again.',
+    signOut: 'Sign out',
+    deleteAccount: 'Delete my account',
+    deleteAccountMsg: 'Your account and all your goals will be deleted from the cloud. This cannot be undone.',
+    account: 'Account',
+    loggedInAs: 'Signed in as',
+    signOutMsg: 'Sign out? Your goals stay saved in the cloud.',
+    footerCloud: 'Your goals sync to the cloud with your account.',
     welNext: 'Next',
     welSkip: 'Skip',
     welStart: 'Get started',
@@ -1125,6 +1241,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "Você conseguiu! Completou sua meta. Dê a si mesmo o crédito que merece. 🎉",
     celTitle: 'Você conseguiu!', celMsg: 'Completou sua meta. Dê o crédito que merece por cada passo.', celBtn: 'Continuar',
+    authLoginTitle: 'Bem-vindo de volta',
+    authLoginSub: 'Entre para acessar suas metas em qualquer dispositivo.',
+    authSignupTitle: 'Crie sua conta',
+    authSignupSub: 'Cadastre-se para salvar suas metas e ve-las em todos os dispositivos.',
+    authLoginBtn: 'Entrar',
+    authSignupBtn: 'Criar conta',
+    authForgot: 'Esqueceu a senha?',
+    authOr: 'ou',
+    authGoogle: 'Continuar com Google',
+    authFacebook: 'Continuar com Facebook',
+    authNoAccount: 'Nao tem conta?',
+    authHaveAccount: 'Ja tem conta?',
+    authFillAll: 'Digite seu email e senha.',
+    authNeedEmailReset: 'Digite seu email para recuperar a senha.',
+    authResetSent: 'Enviamos um email para redefinir sua senha.',
+    authConfirmEmail: 'Verifique seu email para confirmar a conta e depois entre.',
+    authBadLogin: 'Email ou senha incorretos.',
+    authEmailTaken: 'Esse email ja esta cadastrado. Entre.',
+    authWeakPass: 'A senha deve ter pelo menos 6 caracteres.',
+    authBadEmail: 'O email nao e valido.',
+    authNoConn: 'Sem conexao com o servidor. Tente mais tarde.',
+    authError: 'Algo deu errado. Tente de novo.',
+    signOut: 'Sair',
+    deleteAccount: 'Apagar minha conta',
+    deleteAccountMsg: 'Sua conta e todas as suas metas serao apagadas da nuvem. Isso nao pode ser desfeito.',
+    account: 'Conta',
+    loggedInAs: 'Conectado como',
+    signOutMsg: 'Deseja sair? Suas metas ficam salvas na nuvem.',
+    footerCloud: 'Suas metas sincronizam na nuvem com sua conta.',
     welNext: 'Próximo',
     welSkip: 'Pular',
     welStart: 'Começar',
@@ -1321,6 +1466,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "הצלחת! השלמת את המטרה שלך. תן לעצמך את הקרדיט שמגיע לך. 🎉",
     celTitle: 'הצלחת!', celMsg: 'השלמת את המטרה שלך. מגיע לך קרדיט על כל צעד.', celBtn: 'המשך',
+    authLoginTitle: 'ברוך שובך',
+    authLoginSub: 'התחבר כדי לגשת למטרות שלך בכל מכשיר.',
+    authSignupTitle: 'צור חשבון',
+    authSignupSub: 'הירשם כדי לשמור את המטרות שלך ולראות אותן בכל המכשירים.',
+    authLoginBtn: 'התחבר',
+    authSignupBtn: 'צור חשבון',
+    authForgot: 'שכחת סיסמה?',
+    authOr: 'או',
+    authGoogle: 'המשך עם Google',
+    authFacebook: 'המשך עם Facebook',
+    authNoAccount: 'אין לך חשבון?',
+    authHaveAccount: 'כבר יש לך חשבון?',
+    authFillAll: 'הזן אימייל וסיסמה.',
+    authNeedEmailReset: 'הזן את האימייל שלך לאיפוס הסיסמה.',
+    authResetSent: 'שלחנו לך אימייל לאיפוס הסיסמה.',
+    authConfirmEmail: 'בדוק את האימייל שלך לאישור החשבון ואז התחבר.',
+    authBadLogin: 'אימייל או סיסמה שגויים.',
+    authEmailTaken: 'האימייל כבר רשום. התחבר.',
+    authWeakPass: 'הסיסמה חייבת להכיל לפחות 6 תווים.',
+    authBadEmail: 'האימייל אינו תקין.',
+    authNoConn: 'אין חיבור לשרת. נסה שוב מאוחר יותר.',
+    authError: 'משהו השתבש. נסה שוב.',
+    signOut: 'התנתק',
+    deleteAccount: 'מחק את החשבון שלי',
+    deleteAccountMsg: 'החשבון שלך וכל המטרות שלך יימחקו מהענן. לא ניתן לבטל פעולה זו.',
+    account: 'חשבון',
+    loggedInAs: 'מחובר כ',
+    signOutMsg: 'להתנתק? המטרות שלך נשמרות בענן.',
+    footerCloud: 'המטרות שלך מסתנכרנות בענן עם החשבון שלך.',
     welNext: 'הבא',
     welSkip: 'דלג',
     welStart: 'בואו נתחיל',
@@ -1517,6 +1691,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "لقد نجحت! أكملت هدفك. امنح نفسك التقدير الذي تستحقه. 🎉",
     celTitle: 'لقد نجحت!', celMsg: 'أكملت هدفك. امنح نفسك التقدير عن كل خطوة.', celBtn: 'متابعة',
+    authLoginTitle: 'مرحبًا بعودتك',
+    authLoginSub: 'سجّل الدخول للوصول إلى أهدافك على أي جهاز.',
+    authSignupTitle: 'أنشئ حسابك',
+    authSignupSub: 'سجّل لحفظ أهدافك ورؤيتها على جميع أجهزتك.',
+    authLoginBtn: 'تسجيل الدخول',
+    authSignupBtn: 'إنشاء حساب',
+    authForgot: 'نسيت كلمة المرور؟',
+    authOr: 'أو',
+    authGoogle: 'المتابعة باستخدام Google',
+    authFacebook: 'المتابعة باستخدام Facebook',
+    authNoAccount: 'ليس لديك حساب؟',
+    authHaveAccount: 'لديك حساب بالفعل؟',
+    authFillAll: 'أدخل بريدك الإلكتروني وكلمة المرور.',
+    authNeedEmailReset: 'أدخل بريدك لإعادة تعيين كلمة المرور.',
+    authResetSent: 'أرسلنا لك بريدًا لإعادة تعيين كلمة المرور.',
+    authConfirmEmail: 'تحقق من بريدك لتأكيد الحساب ثم سجّل الدخول.',
+    authBadLogin: 'البريد أو كلمة المرور غير صحيحة.',
+    authEmailTaken: 'هذا البريد مسجّل بالفعل. سجّل الدخول.',
+    authWeakPass: 'يجب أن تكون كلمة المرور 6 أحرف على الأقل.',
+    authBadEmail: 'البريد غير صالح.',
+    authNoConn: 'لا يوجد اتصال بالخادم. حاول لاحقًا.',
+    authError: 'حدث خطأ ما. حاول مجددًا.',
+    signOut: 'تسجيل الخروج',
+    deleteAccount: 'حذف حسابي',
+    deleteAccountMsg: 'سيتم حذف حسابك وجميع أهدافك من السحابة. لا يمكن التراجع عن هذا.',
+    account: 'الحساب',
+    loggedInAs: 'مسجّل الدخول باسم',
+    signOutMsg: 'تسجيل الخروج؟ تبقى أهدافك محفوظة في السحابة.',
+    footerCloud: 'تتزامن أهدافك في السحابة مع حسابك.',
     welNext: 'التالي',
     welSkip: 'تخطٍ',
     welStart: 'ابدأ',
@@ -1713,6 +1916,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "Получилось! Вы достигли цели. Отдайте себе должное. 🎉",
     celTitle: 'Получилось!', celMsg: 'Вы достигли цели. Отдайте себе должное за каждый шаг.', celBtn: 'Продолжить',
+    authLoginTitle: 'С возвращением',
+    authLoginSub: 'Войдите, чтобы получить доступ к целям на любом устройстве.',
+    authSignupTitle: 'Создайте аккаунт',
+    authSignupSub: 'Зарегистрируйтесь, чтобы сохранять цели и видеть их на всех устройствах.',
+    authLoginBtn: 'Войти',
+    authSignupBtn: 'Создать аккаунт',
+    authForgot: 'Забыли пароль?',
+    authOr: 'или',
+    authGoogle: 'Продолжить с Google',
+    authFacebook: 'Продолжить с Facebook',
+    authNoAccount: 'Нет аккаунта?',
+    authHaveAccount: 'Уже есть аккаунт?',
+    authFillAll: 'Введите email и пароль.',
+    authNeedEmailReset: 'Введите email для сброса пароля.',
+    authResetSent: 'Мы отправили письмо для сброса пароля.',
+    authConfirmEmail: 'Проверьте почту, чтобы подтвердить аккаунт, затем войдите.',
+    authBadLogin: 'Неверный email или пароль.',
+    authEmailTaken: 'Этот email уже зарегистрирован. Войдите.',
+    authWeakPass: 'Пароль должен быть не менее 6 символов.',
+    authBadEmail: 'Неверный email.',
+    authNoConn: 'Нет связи с сервером. Повторите позже.',
+    authError: 'Что-то пошло не так. Повторите.',
+    signOut: 'Выйти',
+    deleteAccount: 'Удалить аккаунт',
+    deleteAccountMsg: 'Ваш аккаунт и все цели будут удалены из облака. Это нельзя отменить.',
+    account: 'Аккаунт',
+    loggedInAs: 'Вы вошли как',
+    signOutMsg: 'Выйти? Ваши цели останутся сохранёнными в облаке.',
+    footerCloud: 'Ваши цели синхронизируются в облаке с вашим аккаунтом.',
     welNext: 'Далее',
     welSkip: 'Пропустить',
     welStart: 'Начать',
@@ -1909,6 +2141,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "你做到了！你完成了目标。给自己应得的肯定。🎉",
     celTitle: '你做到了！', celMsg: '你完成了目标。为每一步给自己应得的肯定。', celBtn: '继续',
+    authLoginTitle: '欢迎回来',
+    authLoginSub: '登录即可在任何设备上访问你的目标。',
+    authSignupTitle: '创建账户',
+    authSignupSub: '注册以保存目标并在所有设备上查看。',
+    authLoginBtn: '登录',
+    authSignupBtn: '创建账户',
+    authForgot: '忘记密码？',
+    authOr: '或',
+    authGoogle: '使用 Google 继续',
+    authFacebook: '使用 Facebook 继续',
+    authNoAccount: '还没有账户？',
+    authHaveAccount: '已有账户？',
+    authFillAll: '请输入邮箱和密码。',
+    authNeedEmailReset: '请输入邮箱以重置密码。',
+    authResetSent: '我们已发送重置密码的邮件。',
+    authConfirmEmail: '请查收邮件确认账户，然后登录。',
+    authBadLogin: '邮箱或密码错误。',
+    authEmailTaken: '该邮箱已注册，请登录。',
+    authWeakPass: '密码至少需要 6 个字符。',
+    authBadEmail: '邮箱无效。',
+    authNoConn: '无法连接服务器，请稍后再试。',
+    authError: '出错了，请重试。',
+    signOut: '退出登录',
+    deleteAccount: '删除我的账户',
+    deleteAccountMsg: '你的账户和所有目标将从云端删除，此操作无法撤销。',
+    account: '账户',
+    loggedInAs: '已登录为',
+    signOutMsg: '退出登录？你的目标仍保存在云端。',
+    footerCloud: '你的目标会通过账户同步到云端。',
     welNext: '下一步',
     welSkip: '跳过',
     welStart: '开始',
@@ -2105,6 +2366,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "Ce l'hai fatta! Hai completato il tuo obiettivo. Datti il merito che meriti. 🎉",
     celTitle: 'Ce l\'hai fatta!', celMsg: 'Hai completato il tuo obiettivo. Datti merito per ogni passo.', celBtn: 'Continua',
+    authLoginTitle: 'Bentornato',
+    authLoginSub: 'Accedi per usare i tuoi obiettivi su qualsiasi dispositivo.',
+    authSignupTitle: 'Crea il tuo account',
+    authSignupSub: 'Registrati per salvare i tuoi obiettivi e vederli su tutti i dispositivi.',
+    authLoginBtn: 'Accedi',
+    authSignupBtn: 'Crea account',
+    authForgot: 'Password dimenticata?',
+    authOr: 'o',
+    authGoogle: 'Continua con Google',
+    authFacebook: 'Continua con Facebook',
+    authNoAccount: 'Non hai un account?',
+    authHaveAccount: 'Hai gia un account?',
+    authFillAll: 'Inserisci email e password.',
+    authNeedEmailReset: 'Inserisci la tua email per reimpostare la password.',
+    authResetSent: 'Ti abbiamo inviato un email per reimpostare la password.',
+    authConfirmEmail: 'Controlla l\'email per confermare l\'account, poi accedi.',
+    authBadLogin: 'Email o password errati.',
+    authEmailTaken: 'Questo email e gia registrato. Accedi.',
+    authWeakPass: 'La password deve avere almeno 6 caratteri.',
+    authBadEmail: 'L\'email non e valida.',
+    authNoConn: 'Nessuna connessione al server. Riprova piu tardi.',
+    authError: 'Qualcosa e andato storto. Riprova.',
+    signOut: 'Esci',
+    deleteAccount: 'Elimina il mio account',
+    deleteAccountMsg: 'Il tuo account e tutti i tuoi obiettivi saranno eliminati dal cloud. Non si puo annullare.',
+    account: 'Account',
+    loggedInAs: 'Accesso come',
+    signOutMsg: 'Vuoi uscire? I tuoi obiettivi restano salvati nel cloud.',
+    footerCloud: 'I tuoi obiettivi si sincronizzano nel cloud con il tuo account.',
     welNext: 'Avanti',
     welSkip: 'Salta',
     welStart: 'Inizia',
@@ -2301,6 +2591,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "Vous avez réussi ! Vous avez atteint votre objectif. Accordez-vous le mérite que vous méritez. 🎉",
     celTitle: 'Vous avez réussi !', celMsg: 'Vous avez atteint votre objectif. Félicitez-vous pour chaque pas.', celBtn: 'Continuer',
+    authLoginTitle: 'Bon retour',
+    authLoginSub: 'Connecte-toi pour acceder a tes objectifs sur tout appareil.',
+    authSignupTitle: 'Cree ton compte',
+    authSignupSub: 'Inscris-toi pour enregistrer tes objectifs et les voir sur tous tes appareils.',
+    authLoginBtn: 'Se connecter',
+    authSignupBtn: 'Creer un compte',
+    authForgot: 'Mot de passe oublie ?',
+    authOr: 'ou',
+    authGoogle: 'Continuer avec Google',
+    authFacebook: 'Continuer avec Facebook',
+    authNoAccount: 'Pas de compte ?',
+    authHaveAccount: 'Deja un compte ?',
+    authFillAll: 'Saisis ton email et ton mot de passe.',
+    authNeedEmailReset: 'Saisis ton email pour reinitialiser le mot de passe.',
+    authResetSent: 'Nous avons envoye un email pour reinitialiser ton mot de passe.',
+    authConfirmEmail: 'Verifie ton email pour confirmer le compte, puis connecte-toi.',
+    authBadLogin: 'Email ou mot de passe incorrect.',
+    authEmailTaken: 'Cet email est deja enregistre. Connecte-toi.',
+    authWeakPass: 'Le mot de passe doit faire au moins 6 caracteres.',
+    authBadEmail: 'L\'email n\'est pas valide.',
+    authNoConn: 'Pas de connexion au serveur. Reessaie plus tard.',
+    authError: 'Une erreur s\'est produite. Reessaie.',
+    signOut: 'Se deconnecter',
+    deleteAccount: 'Supprimer mon compte',
+    deleteAccountMsg: 'Ton compte et tous tes objectifs seront supprimes du cloud. Action irreversible.',
+    account: 'Compte',
+    loggedInAs: 'Connecte en tant que',
+    signOutMsg: 'Se deconnecter ? Tes objectifs restent enregistres dans le cloud.',
+    footerCloud: 'Tes objectifs se synchronisent dans le cloud avec ton compte.',
     welNext: 'Suivant',
     welSkip: 'Passer',
     welStart: 'Commencer',
@@ -2497,6 +2816,35 @@ Object.assign(I18N, {
     ],
     finishMsg: "やりました！目標を達成しました。自分に相応しい称賛を。🎉",
     celTitle: 'やりました！', celMsg: '目標を達成しました。一歩ごとに自分を称えましょう。', celBtn: '続ける',
+    authLoginTitle: 'おかえりなさい',
+    authLoginSub: 'ログインすると、どのデバイスでも目標にアクセスできます。',
+    authSignupTitle: 'アカウントを作成',
+    authSignupSub: '登録すると、目標を保存してすべてのデバイスで見られます。',
+    authLoginBtn: 'ログイン',
+    authSignupBtn: 'アカウント作成',
+    authForgot: 'パスワードをお忘れですか？',
+    authOr: 'または',
+    authGoogle: 'Googleで続ける',
+    authFacebook: 'Facebookで続ける',
+    authNoAccount: 'アカウントがありませんか？',
+    authHaveAccount: 'すでにアカウントをお持ちですか？',
+    authFillAll: 'メールとパスワードを入力してください。',
+    authNeedEmailReset: 'パスワード再設定のためメールを入力してください。',
+    authResetSent: 'パスワード再設定のメールを送信しました。',
+    authConfirmEmail: 'メールでアカウントを確認してからログインしてください。',
+    authBadLogin: 'メールまたはパスワードが違います。',
+    authEmailTaken: 'そのメールは登録済みです。ログインしてください。',
+    authWeakPass: 'パスワードは6文字以上必要です。',
+    authBadEmail: 'メールが無効です。',
+    authNoConn: 'サーバーに接続できません。後でもう一度お試しください。',
+    authError: '問題が発生しました。もう一度お試しください。',
+    signOut: 'ログアウト',
+    deleteAccount: 'アカウントを削除',
+    deleteAccountMsg: 'アカウントとすべての目標がクラウドから削除されます。元に戻せません。',
+    account: 'アカウント',
+    loggedInAs: 'ログイン中',
+    signOutMsg: 'ログアウトしますか？目標はクラウドに保存されたままです。',
+    footerCloud: '目標はアカウントでクラウドに同期されます。',
     welNext: '次へ',
     welSkip: 'スキップ',
     welStart: 'はじめる',
@@ -2559,6 +2907,196 @@ Object.assign(I18N, {
     tourEnd: 'これで要点はバッチリ。大切なのは、最初の目標を作り、第一歩を踏み出すこと。始めるのに一番いい時は今日です。'
   }
 });
+
+
+/* auth.js */
+/* ============================================================
+   Rumbo - Cuentas y sincronización con Supabase
+   Carga supabase-js, maneja sesión (login/registro/logout),
+   y sincroniza metas + perfil (ajustes, trofeos, papelera).
+   ============================================================ */
+
+const SUPA_URL = 'https://xdjixzfqkcpscjmwbqeq.supabase.co';
+const SUPA_KEY = 'sb_publishable_UyFCBTK_q_LfcDfLoUm5Bg_DBmt3FIc';
+
+let supa = null;          // cliente supabase
+let currentUser = null;   // usuario logueado (o null)
+let syncTimer = null;     // para agrupar guardados en la nube
+let cloudReady = false;   // supabase-js cargado y cliente creado
+
+// Carga la librería supabase-js desde CDN (una sola vez)
+function loadSupabaseLib(){
+  return new Promise((resolve, reject)=>{
+    if(window.supabase && window.supabase.createClient){ resolve(); return; }
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+    s.onload=()=>resolve();
+    s.onerror=()=>reject(new Error('No se pudo cargar Supabase'));
+    document.head.appendChild(s);
+  });
+}
+
+// Inicializa el cliente y recupera la sesión guardada (si la hay)
+async function initAuth(){
+  try{
+    await loadSupabaseLib();
+    supa = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
+      auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+    });
+    cloudReady = true;
+    // ¿hay sesión activa?
+    const { data:{ session } } = await supa.auth.getSession();
+    currentUser = session ? session.user : null;
+    // reaccionar a cambios de sesión (login social, logout, refresco)
+    supa.auth.onAuthStateChange((_event, sess)=>{
+      currentUser = sess ? sess.user : null;
+    });
+    return currentUser;
+  }catch(e){
+    cloudReady = false;
+    return null;
+  }
+}
+
+function isLoggedIn(){ return !!currentUser; }
+function userEmail(){ return currentUser ? (currentUser.email || '') : ''; }
+
+/* ---------- Autenticación ---------- */
+async function authSignUp(email, password){
+  if(!supa) return { error: t('authNoConn') };
+  const { data, error } = await supa.auth.signUp({ email, password });
+  if(error) return { error: mapAuthError(error) };
+  currentUser = data.user;
+  return { user: data.user, needsConfirm: !data.session };
+}
+async function authSignIn(email, password){
+  if(!supa) return { error: t('authNoConn') };
+  const { data, error } = await supa.auth.signInWithPassword({ email, password });
+  if(error) return { error: mapAuthError(error) };
+  currentUser = data.user;
+  return { user: data.user };
+}
+async function authSignInProvider(provider){
+  if(!supa) return { error: t('authNoConn') };
+  const redirectTo = location.origin + location.pathname;
+  const { error } = await supa.auth.signInWithOAuth({ provider, options:{ redirectTo } });
+  if(error) return { error: mapAuthError(error) };
+  return { ok:true }; // redirige fuera; al volver, initAuth recupera la sesión
+}
+async function authResetPassword(email){
+  if(!supa) return { error: t('authNoConn') };
+  const redirectTo = location.origin + location.pathname;
+  const { error } = await supa.auth.resetPasswordForEmail(email, { redirectTo });
+  if(error) return { error: mapAuthError(error) };
+  return { ok:true };
+}
+async function authSignOut(){
+  if(supa) { try{ await supa.auth.signOut(); }catch(e){} }
+  currentUser = null;
+}
+async function authDeleteAccount(){
+  // Borra las metas y el perfil del usuario (RLS garantiza que solo borra lo suyo).
+  // La cuenta en sí (auth.users) solo se puede borrar desde el servidor; aquí
+  // limpiamos sus datos y cerramos sesión. (Ver nota en la guía.)
+  if(!supa || !currentUser) return { error: t('authNoConn') };
+  try{
+    await supa.from('goals').delete().eq('user_id', currentUser.id);
+    await supa.from('profiles').delete().eq('id', currentUser.id);
+    await supa.auth.signOut();
+    currentUser = null;
+    return { ok:true };
+  }catch(e){ return { error:String(e.message||e) }; }
+}
+
+// Traduce errores comunes de Supabase a mensajes amigables
+function mapAuthError(error){
+  const m=(error && error.message || '').toLowerCase();
+  if(m.includes('invalid login')) return t('authBadLogin');
+  if(m.includes('already registered') || m.includes('already exists')) return t('authEmailTaken');
+  if(m.includes('password')) return t('authWeakPass');
+  if(m.includes('email')) return t('authBadEmail');
+  return (error && error.message) || t('authError');
+}
+
+/* ---------- Sincronización de datos ---------- */
+// Sube el estado local a la nube (metas + perfil). Se agrupa para no spamear.
+function cloudSync(){
+  if(!cloudReady || !currentUser) return;
+  if(syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(doCloudPush, 1200);
+}
+async function doCloudPush(){
+  if(!cloudReady || !currentUser) return;
+  const uid = currentUser.id;
+  try{
+    // Perfil: ajustes, trofeos, papelera
+    await supa.from('profiles').upsert({
+      id: uid,
+      email: currentUser.email || '',
+      settings: data.settings || {},
+      trophies: data.trophies || [],
+      trash: data.trash || [],
+      updated_at: new Date().toISOString()
+    }, { onConflict:'id' });
+    // Metas: una fila por meta
+    const rows = (data.goals||[]).map(g=>goalToRow(g, uid));
+    if(rows.length){
+      await supa.from('goals').upsert(rows, { onConflict:'id' });
+    }
+    // Borrar en la nube las metas que ya no están localmente
+    const localIds = (data.goals||[]).map(g=>g.id);
+    const { data:cloudGoals } = await supa.from('goals').select('id').eq('user_id', uid);
+    if(Array.isArray(cloudGoals)){
+      const toDelete = cloudGoals.map(r=>r.id).filter(id=>!localIds.includes(id));
+      if(toDelete.length) await supa.from('goals').delete().in('id', toDelete);
+    }
+  }catch(e){ /* sin conexión: se reintentará en el próximo save */ }
+}
+// Baja el estado de la nube y lo vuelca en local (al iniciar sesión)
+async function cloudPull(){
+  if(!cloudReady || !currentUser) return false;
+  const uid = currentUser.id;
+  try{
+    const { data:prof } = await supa.from('profiles').select('*').eq('id', uid).maybeSingle();
+    const { data:goals } = await supa.from('goals').select('*').eq('user_id', uid);
+    const cloudData = {
+      goals: Array.isArray(goals) ? goals.map(rowToGoal) : [],
+      settings: (prof && prof.settings) ? prof.settings : (data.settings||{}),
+      trophies: (prof && Array.isArray(prof.trophies)) ? prof.trophies : [],
+      trash: (prof && Array.isArray(prof.trash)) ? prof.trash : []
+    };
+    return cloudData;
+  }catch(e){ return false; }
+}
+
+// Convierte una meta de la app a una fila de la tabla goals
+function goalToRow(g, uid){
+  return {
+    id: g.id, user_id: uid,
+    title: g.title||'', emoji: g.emoji||'🎯', type: g.type||'days',
+    freq: g.freq||null, weekdays: g.weekdays||[],
+    start_date: g.startDate||null, end_date: g.endDate||null,
+    days: g.days||[], target: (g.target!==undefined?g.target:null),
+    unit: g.unit||null, current: (g.current||0), celebrated: !!g.celebrated,
+    updated_at: new Date().toISOString()
+  };
+}
+// Convierte una fila de la tabla goals a una meta de la app
+function rowToGoal(r){
+  const g = {
+    id: r.id, title: r.title||'', emoji: r.emoji||'🎯', type: r.type||'days',
+    startDate: r.start_date||'', endDate: r.end_date||'',
+    celebrated: !!r.celebrated
+  };
+  if(r.type==='number'){
+    g.target = (r.target!==null?Number(r.target):0);
+    g.unit = r.unit||''; g.current = Number(r.current||0);
+  } else {
+    g.freq = r.freq||'daily'; g.weekdays = r.weekdays||[];
+    g.days = Array.isArray(r.days)?r.days:[];
+  }
+  return g;
+}
 
 
 /* app.js */
@@ -2717,7 +3255,7 @@ function cleanupBank(){
   });
   if(changed){ try{ save(); }catch(e){} }
 }
-function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast(t('toastNoSpace')); } }
+function save(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(data)); }catch(e){ toast(t('toastNoSpace')); } if(typeof cloudSync==='function') cloudSync(); }
 
 /* ---------- helpers ---------- */
 function uid(){ return 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
@@ -2789,12 +3327,7 @@ function progressToast(pct, msg){
 }
 
 /* ---------- navigation ---------- */
-function show(view){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+view).classList.add('active');
-  window.scrollTo(0,0);
-  document.getElementById('fab').style.display = view==='home' ? 'flex':'none';
-}
+/* show(view) está definido más abajo (maneja también las pantallas de cuenta) */
 
 /* ---------- ring svg ---------- */
 function ring(pct,size,stroke){
@@ -4259,7 +4792,10 @@ function chooseLang(lang){
   applyI18n();
   renderHome();
   closeLang();
-  if(langFromWelcome){
+  if(langFromAuth){
+    langFromAuth=false;
+    renderAuth();             // re-dibuja la pantalla de cuenta en el nuevo idioma
+  } else if(langFromWelcome){
     langFromWelcome=false;
     renderWelcome();          // re-dibuja la bienvenida en el nuevo idioma
   } else {
@@ -4300,9 +4836,6 @@ function renderWelcome(){
   document.getElementById('welNext').textContent = last ? t('welStart') : t('welNext');
   const skip=document.getElementById('welSkip');
   skip.textContent=t('welSkip'); skip.style.visibility = last ? 'hidden' : 'visible';
-  // nombre del idioma actual en el selector de la bienvenida
-  const wl=document.getElementById('welLangName');
-  if(wl) wl.textContent = (I18N[CURRENT_LANG]?._name || 'Español');
 }
 function nextWelcome(){
   const slides=welSlides();
@@ -4424,6 +4957,81 @@ function endTour(){
 }
 function skipTour(){ endTour(); }
 
+/* ---------- Pantallas de cuenta (login / registro) ---------- */
+let authMode='login';   // 'login' | 'signup'
+function show(view){
+  // Las pantallas de cuenta son overlays, no vistas normales
+  const lo=document.getElementById('loadingOverlay');
+  const ao=document.getElementById('authOverlay');
+  if(view==='loading'){ if(lo) lo.classList.add('open'); return; }
+  if(lo) lo.classList.remove('open');
+  if(view!=='auth' && ao) ao.classList.remove('open');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('view-'+view);
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+  const fab=document.getElementById('fab');
+  if(fab) fab.style.display = view==='home' ? 'flex':'none';
+}
+function showLogin(){
+  authMode='login';
+  const ao=document.getElementById('authOverlay');
+  const lo=document.getElementById('loadingOverlay');
+  if(lo) lo.classList.remove('open');
+  if(ao) ao.classList.add('open');
+  renderAuth();
+}
+function renderAuth(){
+  const signup = authMode==='signup';
+  document.getElementById('authTitle').textContent = signup ? t('authSignupTitle') : t('authLoginTitle');
+  document.getElementById('authSub').textContent   = signup ? t('authSignupSub')   : t('authLoginSub');
+  document.getElementById('authMainBtn').textContent = signup ? t('authSignupBtn') : t('authLoginBtn');
+  document.getElementById('authForgot').textContent = t('authForgot');
+  document.getElementById('authForgot').style.display = signup ? 'none':'';
+  document.getElementById('authOrText').textContent = t('authOr');
+  document.getElementById('authGoogleText').textContent = t('authGoogle');
+  document.getElementById('authFacebookText').textContent = t('authFacebook');
+  document.getElementById('authSwitch').innerHTML = signup
+    ? t('authHaveAccount')+' <b>'+t('authLoginBtn')+'</b>'
+    : t('authNoAccount')+' <b>'+t('authSignupBtn')+'</b>';
+  document.getElementById('authPass').setAttribute('autocomplete', signup?'new-password':'current-password');
+  document.getElementById('authErr').textContent='';
+  const wl=document.getElementById('authLangName'); if(wl) wl.textContent=(I18N[CURRENT_LANG]?._name||'Español');
+}
+function toggleAuthMode(){ authMode = authMode==='login'?'signup':'login'; renderAuth(); }
+function authErr(msg){ const e=document.getElementById('authErr'); if(e) e.textContent=msg||''; }
+async function submitAuth(){
+  const email=(document.getElementById('authEmail').value||'').trim();
+  const pass=(document.getElementById('authPass').value||'');
+  authErr('');
+  if(!email || !pass){ authErr(t('authFillAll')); return; }
+  const btn=document.getElementById('authMainBtn');
+  btn.disabled=true; const old=btn.textContent; btn.textContent='…';
+  try{
+    const res = authMode==='signup' ? await authSignUp(email,pass) : await authSignIn(email,pass);
+    if(res.error){ authErr(res.error); return; }
+    if(res.needsConfirm){ authErr(t('authConfirmEmail')); return; }
+    // Entrar: sincronizar y abrir la app
+    await syncOnLogin();
+    document.getElementById('authOverlay').classList.remove('open');
+    enterApp();
+  } finally { btn.disabled=false; btn.textContent=old; }
+}
+async function authForgotPass(){
+  const email=(document.getElementById('authEmail').value||'').trim();
+  if(!email){ authErr(t('authNeedEmailReset')); return; }
+  const res=await authResetPassword(email);
+  if(res.error){ authErr(res.error); } else { authErr(''); toast(t('authResetSent')); }
+}
+async function authProvider(p){
+  authErr('');
+  const res=await authSignInProvider(p);
+  if(res.error) authErr(res.error);
+  // si ok, el navegador redirige al proveedor
+}
+function openLangFromAuth(){ langFromAuth=true; openLangPicker(); document.getElementById('langScrim').classList.add('above-welcome'); }
+let langFromAuth=false;
+
 function init(){
   load();
   // Idioma: el guardado en ajustes, o el del dispositivo
@@ -4435,7 +5043,7 @@ function init(){
   renderHome();
 
   document.getElementById('fab').onclick=()=>chooseNewGoalMode();
-  document.getElementById('settingsBtn').onclick=()=>show('settings');
+  document.getElementById('settingsBtn').onclick=()=>{ renderAccountRow(); show('settings'); };
   document.getElementById('settingsBack').onclick=()=>{ show('home'); renderHome(); };
   document.getElementById('trophiesBtn').onclick=()=>{ show('trophies'); renderTrophies(); };
   document.getElementById('trophiesBack').onclick=()=>{ show('home'); renderHome(); };
@@ -4471,8 +5079,84 @@ function init(){
   const htb=document.getElementById('howToBtn');
   if(htb) htb.onclick=()=>{ show('home'); renderHome(); setTimeout(()=>startTour(false),350); };
 
-  // Primera vez que el usuario abre la app: bienvenida y, al terminar, la guía de globos.
-  // Si ya vio la bienvenida pero no la guía (p.ej. versión anterior), le mostramos la guía.
+  // ---- Botones de la pantalla de cuenta ----
+  document.getElementById('authMainBtn').onclick=submitAuth;
+  document.getElementById('authForgot').onclick=authForgotPass;
+  document.getElementById('authSwitch').onclick=toggleAuthMode;
+  document.getElementById('authGoogle').onclick=()=>authProvider('google');
+  document.getElementById('authFacebook').onclick=()=>authProvider('facebook');
+  document.getElementById('authPass').addEventListener('keydown',e=>{ if(e.key==='Enter') submitAuth(); });
+
+  // ---- Cerrar sesión y borrar cuenta (Ajustes) ----
+  const soR=document.getElementById('signOutRow');
+  if(soR) soR.onclick=()=>confirmSheet(t('signOut'), t('signOutMsg'), t('signOut'), async()=>{
+    await authSignOut();
+    location.reload();   // volver a la pantalla de login limpia
+  });
+  const daR=document.getElementById('deleteAccountRow');
+  if(daR) daR.onclick=()=>confirmSheet(t('deleteAccount'), t('deleteAccountMsg'), t('deleteAccount'), async()=>{
+    const res=await authDeleteAccount();
+    if(res && res.error){ toast(res.error); return; }
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+    location.reload();
+  });
+
+  // ---- Cuentas: la app requiere iniciar sesión ----
+  bootAuth();
+}
+// Muestra u oculta el bloque de cuenta en Ajustes según haya sesión
+function renderAccountRow(){
+  const grp=document.getElementById('accountGroup');
+  if(!grp) return;
+  if(typeof isLoggedIn==='function' && isLoggedIn()){
+    grp.style.display='';
+    const em=document.getElementById('accountEmail');
+    if(em) em.textContent=userEmail();
+  } else {
+    grp.style.display='none';
+  }
+}
+
+// Arranca la autenticación: si no hay sesión, muestra el login; si la hay, sincroniza.
+async function bootAuth(){
+  show('loading');
+  let user=null;
+  try{ user = await initAuth(); }catch(e){ user=null; }
+  if(!cloudReady){
+    // Sin conexión con el servidor de cuentas: dejamos entrar en modo local para no bloquear.
+    enterApp();
+    return;
+  }
+  if(user){
+    await syncOnLogin();
+    enterApp();
+  } else {
+    showLogin();
+  }
+}
+
+// Tras iniciar sesión: baja los datos de la nube y los funde con lo local.
+async function syncOnLogin(){
+  const cloud = await cloudPull();
+  if(cloud){
+    // La nube manda para metas/trofeos; conservamos ajustes locales de este dispositivo
+    // (tema/idioma) salvo que la nube los tenga.
+    const localSettings = data.settings || {};
+    data.goals = cloud.goals || [];
+    data.trophies = cloud.trophies || [];
+    data.trash = cloud.trash || [];
+    data.settings = Object.assign({}, localSettings, cloud.settings||{});
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
+    setLang(data.settings.lang || CURRENT_LANG);
+    applyI18n(); applyTheme();
+  }
+  // Empuja de vuelta por si había cambios locales previos al login
+  doCloudPush();
+}
+
+// Entra a la app ya autenticado (o en modo local): muestra inicio y onboarding si toca.
+function enterApp(){
+  renderHome(); show('home');
   if(!data.settings.seenWelcome){ setTimeout(showWelcome,300); }
   else if(!data.settings.seenTour){ setTimeout(()=>startTour(true),400); }
 }
