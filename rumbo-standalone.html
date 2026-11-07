@@ -5097,11 +5097,12 @@ async function submitAuth(){
   const btn=document.getElementById('authMainBtn');
   btn.disabled=true; const old=btn.textContent; btn.textContent='…';
   try{
-    const res = authMode==='signup' ? await authSignUp(email,pass) : await authSignIn(email,pass);
+    const isSignup = authMode==='signup';
+    const res = isSignup ? await authSignUp(email,pass) : await authSignIn(email,pass);
     if(res.error){ authErr(res.error); return; }
     if(res.needsConfirm){ authErr(t('authConfirmEmail')); return; }
     // Entrar: sincronizar y abrir la app
-    await syncOnLogin();
+    await syncOnLogin(isSignup);
     document.getElementById('authOverlay').classList.remove('open');
     enterApp();
   } finally { btn.disabled=false; btn.textContent=old; }
@@ -5225,16 +5226,23 @@ async function bootAuth(){
 }
 
 // Tras iniciar sesión: baja los datos de la nube y los funde con lo local.
-async function syncOnLogin(){
+// isSignup=true cuando es una cuenta recién creada (debe ver bienvenida + guía).
+async function syncOnLogin(isSignup){
   const cloud = await cloudPull();
   if(cloud){
-    // La nube manda para metas/trofeos; conservamos ajustes locales de este dispositivo
-    // (tema/idioma) salvo que la nube los tenga.
-    const localSettings = data.settings || {};
+    const cloudHasProfile = cloud.settings && Object.keys(cloud.settings).length>0;
+    // La nube manda para metas/trofeos; conservamos tema/idioma local salvo que la nube los tenga.
+    const keepLocal = { theme:(data.settings||{}).theme, lang:(data.settings||{}).lang };
     data.goals = cloud.goals || [];
     data.trophies = cloud.trophies || [];
     data.trash = cloud.trash || [];
-    data.settings = Object.assign({}, localSettings, cloud.settings||{});
+    data.settings = Object.assign({}, keepLocal, cloud.settings||{});
+    // Cuenta nueva (o perfil en la nube sin onboarding): mostrar bienvenida + guía,
+    // sin importar que este dispositivo ya las hubiera visto en pruebas.
+    if(isSignup || !cloudHasProfile){
+      data.settings.seenWelcome = false;
+      data.settings.seenTour = false;
+    }
     try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
     setLang(data.settings.lang || CURRENT_LANG);
     applyI18n(); applyTheme();
