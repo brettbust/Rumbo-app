@@ -162,7 +162,7 @@ var I18N = {
     tourFabTitle: 'Aquí nace todo',
     tourFab: 'Este botón crea una meta nueva. Es el corazón de la app: cada vez que tengas un objetivo, empieza aquí. Toca para ver cómo.',
     tourModeTitle: 'Dos formas de crear',
-    tourMode: 'Puedes crear tu meta a mano, o dejar que la IA arme un plan paso a paso por ti. Si no sabes por dónde empezar, prueba la IA: te sorprenderá.',
+    tourMode: 'Con IA: escribes qué quieres lograr (ej: aprender piano) y la IA arma un plan completo con etapas y fechas; solo lo revisas y creas. Manualmente: tú pones el nombre, el tipo de meta, las fechas y los detalles a tu gusto. Si no sabes por dónde empezar, prueba la IA.',
     tourTypeTitle: 'Elige el tipo de meta',
     tourType: 'Metas de hábito (correr cada día), de cantidad (leer 100 páginas) o de fechas. La app se adapta a cómo mides tu progreso.',
     tourGoalTitle: 'Tu progreso, siempre visible',
