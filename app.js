@@ -1758,6 +1758,7 @@ function finishWelcome(){
 let tourStep=0, tourItems=[], tourFirstRun=false;
 function startTour(firstRun){
   tourFirstRun=!!firstRun;
+  tourSheetState='';
   // Nos aseguramos de arrancar desde Inicio y cerrar cualquier hoja abierta
   closeEdit(); show('home'); renderHome();
   // Recorrido completo: cada paso resalta una parte real y explica para qué sirve.
@@ -1765,16 +1766,20 @@ function startTour(firstRun){
   tourItems=[
     {sel:null,            title:t('tourWelcomeTitle'),  text:t('tourWelcomeText')},
     {sel:'#fab',          title:t('tourFabTitle'),      text:t('tourFab')},
-    {sel:'.mode-choice',  title:t('tourModeTitle'),     text:t('tourMode'),   action:'openMode'},
-    {sel:'#trophiesBtn',  title:t('tourTrophiesTitle'), text:t('tourTrophies'), before:'closeMode'},
+    {sel:'.mode-choice',  title:t('tourModeTitle'),     text:t('tourMode'),      action:'openMode'},
+    // Entramos a CREAR CON IA y explicamos sus partes
+    {sel:'.ai-gen-box',   title:t('tourAiTitle'),       text:t('tourAiBox'),     action:'openAi'},
+    {sel:'#aiGenBtn',     title:t('tourAiBtnTitle'),    text:t('tourAiBtn'),     action:'openAi'},
+    // Entramos a CREAR MANUALMENTE y explicamos cada campo
+    {sel:'#fTitle',       title:t('tourManTitleTitle'), text:t('tourManTitle'),  action:'openManual'},
+    {sel:'.icon-auto-row',title:t('tourManIconTitle'),  text:t('tourManIcon'),   action:'openManual'},
+    {sel:'.type-toggle',  title:t('tourManTypeTitle'),  text:t('tourManType'),   action:'openManual'},
+    {sel:'#typeFields',   title:t('tourManWhenTitle'),  text:t('tourManWhen'),   action:'openManual'},
+    // Volvemos a Inicio y seguimos con el resto
+    {sel:'#trophiesBtn',  title:t('tourTrophiesTitle'), text:t('tourTrophies'),  before:'closeSheet'},
     {sel:'#settingsBtn',  title:t('tourSettingsTitle'), text:t('tourSettings')},
     {sel:null,            title:t('tourEndTitle'),      text:t('tourEnd')}
   ];
-  // Si ya tiene una meta creada, insertamos un paso que la explica (antes de trofeos)
-  const goalEl=document.querySelector('.goal');
-  if(goalEl){
-    tourItems.splice(3,0,{sel:'.goal', title:t('tourGoalTitle'), text:t('tourGoal'), before:'closeMode'});
-  }
   tourStep=0;
   const ov=document.getElementById('tourOverlay');
   if(!ov) return;
@@ -1784,19 +1789,26 @@ function startTour(firstRun){
 function tourCloseMode(){
   const scrim=document.getElementById('editScrim');
   if(scrim && scrim.classList.contains('open')) closeEdit();
+  tourSheetState='';
 }
+let tourSheetState=''; // '', 'mode', 'ai' o 'manual': qué hay abierto ahora en la hoja
 function renderTourStep(){
   const item=tourItems[tourStep];
-  // Acción previa a resaltar (abrir el selector de modo para enseñarlo de verdad)
+  const scrim=document.getElementById('editScrim');
+  const sheetOpen = scrim && scrim.classList.contains('open');
+  let changedSheet=false;
   if(item.action==='openMode'){
-    const scrim=document.getElementById('editScrim');
-    if(!(scrim && scrim.classList.contains('open'))) chooseNewGoalMode();
+    if(!(sheetOpen && tourSheetState==='mode')){ chooseNewGoalMode(); tourSheetState='mode'; changedSheet=true; }
+  } else if(item.action==='openAi'){
+    if(!(sheetOpen && tourSheetState==='ai')){ openEdit(null,'ai'); tourSheetState='ai'; changedSheet=true; }
+  } else if(item.action==='openManual'){
+    if(!(sheetOpen && tourSheetState==='manual')){ openEdit(null,'manual'); tourSheetState='manual'; changedSheet=true; }
   } else {
-    // Cualquier paso que no sea el del selector debe cerrar el selector si está abierto
-    tourCloseMode();
+    // Paso fuera del formulario: cerrar la hoja si está abierta
+    if(sheetOpen){ tourCloseMode(); changedSheet=true; }
   }
-  // Damos un respiro para que el DOM se acomode tras abrir/cerrar hojas
-  setTimeout(()=>positionTour(item),item.action==='openMode'?260:0);
+  // Damos un respiro para que el DOM se acomode tras abrir/cerrar la hoja
+  setTimeout(()=>positionTour(item), changedSheet?280:0);
 }
 function positionTour(item){
   const spot=document.getElementById('tourSpot');
