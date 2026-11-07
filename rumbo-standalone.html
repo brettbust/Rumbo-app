@@ -3252,9 +3252,9 @@ function openEdit(id, mode){
       <button class="btn primary block" id="aiGenBtn" onclick="generatePlan()">${icon('star',16)} ${t('aiPlanBtn')}</button>
       <div id="aiGenStatus"></div>
     </div>
-    <div class="ai-gen-divider"><span>${t('aiPlanOr')}</span></div>
     `}
 
+    <div id="manualFields"${showAi ? ' style="display:none"' : ''}>
     <div class="field"><label>${t('whatAchieve')}</label>
       <input id="fTitle" type="text" maxlength="60" placeholder="${t('goalNamePh')}" value="${g?esc(g.title):''}" oninput="autoIcon(this.value)"></div>
 
@@ -3277,6 +3277,7 @@ function openEdit(id, mode){
 
     <button class="btn primary block" onclick="commitGoal(${editing?`'${id}'`:'null'})">${editing?t('saveChanges'):t('createGoal')}</button>
     <div style="height:8px"></div>
+    </div>
     <button class="btn ghost block" onclick="closeEdit()">${t('cancel')}</button>
   `;
   renderTypeFields(g);
@@ -3635,6 +3636,8 @@ async function generatePlan(){
       .map(s=>({date:normalizeDate(s.date)||s.date, label:(s.label||t('stageLabel')).trim()}))
       .filter(s=>s.date && s.label);
     if(stages.length===0){ if(statusEl) statusEl.innerHTML=`<div class="import-err">${t('aiPlanNoStages')}</div>`; return; }
+    // Mostrar los campos (título, icono, tipo, vista previa) ya rellenos para revisar y crear
+    const mf=document.getElementById('manualFields'); if(mf) mf.style.display='';
     // Rellenar el formulario con el plan y pasarlo a modo "fechas manuales" (cada etapa su fecha)
     if(res.title){ const ft=document.getElementById('fTitle'); if(ft) ft.value=res.title.slice(0,60); }
     if(res.emoji){ draftEmoji=res.emoji; iconUserPicked=true; const pv=document.getElementById('iconPreview'); if(pv) pv.textContent=res.emoji; }
